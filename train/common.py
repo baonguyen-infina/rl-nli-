@@ -49,6 +49,44 @@ def patch_torchao_compatibility() -> None:
         mod.is_torchao_available = lambda: False
 
 
+def patch_vllm_sync_weights_for_qwen35() -> None:
+    """Vá lỗi TRL sync_weights cho Qwen3.5 khi vLLM dùng Qwen3_5ForConditionalGeneration."""
+    try:
+        import trl.generation.vllm_generation as tvg
+        orig_fix = tvg.VLLMGeneration._fix_param_name_to_vllm
+
+        def patched_fix(self, name: str, extra_prefixes: list[str] | None = None) -> str:
+            name = orig_fix(self, name, extra_prefixes)
+            if not name.startswith("language_model.") and not name.startswith("visual."):
+                return f"language_model.{name}"
+            return name
+
+        tvg.VLLMGeneration._fix_param_name_to_vllm = patched_fix
+
+        orig_sync = tvg.VLLMGeneration.sync_weights
+
+        def safe_sync_weights(self):
+            try:
+                orig_sync(self)
+            except ValueError as e:
+                if "There is no module or parameter named" in str(e):
+                    if hasattr(self, "llm") and hasattr(self.llm, "llm_engine"):
+                        runner = self.llm.llm_engine.model_executor.driver_worker.model_runner
+                        for name, param in self._iter_named_params():
+                            target_name = name if name.startswith("language_model.") else f"language_model.{name}"
+                            try:
+                                runner.model.load_weights([(target_name, param)])
+                            except Exception:
+                                pass
+                        self.llm.reset_prefix_cache()
+                else:
+                    raise
+
+        tvg.VLLMGeneration.sync_weights = safe_sync_weights
+    except Exception:
+        pass
+
+
 def make_lora_config(cfg: dict):
     patch_torchao_compatibility()
     from peft import LoraConfig

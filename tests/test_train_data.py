@@ -57,3 +57,39 @@ def test_patch_torchao_compatibility():
         sys.modules.pop("peft.tuners.lora.torchao", None)
         sys.modules.pop("peft.import_utils", None)
         sys.modules.pop("peft", None)
+
+
+def test_patch_vllm_sync_weights_for_qwen35():
+    import sys
+    from types import ModuleType
+    from train.common import patch_vllm_sync_weights_for_qwen35
+
+    # Should run cleanly without trl
+    patch_vllm_sync_weights_for_qwen35()
+
+    # Mock trl.generation.vllm_generation
+    fake_trl = ModuleType("trl")
+    fake_gen = ModuleType("trl.generation")
+    fake_vllm_gen = ModuleType("trl.generation.vllm_generation")
+
+    class FakeVLLMGeneration:
+        def _fix_param_name_to_vllm(self, name: str, extra_prefixes=None):
+            return name
+        def sync_weights(self):
+            pass
+
+    fake_vllm_gen.VLLMGeneration = FakeVLLMGeneration
+    sys.modules["trl"] = fake_trl
+    sys.modules["trl.generation"] = fake_gen
+    sys.modules["trl.generation.vllm_generation"] = fake_vllm_gen
+    try:
+        patch_vllm_sync_weights_for_qwen35()
+        inst = FakeVLLMGeneration()
+        # model.layers should get language_model. prefix
+        assert inst._fix_param_name_to_vllm("model.layers.0.weight") == "language_model.model.layers.0.weight"
+        # already prefixed should not be duplicated
+        assert inst._fix_param_name_to_vllm("language_model.model.layers.0.weight") == "language_model.model.layers.0.weight"
+    finally:
+        sys.modules.pop("trl.generation.vllm_generation", None)
+        sys.modules.pop("trl.generation", None)
+        sys.modules.pop("trl", None)
