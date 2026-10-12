@@ -26,7 +26,7 @@ def _run_sft(run_id, seed, cfg, out):
     for ck in ckpts:
         ev = out / "ckpt_eval" / ck.name
         _predict_cli(run_id, seed, "dev", ev, adapter=ck)
-        scores[ck.name] = read_json(ev / "metrics_dev.json")["accuracy"]
+        scores[ck.name] = read_json(ev / "metrics_dev.json")["macro_f1"]
     best = pick_best(scores)
     write_json(out / "ckpt_scores.json", {"scores": scores, "best": best})
     shutil.copytree(out / "sft_ckpts" / best, out / "best_adapter", dirs_exist_ok=True)
