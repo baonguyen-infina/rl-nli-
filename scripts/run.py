@@ -20,12 +20,22 @@ def _predict_cli(run_id, seed, split, out_dir, adapter=None):
 
 
 def _run_sft(run_id, seed, cfg, out):
-    from train.sft import train_sft
+    from train.sft import pick_best, train_sft
     ckpts = train_sft(cfg, seed, out)
-    best = out / "best_adapter"
-    if not best.exists() and ckpts:
-        best = ckpts[-1]
-    _predict_cli(run_id, seed, "dev", out, adapter=best)
+    if ckpts:
+        scores = {}
+        for ck in ckpts:
+            ev = out / "ckpt_eval" / ck.name
+            _predict_cli(run_id, seed, "dev", ev, adapter=ck)
+            scores[ck.name] = read_json(ev / "metrics_dev.json")["macro_f1"]
+        best = pick_best(scores)
+        write_json(out / "ckpt_scores.json", {"scores": scores, "best": best})
+        shutil.copytree(out / "sft_ckpts" / best, out / "best_adapter", dirs_exist_ok=True)
+        for name in ("predictions_dev.jsonl", "metrics_dev.json"):
+            shutil.copy(out / "ckpt_eval" / best / name, out / name)
+    else:
+        best = out / "best_adapter"
+        _predict_cli(run_id, seed, "dev", out, adapter=best)
 
 
 def _run_encoder(cfg, seed, out):

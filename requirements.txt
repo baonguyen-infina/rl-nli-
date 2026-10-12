@@ -1,13 +1,4 @@
 trl==1.15.0
-# vllm, transformers, peft: pin bản đầu tiên chạy được Qwen3.5-2B ở G0
 vllm
-transformers
 peft
 datasets
-huggingface_hub
-accelerate
-numpy
-scipy
-pyyaml
-matplotlib
-pytest
