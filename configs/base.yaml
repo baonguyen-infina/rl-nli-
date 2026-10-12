@@ -21,6 +21,7 @@ sft:
   max_len: 512
   eval_steps: 100
   save_steps: 100
+  early_stopping_patience: 3
 grpo:
   lr: 1.0e-5
   num_generations: 8

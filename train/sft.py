@@ -81,9 +81,18 @@ def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
         except Exception:
             collator = None
 
+    patience = s.get("early_stopping_patience", 3)
+    callbacks = []
+    try:
+        from transformers import EarlyStoppingCallback
+        callbacks.append(EarlyStoppingCallback(early_stopping_patience=patience))
+    except Exception:
+        pass
+
     kwargs = {
         "model": model, "args": args, "train_dataset": train_ds, "eval_dataset": dev_ds,
         "processing_class": tok, "peft_config": make_lora_config(cfg),
+        "callbacks": callbacks,
     }
     if collator is not None:
         kwargs["data_collator"] = collator
