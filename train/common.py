@@ -25,7 +25,10 @@ def build_sft_dataset(rows: list[dict], fmt: str, guess: bool = False) -> list[d
         rid = r.get("id")
         content = comp_map.get(rid)
         if content is None:
-            content = f"<answer>{r['label']}</answer>"
+            from teacher.generate import synthesize_valid_rationale
+            content = synthesize_valid_rationale(r["premise"], r["hypothesis"], r["label"], fmt)
+            if content is None:
+                content = f"<answer>{r['label']}</answer>"
         if guess and not content.startswith("<guess>"):
             content = f"<guess>{r['label']}</guess>{content}"
         out.append({

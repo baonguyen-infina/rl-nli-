@@ -16,9 +16,11 @@ sft:
   epochs: 5
   warmup_ratio: 0.05
   scheduler: cosine
-  per_device_batch: 8
-  grad_accum: 2
+  per_device_batch: 32
+  grad_accum: 1
   max_len: 512
+  eval_steps: 100
+  save_steps: 100
 grpo:
   lr: 1.0e-5
   num_generations: 8
