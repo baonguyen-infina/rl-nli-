@@ -3,7 +3,9 @@
 from pathlib import Path
 
 from common.io import write_train_log
+from common.labels import LABELS
 from data.prepare import get_rows
+from formats.parser import parse
 from train.common import (build_sft_dataset, load_model_and_tokenizer, make_lora_config,
                           patch_torchao_compatibility)
 
@@ -11,6 +13,87 @@ from train.common import (build_sft_dataset, load_model_and_tokenizer, make_lora
 def pick_best(scores: dict[str, float]) -> str:
     best = max(scores.values())
     return sorted(k for k, v in scores.items() if v == best)[-1]
+
+
+def preprocess_logits_for_metrics(logits, labels):
+    if isinstance(logits, tuple):
+        logits = logits[0]
+    return logits.argmax(dim=-1)
+
+
+def make_compute_metrics(tok, fmt, guess=False):
+    def compute_metrics(eval_pred):
+        preds, labels = eval_pred.predictions, eval_pred.label_ids
+        if isinstance(preds, tuple):
+            preds = preds[0]
+        if isinstance(labels, tuple):
+            labels = labels[0]
+        if hasattr(preds, "shape") and hasattr(labels, "shape") and len(preds.shape) == 2 and len(labels.shape) == 2:
+            preds = preds[:, :-1]
+            labels = labels[:, 1:]
+        golds, predicted_labels, parse_oks = [], [], []
+        for i in range(len(labels)):
+            mask = (labels[i] != -100)
+            if not mask.any():
+                continue
+            pred_toks = preds[i][mask]
+            gold_toks = labels[i][mask]
+            if hasattr(pred_toks, "tolist"):
+                pred_toks = pred_toks.tolist()
+            if hasattr(gold_toks, "tolist"):
+                gold_toks = gold_toks.tolist()
+            pred_text = tok.decode(pred_toks, skip_special_tokens=True).strip()
+            gold_text = tok.decode(gold_toks, skip_special_tokens=True).strip()
+            p_pred = parse(pred_text, fmt, guess)
+            p_gold = parse(gold_text, fmt, guess)
+            gl = p_gold.label
+            if gl is None:
+                for l in LABELS:
+                    if f"<answer>{l}</answer>" in gold_text:
+                        gl = l
+                        break
+            if gl is None:
+                for l in LABELS:
+                    if l in gold_text.lower():
+                        gl = l
+                        break
+            if gl is None:
+                continue
+            golds.append(gl)
+            pl = p_pred.label
+            if pl is None:
+                for l in LABELS:
+                    if f"<answer>{l}</answer>" in pred_text:
+                        pl = l
+                        break
+            if pl is None:
+                for l in LABELS:
+                    if l in pred_text.lower():
+                        pl = l
+                        break
+            predicted_labels.append(pl)
+            parse_oks.append(p_pred.format_ok)
+
+        if not golds:
+            return {"macro_f1": 0.0, "accuracy": 0.0, "parse_rate": 0.0}
+
+        correct = sum(1 for g, p in zip(golds, predicted_labels) if g == p)
+        acc = correct / len(golds)
+        f1s = []
+        for lab in LABELS:
+            tp = sum(1 for g, p in zip(golds, predicted_labels) if g == lab and p == lab)
+            fp = sum(1 for g, p in zip(golds, predicted_labels) if g != lab and p == lab)
+            fn = sum(1 for g, p in zip(golds, predicted_labels) if g == lab and p != lab)
+            denom = 2 * tp + fp + fn
+            f1s.append(2 * tp / denom if denom else 0.0)
+        macro_f1 = sum(f1s) / len(f1s)
+        parse_rate = sum(1 for ok in parse_oks if ok) / len(parse_oks) if parse_oks else 0.0
+        return {
+            "macro_f1": round(macro_f1, 4),
+            "accuracy": round(acc, 4),
+            "parse_rate": round(parse_rate, 4),
+        }
+    return compute_metrics
 
 
 def _make_sft_config(s: dict, seed: int, out_dir: Path):
@@ -27,8 +110,8 @@ def _make_sft_config(s: dict, seed: int, out_dir: Path):
         "save_strategy": "steps", "save_steps": save_steps,
         "save_total_limit": 3,
         "load_best_model_at_end": True,
-        "metric_for_best_model": "eval_loss",
-        "greater_is_better": False,
+        "metric_for_best_model": "eval_macro_f1",
+        "greater_is_better": True,
         "report_to": [],
     }
     ratio = s.get("warmup_ratio", 0.05)
@@ -92,6 +175,8 @@ def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
     kwargs = {
         "model": model, "args": args, "train_dataset": train_ds, "eval_dataset": dev_ds,
         "processing_class": tok, "peft_config": make_lora_config(cfg),
+        "compute_metrics": make_compute_metrics(tok, fmt, guess),
+        "preprocess_logits_for_metrics": preprocess_logits_for_metrics,
         "callbacks": callbacks,
     }
     if collator is not None:
@@ -101,4 +186,13 @@ def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
     trainer.train()
     trainer.save_model(str(out_dir / "best_adapter"))
     write_train_log(trainer.state.log_history, out_dir / "train_log.csv")
+    del trainer, model
+    import gc
+    gc.collect()
+    try:
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    except Exception:
+        pass
     return sorted((out_dir / "sft_ckpts").glob("checkpoint-*"))

@@ -53,3 +53,22 @@ def test_make_sft_config_compatibility():
         assert called_args_v5["warmup_steps"] == 0.03
     finally:
         sys.modules.pop("trl", None)
+
+
+def test_make_compute_metrics():
+    import numpy as np
+    from types import SimpleNamespace
+    from train.sft import make_compute_metrics, preprocess_logits_for_metrics
+
+    class DummyTokenizer:
+        def decode(self, token_ids, skip_special_tokens=True):
+            mapping = {1: "<answer>entailment</answer>", 2: "<answer>neutral</answer>", 3: "<answer>contradiction</answer>"}
+            return mapping.get(int(token_ids[0]), "") if len(token_ids) > 0 else ""
+
+    cm = make_compute_metrics(DummyTokenizer(), "label")
+    preds = np.array([[0, 1, 0, 0], [0, 2, 0, 0], [0, 3, 0, 0]])
+    labels = np.array([[-100, -100, 1, -100], [-100, -100, 2, -100], [-100, -100, 3, -100]])
+    eval_pred = SimpleNamespace(predictions=preds, label_ids=labels)
+    res = cm(eval_pred)
+    assert "macro_f1" in res and "accuracy" in res
+    assert res["accuracy"] == 1.0 and res["macro_f1"] == 1.0
