@@ -28,3 +28,32 @@ def test_grpo_dataset_columns():
 def test_sft_other_formats_not_yet_supported():
     with pytest.raises(NotImplementedError):
         build_sft_dataset(ROWS, "align")
+
+
+def test_patch_torchao_compatibility():
+    import sys
+    from types import ModuleType
+    from train.common import patch_torchao_compatibility
+
+    patch_torchao_compatibility()
+
+    fake_peft = ModuleType("peft")
+    fake_import_utils = ModuleType("peft.import_utils")
+    def buggy_is_torchao_available():
+        raise ImportError("Found an incompatible version of torchao. Found version 0.10.0")
+    fake_import_utils.is_torchao_available = buggy_is_torchao_available
+
+    fake_torchao = ModuleType("peft.tuners.lora.torchao")
+    fake_torchao.is_torchao_available = buggy_is_torchao_available
+
+    sys.modules["peft"] = fake_peft
+    sys.modules["peft.import_utils"] = fake_import_utils
+    sys.modules["peft.tuners.lora.torchao"] = fake_torchao
+    try:
+        patch_torchao_compatibility()
+        assert fake_import_utils.is_torchao_available() is False
+        assert fake_torchao.is_torchao_available() is False
+    finally:
+        sys.modules.pop("peft.tuners.lora.torchao", None)
+        sys.modules.pop("peft.import_utils", None)
+        sys.modules.pop("peft", None)

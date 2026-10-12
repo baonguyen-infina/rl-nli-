@@ -25,7 +25,29 @@ def load_model_and_tokenizer(model_name: str):
     return model, tok
 
 
+def patch_torchao_compatibility() -> None:
+    """Vá lỗi PEFT khi môi trường có torchao không tương thích (< 0.16.0)."""
+    import sys
+    try:
+        import peft.import_utils as piu
+        orig_fn = getattr(piu, "is_torchao_available", None)
+        if orig_fn is not None:
+            def safe_is_torchao_available():
+                try:
+                    return orig_fn()
+                except Exception:
+                    return False
+            piu.is_torchao_available = safe_is_torchao_available
+    except Exception:
+        pass
+
+    mod = sys.modules.get("peft.tuners.lora.torchao")
+    if mod is not None:
+        mod.is_torchao_available = lambda: False
+
+
 def make_lora_config(cfg: dict):
+    patch_torchao_compatibility()
     from peft import LoraConfig
     lo = cfg["lora"]
     return LoraConfig(r=lo["r"], lora_alpha=lo["alpha"], lora_dropout=lo["dropout"],

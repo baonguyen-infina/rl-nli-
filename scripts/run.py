@@ -48,6 +48,11 @@ def _run_encoder(cfg, seed, out):
 
 
 def main(argv=None) -> None:
+    try:
+        from train.common import patch_torchao_compatibility
+        patch_torchao_compatibility()
+    except Exception:
+        pass
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", required=True)
     ap.add_argument("--seed", type=int, default=0)

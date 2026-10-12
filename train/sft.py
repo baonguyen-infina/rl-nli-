@@ -4,7 +4,8 @@ from pathlib import Path
 
 from common.io import write_train_log
 from data.prepare import get_rows
-from train.common import (build_sft_dataset, load_model_and_tokenizer, make_lora_config)
+from train.common import (build_sft_dataset, load_model_and_tokenizer, make_lora_config,
+                          patch_torchao_compatibility)
 
 
 def pick_best(scores: dict[str, float]) -> str:
@@ -13,6 +14,7 @@ def pick_best(scores: dict[str, float]) -> str:
 
 
 def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
+    patch_torchao_compatibility()
     from datasets import Dataset
     from trl import SFTConfig, SFTTrainer
     out_dir = Path(out_dir)

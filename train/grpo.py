@@ -5,10 +5,12 @@ from pathlib import Path
 from common.io import write_train_log
 from data.prepare import get_rows
 from rewards.trl_rewards import make_reward_funcs
-from train.common import (build_grpo_dataset, load_model_and_tokenizer, make_lora_config)
+from train.common import (build_grpo_dataset, load_model_and_tokenizer, make_lora_config,
+                          patch_torchao_compatibility)
 
 
 def train_grpo(cfg: dict, seed: int, out_dir) -> None:
+    patch_torchao_compatibility()
     from datasets import Dataset
     from trl import GRPOConfig, GRPOTrainer
     out_dir = Path(out_dir)
