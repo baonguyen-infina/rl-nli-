@@ -30,7 +30,22 @@ def train_grpo(cfg: dict, seed: int, out_dir) -> None:
         reward_weights=g["reward_weights"], bf16=True, logging_steps=1,
         save_strategy="no", report_to=[],
     )
+    init_run = cfg.get("init_from")
+    if init_run:
+        from common.io import RESULTS
+        from peft import PeftModel
+        candidates = list(RESULTS.glob(f"{init_run}_*_{seed}/best_adapter"))
+        if not candidates:
+            candidates = list(RESULTS.glob(f"{init_run}_*/best_adapter"))
+        if not candidates:
+            raise FileNotFoundError(f"Không tìm thấy adapter khởi tạo từ {init_run} trong results/")
+        model = PeftModel.from_pretrained(model, str(candidates[0]), is_trainable=True)
+        peft_cfg = None
+    else:
+        peft_cfg = make_lora_config(cfg)
+
     trainer = GRPOTrainer(model=model, reward_funcs=make_reward_funcs(fmt, guess), args=args,
-                          train_dataset=ds, processing_class=tok, peft_config=make_lora_config(cfg))
+                          train_dataset=ds, processing_class=tok, peft_config=peft_cfg)
     trainer.train()
+    trainer.save_model(str(out_dir / "best_adapter"))
     write_train_log(trainer.state.log_history, out_dir / "train_log.csv")

@@ -70,7 +70,11 @@ def main(argv=None) -> None:
         _run_sft(a.run, a.seed, cfg, out)
     elif recipe == "grpo":
         from train.grpo import train_grpo
-        train_grpo(cfg, a.seed, out)  # G0: 1 bước; chưa predict
+        train_grpo(cfg, a.seed, out)
+        if a.run != "G0":
+            adapter_path = out / "best_adapter"
+            _predict_cli(a.run, a.seed, cfg["eval"]["split"], out,
+                         adapter=adapter_path if adapter_path.exists() else None)
     elif recipe == "encoder":
         _run_encoder(cfg, a.seed, out)
     else:

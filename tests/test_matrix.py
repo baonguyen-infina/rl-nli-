@@ -4,9 +4,11 @@ from common.io import load_config
 
 
 def test_runs_defined():
-    assert set(RUNS) == {"G0", "E0", "E1", "E2", "E3", "B1"}
+    assert {"G0", "E0", "E1", "E2", "E3", "E8", "E11", "B1"}.issubset(set(RUNS))
     assert [RUNS[k]["format"] for k in ("E0", "E1", "E2")] == ["label", "cot", "align"]
     assert RUNS["E3"]["recipe"] == "sft" and RUNS["E3"]["format"] == "label"
+    assert RUNS["E8"]["recipe"] == "grpo" and RUNS["E8"]["format"] == "align"
+    assert RUNS["E11"]["recipe"] == "grpo" and RUNS["E11"]["format"] == "align" and RUNS["E11"]["init_from"] == "E5"
     assert RUNS["B1"]["recipe"] == "encoder"
     assert all(RUNS[k]["recipe"] == "zs" for k in ("E0", "E1", "E2"))
 
