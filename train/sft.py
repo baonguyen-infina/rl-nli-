@@ -151,6 +151,7 @@ def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
     s = cfg["sft"]
     model, tok = load_model_and_tokenizer(cfg["model"]["name"])
 
+    fmt, guess = cfg["format"], cfg.get("guess", False)
     dev_rows = get_rows("dev")
     train_raw = build_sft_dataset(get_rows("train"), fmt, guess)
     dev_raw = build_sft_dataset(dev_rows, fmt, guess)
