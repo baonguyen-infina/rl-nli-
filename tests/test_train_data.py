@@ -25,9 +25,20 @@ def test_grpo_dataset_columns():
     assert set(ds[0]) == {"prompt", "gold", "premise", "hypothesis"}
 
 
-def test_sft_other_formats_not_yet_supported():
-    with pytest.raises(NotImplementedError):
-        build_sft_dataset(ROWS, "align")
+def test_sft_missing_teacher_raises():
+    from unittest.mock import patch
+    with patch("train.common.ARTIFACTS") as mock_art:
+        mock_art.__truediv__.return_value.__truediv__.return_value.exists.return_value = False
+        with pytest.raises(NotImplementedError):
+            build_sft_dataset(ROWS, "nonexistent_fmt")
+
+
+def test_sft_dataset_align():
+    ds = build_sft_dataset(ROWS, "align")
+    assert "<align>" in ds[0]["completion"][0]["content"]
+    assert "<answer>" in ds[0]["completion"][0]["content"]
+    assert "uit_Adver" not in str(ds)
+    assert "intended" not in str(ds)
 
 
 def test_patch_torchao_compatibility():

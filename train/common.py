@@ -1,14 +1,38 @@
 """Nạp Qwen3.5 phần ngôn ngữ, LoRA (q,k,v,o_proj; in_proj_qkv, in_proj_z, out_proj; gate,up,down_proj), dựng dataset prompt-completion.
 """
+from common.io import ARTIFACTS, read_jsonl
 from formats.prompts import build_messages
 
 
 def build_sft_dataset(rows: list[dict], fmt: str, guess: bool = False) -> list[dict]:
-    if fmt != "label":
-        raise NotImplementedError("SFT cot/align cần rationale từ teacher (giai đoạn G2)")
-    return [{"prompt": build_messages(r["premise"], r["hypothesis"], fmt, guess),
-             "completion": [{"role": "assistant", "content": f"<answer>{r['label']}</answer>"}]}
-            for r in rows]
+    if fmt == "label":
+        return [{"prompt": build_messages(r["premise"], r["hypothesis"], fmt, guess),
+                 "completion": [{"role": "assistant", "content": f"<answer>{r['label']}</answer>"}]}
+                for r in rows]
+
+    teacher_file = ARTIFACTS / "teacher" / f"rationales_{fmt}.jsonl"
+    if not teacher_file.exists():
+        raise NotImplementedError(
+            f"SFT {fmt} cần rationale từ teacher. Không tìm thấy {teacher_file}. "
+            f"Hãy chạy `python -m teacher.generate --format {fmt}` trước."
+        )
+
+    teacher_rows = read_jsonl(teacher_file)
+    comp_map = {r["id"]: r["completion"] for r in teacher_rows if "id" in r and "completion" in r}
+
+    out = []
+    for r in rows:
+        rid = r.get("id")
+        content = comp_map.get(rid)
+        if content is None:
+            content = f"<answer>{r['label']}</answer>"
+        if guess and not content.startswith("<guess>"):
+            content = f"<guess>{r['label']}</guess>{content}"
+        out.append({
+            "prompt": build_messages(r["premise"], r["hypothesis"], fmt, guess),
+            "completion": [{"role": "assistant", "content": content}],
+        })
+    return out
 
 
 def build_grpo_dataset(rows: list[dict], fmt: str, guess: bool = False) -> list[dict]:
