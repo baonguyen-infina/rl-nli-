@@ -1,2 +1,48 @@
 # Hyperparameter chung: LoRA, SFT, GRPO (lr 1e-5, num_generations 8, max_steps 500, beta 0, loss_type dapo...), teacher, eval.
-# TODO: điền theo SPEC.md mục 'Model, hyperparameter và compute'
+# Giá trị đánh dấu [đề xuất] trong spec; sửa ở đây (một chỗ duy nhất), không sửa theo từng run.
+data:
+  dataset: vianli
+  dev_mini_n: 300
+  dev_mini_seed: 42
+model:
+  name: Qwen/Qwen3.5-2B
+lora:
+  r: 32
+  alpha: 64
+  dropout: 0.05
+  target_modules: [q_proj, k_proj, v_proj, o_proj, in_proj_qkv, in_proj_z, out_proj, gate_proj, up_proj, down_proj]
+sft:
+  lr: 2.0e-4
+  epochs: 3
+  warmup_ratio: 0.03
+  scheduler: cosine
+  per_device_batch: 8
+  grad_accum: 4
+  max_len: 1024
+grpo:
+  lr: 1.0e-5
+  num_generations: 8
+  max_steps: 500
+  beta: 0.0
+  loss_type: dapo
+  temperature: 1.0
+  top_p: 1.0
+  per_device_batch: 8
+  grad_accum: 4
+  max_completion_length: 512
+  use_vllm: true
+  vllm_mode: colocate
+  vllm_gpu_memory_utilization: 0.3
+  reward_weights: [1.0, 0.2, 0.3]
+eval:
+  split: dev
+  gpu_memory_utilization: 0.85
+  max_model_len: 2048
+  max_new_tokens: {label: 16, cot: 512, align: 512}
+encoder:
+  name: uitnlp/CafeBERT
+  lr: 2.0e-5
+  epochs: 3
+  batch: 32
+  max_len: 256
+  folds: 5

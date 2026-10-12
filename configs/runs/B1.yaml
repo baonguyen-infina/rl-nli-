@@ -1,0 +1,10 @@
+recipe: encoder
+format: label
+guess: false
+model:
+  name: uitnlp/CafeBERT
+init_from: null
+priority: P1
+seeds:
+- 0
+run_id: B1
