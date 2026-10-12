@@ -28,7 +28,7 @@ def train_grpo(cfg: dict, seed: int, out_dir) -> None:
         max_completion_length=g["max_completion_length"],
         use_vllm=g["use_vllm"], vllm_mode=g["vllm_mode"],
         vllm_gpu_memory_utilization=g["vllm_gpu_memory_utilization"],
-        reward_weights=g["reward_weights"], bf16=True, logging_steps=1,
+        reward_weights=g["reward_weights"], bf16=True, fp16=False, logging_steps=1,
         save_strategy="no", report_to=[],
     )
     init_run = cfg.get("init_from")

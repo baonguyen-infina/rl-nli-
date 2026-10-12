@@ -150,6 +150,7 @@ def generate_rationales(
             llm = LLM(
                 model=model_name,
                 language_model_only=True,
+                dtype="bfloat16",
                 max_model_len=2048,
                 gpu_memory_utilization=0.85,
                 trust_remote_code=True,

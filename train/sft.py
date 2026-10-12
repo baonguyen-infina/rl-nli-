@@ -23,7 +23,7 @@ def _make_sft_config(s: dict, seed: int, out_dir: Path):
         "lr_scheduler_type": s["scheduler"], "per_device_train_batch_size": s["per_device_batch"],
         "per_device_eval_batch_size": s.get("per_device_eval_batch", s["per_device_batch"]),
         "gradient_accumulation_steps": s["grad_accum"], "max_length": s["max_len"],
-        "bf16": True, "logging_steps": 10,
+        "bf16": True, "fp16": False, "logging_steps": 10,
         "save_strategy": "steps", "save_steps": save_steps,
         "save_total_limit": 3,
         "load_best_model_at_end": True,
