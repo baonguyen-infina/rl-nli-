@@ -86,20 +86,54 @@ def make_compute_metrics(tok, fmt, guess=False, dev_golds=None):
 
         correct = sum(1 for g, p in zip(golds, predicted_labels) if g == p and p is not None)
         acc = correct / len(golds)
-        f1s = []
+        precisions, recalls, class_f1s, supports = {}, {}, {}, {}
         for lab in LABELS:
             tp = sum(1 for g, p in zip(golds, predicted_labels) if g == lab and p == lab)
             fp = sum(1 for g, p in zip(golds, predicted_labels) if g != lab and p == lab)
             fn = sum(1 for g, p in zip(golds, predicted_labels) if g == lab and p != lab)
+            supp = tp + fn
+            supports[lab] = supp
+            p = tp / (tp + fp) if (tp + fp) else 0.0
+            r = tp / (tp + fn) if (tp + fn) else 0.0
             denom = 2 * tp + fp + fn
-            f1s.append(2 * tp / denom if denom else 0.0)
-        macro_f1 = sum(f1s) / len(f1s)
+            f1 = 2 * tp / denom if denom else 0.0
+            precisions[lab] = p
+            recalls[lab] = r
+            class_f1s[lab] = f1
+
+        macro_p = sum(precisions.values()) / len(LABELS)
+        macro_r = sum(recalls.values()) / len(LABELS)
+        macro_f1 = sum(class_f1s.values()) / len(LABELS)
         parse_rate = sum(1 for ok in parse_oks if ok) / len(parse_oks) if parse_oks else 0.0
-        return {
+
+        report = (
+            f"\n{'='*70}\n"
+            f"{'CLASSIFICATION REPORT (DEV)':^70}\n"
+            f"{'='*70}\n"
+            f"{'Class':<18} {'Precision':>10} {'Recall':>10} {'F1-Score':>10} {'Support':>12}\n"
+            f"{'-'*70}\n"
+        )
+        for lab in LABELS:
+            report += f"{lab:<18} {precisions[lab]:>10.4f} {recalls[lab]:>10.4f} {class_f1s[lab]:>10.4f} {supports[lab]:>12d}\n"
+        report += (
+            f"{'-'*70}\n"
+            f"{'Macro Avg':<18} {macro_p:>10.4f} {macro_r:>10.4f} {macro_f1:>10.4f} {len(golds):>12d}\n"
+            f"{'Accuracy':<18} {'':>10} {'':>10} {acc:>10.4f} {len(golds):>12d}\n"
+            f"{'Parse Rate':<18} {'':>10} {'':>10} {parse_rate:>10.4f} {len(golds):>12d}\n"
+            f"{'='*70}\n"
+        )
+        print(report)
+
+        out_metrics = {
             "macro_f1": round(macro_f1, 4),
             "accuracy": round(acc, 4),
             "parse_rate": round(parse_rate, 4),
         }
+        for lab in LABELS:
+            out_metrics[f"f1_{lab}"] = round(class_f1s[lab], 4)
+            out_metrics[f"p_{lab}"] = round(precisions[lab], 4)
+            out_metrics[f"r_{lab}"] = round(recalls[lab], 4)
+        return out_metrics
     return compute_metrics
 
 
@@ -117,8 +151,8 @@ def _make_sft_config(s: dict, seed: int, out_dir: Path):
         "save_strategy": "steps", "save_steps": save_steps,
         "save_total_limit": 3,
         "load_best_model_at_end": True,
-        "metric_for_best_model": "eval_macro_f1",
-        "greater_is_better": True,
+        "metric_for_best_model": "eval_loss",
+        "greater_is_better": False,
         "report_to": [],
     }
     ratio = s.get("warmup_ratio", 0.05)

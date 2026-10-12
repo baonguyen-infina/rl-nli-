@@ -45,6 +45,8 @@ def predict_split(cfg: dict, split: str, out_dir, adapter=None) -> dict:
     write_jsonl(out_dir / f"predictions_{split}.jsonl", recs)
     metrics = compute_metrics(recs)
     write_json(out_dir / f"metrics_{split}.json", metrics)
+    if "report" in metrics:
+        print(metrics["report"])
     return metrics
 
 
