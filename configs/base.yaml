@@ -1,0 +1,2 @@
+# Hyperparameter chung: LoRA, SFT, GRPO (lr 1e-5, num_generations 8, max_steps 500, beta 0, loss_type dapo...), teacher, eval.
+# TODO: điền theo SPEC.md mục 'Model, hyperparameter và compute'
