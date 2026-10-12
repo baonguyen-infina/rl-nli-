@@ -21,7 +21,9 @@ def preprocess_logits_for_metrics(logits, labels):
     return logits.argmax(dim=-1)
 
 
-def make_compute_metrics(tok, fmt, guess=False):
+def make_compute_metrics(tok, fmt, guess=False, dev_golds=None):
+    import re
+
     def compute_metrics(eval_pred):
         preds, labels = eval_pred.predictions, eval_pred.label_ids
         if isinstance(preds, tuple):
@@ -33,51 +35,56 @@ def make_compute_metrics(tok, fmt, guess=False):
             labels = labels[:, 1:]
         golds, predicted_labels, parse_oks = [], [], []
         for i in range(len(labels)):
-            mask = (labels[i] != -100)
-            if not mask.any():
-                continue
-            pred_toks = preds[i][mask]
-            gold_toks = labels[i][mask]
-            if hasattr(pred_toks, "tolist"):
-                pred_toks = pred_toks.tolist()
-            if hasattr(gold_toks, "tolist"):
-                gold_toks = gold_toks.tolist()
-            pred_text = tok.decode(pred_toks, skip_special_tokens=True).strip()
-            gold_text = tok.decode(gold_toks, skip_special_tokens=True).strip()
-            p_pred = parse(pred_text, fmt, guess)
-            p_gold = parse(gold_text, fmt, guess)
-            gl = p_gold.label
+            gl = None
+            if dev_golds is not None and i < len(dev_golds):
+                gl = dev_golds[i]
             if gl is None:
-                for l in LABELS:
-                    if f"<answer>{l}</answer>" in gold_text:
-                        gl = l
-                        break
-            if gl is None:
-                for l in LABELS:
-                    if l in gold_text.lower():
-                        gl = l
-                        break
+                mask_g = (labels[i] != -100)
+                if mask_g.any():
+                    gold_toks = labels[i][mask_g]
+                    if hasattr(gold_toks, "tolist"):
+                        gold_toks = gold_toks.tolist()
+                    gold_text = tok.decode(gold_toks, skip_special_tokens=True).strip()
+                    m_gold = re.search(r"<answer>\s*(entailment|neutral|contradiction)\s*</answer>", gold_text)
+                    if m_gold:
+                        gl = m_gold.group(1)
             if gl is None:
                 continue
             golds.append(gl)
+
+            mask_p = (labels[i] != -100)
+            pred_toks = preds[i][mask_p] if mask_p.any() else preds[i]
+            if hasattr(pred_toks, "tolist"):
+                pred_toks = pred_toks.tolist()
+            pred_text = tok.decode(pred_toks, skip_special_tokens=True).strip()
+
+            comp = pred_text
+            if "<|im_start|>assistant" in pred_text:
+                comp = pred_text.split("<|im_start|>assistant")[-1]
+            elif fmt == "align" and "<align>" in pred_text:
+                comp = pred_text[pred_text.rfind("<align>"):]
+            elif fmt == "cot" and "<think>" in pred_text:
+                comp = pred_text[pred_text.rfind("<think>"):]
+            elif fmt == "label" and "<answer>" in pred_text:
+                comp = pred_text[pred_text.rfind("<answer>"):]
+            elif guess and "<guess>" in pred_text:
+                comp = pred_text[pred_text.rfind("<guess>"):]
+            comp = comp.strip()
+
+            p_pred = parse(comp, fmt, guess)
             pl = p_pred.label
+            parse_ok = p_pred.format_ok
             if pl is None:
-                for l in LABELS:
-                    if f"<answer>{l}</answer>" in pred_text:
-                        pl = l
-                        break
-            if pl is None:
-                for l in LABELS:
-                    if l in pred_text.lower():
-                        pl = l
-                        break
+                m_ans = re.search(r"<answer>\s*(entailment|neutral|contradiction)\s*</answer>", comp)
+                if m_ans:
+                    pl = m_ans.group(1)
             predicted_labels.append(pl)
-            parse_oks.append(p_pred.format_ok)
+            parse_oks.append(parse_ok)
 
         if not golds:
             return {"macro_f1": 0.0, "accuracy": 0.0, "parse_rate": 0.0}
 
-        correct = sum(1 for g, p in zip(golds, predicted_labels) if g == p)
+        correct = sum(1 for g, p in zip(golds, predicted_labels) if g == p and p is not None)
         acc = correct / len(golds)
         f1s = []
         for lab in LABELS:
@@ -144,9 +151,10 @@ def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
     s = cfg["sft"]
     model, tok = load_model_and_tokenizer(cfg["model"]["name"])
 
-    fmt, guess = cfg["format"], cfg.get("guess", False)
+    dev_rows = get_rows("dev")
     train_raw = build_sft_dataset(get_rows("train"), fmt, guess)
-    dev_raw = build_sft_dataset(get_rows("dev"), fmt, guess)
+    dev_raw = build_sft_dataset(dev_rows, fmt, guess)
+    dev_golds = [r["label"] for r in dev_rows]
 
     train_ds = Dataset.from_list([{"messages": r["prompt"] + r["completion"]} for r in train_raw])
     dev_ds = Dataset.from_list([{"messages": r["prompt"] + r["completion"]} for r in dev_raw])
@@ -175,7 +183,7 @@ def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
     kwargs = {
         "model": model, "args": args, "train_dataset": train_ds, "eval_dataset": dev_ds,
         "processing_class": tok, "peft_config": make_lora_config(cfg),
-        "compute_metrics": make_compute_metrics(tok, fmt, guess),
+        "compute_metrics": make_compute_metrics(tok, fmt, guess, dev_golds=dev_golds),
         "preprocess_logits_for_metrics": preprocess_logits_for_metrics,
         "callbacks": callbacks,
     }

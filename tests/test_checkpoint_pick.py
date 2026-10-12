@@ -72,3 +72,21 @@ def test_make_compute_metrics():
     res = cm(eval_pred)
     assert "macro_f1" in res and "accuracy" in res
     assert res["accuracy"] == 1.0 and res["macro_f1"] == 1.0
+
+    # Test align format with prompt containing label names
+    class AlignTokenizer:
+        def decode(self, token_ids, skip_special_tokens=True):
+            mapping = {
+                1: 'Prompt: entailment, neutral, contradiction.\n<align>\nH1: "a" <-> "b" | match\n</align>\n<answer>neutral</answer>',
+                2: 'Prompt: entailment, neutral, contradiction.\n<align>\nH1: "a" <-> "b" | match\n</align>\n<answer>contradiction</answer>',
+            }
+            return mapping.get(int(token_ids[0]), "")
+
+    cm_align = make_compute_metrics(AlignTokenizer(), "align", dev_golds=["neutral", "entailment"])
+    preds_align = np.array([[0, 1, 0, 0], [0, 2, 0, 0]])
+    labels_align = np.array([[-100, -100, 1, -100], [-100, -100, 2, -100]])
+    eval_pred_align = SimpleNamespace(predictions=preds_align, label_ids=labels_align)
+    res_align = cm_align(eval_pred_align)
+    # sample 0 matches ('neutral' == 'neutral'), sample 1 differs ('contradiction' != 'entailment')
+    assert res_align["accuracy"] == 0.5
+    assert res_align["parse_rate"] == 1.0
