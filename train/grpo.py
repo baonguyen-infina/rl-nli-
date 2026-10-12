@@ -35,11 +35,14 @@ def train_grpo(cfg: dict, seed: int, out_dir) -> None:
     if init_run:
         from common.io import RESULTS
         from peft import PeftModel
-        candidates = list(RESULTS.glob(f"{init_run}_*_{seed}/best_adapter"))
+        candidates = list(RESULTS.glob(f"{init_run}_*_s{seed}/best_adapter"))
         if not candidates:
             candidates = list(RESULTS.glob(f"{init_run}_*/best_adapter"))
         if not candidates:
-            raise FileNotFoundError(f"Không tìm thấy adapter khởi tạo từ {init_run} trong results/")
+            raise FileNotFoundError(
+                f"Không tìm thấy adapter khởi tạo từ {init_run} trong results/. "
+                f"Bạn cần chạy SFT cho {init_run} trước: `python -m scripts.run --run {init_run} --seed {seed}`"
+            )
         model = PeftModel.from_pretrained(model, str(candidates[0]), is_trainable=True)
         peft_cfg = None
     else:
