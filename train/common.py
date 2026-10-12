@@ -21,7 +21,10 @@ def load_model_and_tokenizer(model_name: str):
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tok = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16)
+    try:
+        model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.bfloat16)
+    except (TypeError, ValueError):
+        model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16)
     return model, tok
 
 
