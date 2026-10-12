@@ -10,7 +10,7 @@ lora:
   r: 32
   alpha: 64
   dropout: 0.05
-  target_modules: [q_proj, k_proj, v_proj, o_proj, in_proj_qkv, in_proj_z, out_proj, gate_proj, up_proj, down_proj]
+  target_modules: [q_proj, k_proj, v_proj, o_proj, qkv_proj, in_proj_qkv, in_proj_qkvz, in_proj_ba, in_proj_z, out_proj, gate_proj, up_proj, gate_up_proj, down_proj]
 sft:
   lr: 2.0e-4
   epochs: 3
