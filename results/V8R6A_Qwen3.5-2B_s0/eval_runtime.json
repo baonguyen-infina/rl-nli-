@@ -1,0 +1,13 @@
+{
+  "protocol": "fixed_single_sequence",
+  "engine_options": {
+    "max_num_seqs": 1,
+    "max_num_batched_tokens": 2048,
+    "enforce_eager": true,
+    "enable_prefix_caching": false,
+    "seed": 0
+  },
+  "temperature": 0.0,
+  "split": "dev",
+  "n": 1000
+}

@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "locked": true,
+  "selection_split": "dev",
+  "report_split": "test",
+  "frozen_at_utc": "2026-10-14T22:18:48.753550+00:00",
+  "lane": "primary",
+  "training_seeds": [
+    0
+  ],
+  "model_revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+  "dataset": {
+    "repo": "uitnlp/ViANLI",
+    "file": "vianli_test.jsonl",
+    "revision": "0fec8d6ecb043a61c609f9b51f80401fdf1e84d3",
+    "expected_n": 1000
+  },
+  "runs": [
+    {
+      "run_id": "HN4R9L",
+      "seed": 0,
+      "model": "Qwen/Qwen3.5-2B",
+      "recipe": "zs",
+      "format": "label",
+      "source_config": {
+        "path": "results/HN4R9L_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "5ddb5540f2a12fcc407eeb9a169bd832e2193911c872817f41e79e64a8c8d028"
+      },
+      "adapter": {
+        "path": "results/N4R9_Qwen3.5-2B_s0/best_adapter",
+        "sha256": "696eaf1beb0e826852142542429b77c536d91143349e25695871c67c9a2a964c"
+      },
+      "training_run": "N4R9",
+      "training_config": {
+        "path": "results/N4R9_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "e9846a33c245205114c204bab1392e5dfc777eb10f80f8d1cd18f8c4dac31790"
+      },
+      "checkpoint": "checkpoint-100",
+      "checkpoint_selection": "full_dev_greedy_macro_f1",
+      "inference_view": "primary_label"
+    },
+    {
+      "run_id": "HN6R11L",
+      "seed": 0,
+      "model": "Qwen/Qwen3.5-2B",
+      "recipe": "zs",
+      "format": "label",
+      "source_config": {
+        "path": "results/HN6R11L_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "7bbe96ce53c25715ca7e990083524afa37f60306ceed9fa6d64b9d3510f00bbb"
+      },
+      "adapter": {
+        "path": "results/N6R11_Qwen3.5-2B_s0/best_adapter",
+        "sha256": "39a974b5630ba25385141c9c8205447a71a7e43ef91bd08d0892daefde363018"
+      },
+      "training_run": "N6R11",
+      "training_config": {
+        "path": "results/N6R11_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "b48110566c10c1c5e190372f562d11837a13d38924d74b6a5b72e4216d1c158f"
+      },
+      "checkpoint": "checkpoint-100",
+      "checkpoint_selection": "full_dev_greedy_macro_f1",
+      "inference_view": "primary_label"
+    },
+    {
+      "run_id": "HN6R11P200L",
+      "seed": 0,
+      "model": "Qwen/Qwen3.5-2B",
+      "recipe": "zs",
+      "format": "label",
+      "source_config": {
+        "path": "results/HN6R11P200L_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "44ff495cc417acaac15dc95a7ff5410c1e7c366766d14b054211ab4a859328af"
+      },
+      "adapter": {
+        "path": "results/N6R11_Qwen3.5-2B_s0/grpo_ckpts/checkpoint-200",
+        "sha256": "c2362a693ca09c9d132dc1dc5f1df461a20fb8981b3b9425a225f1a370fd634c"
+      },
+      "training_run": "N6R11",
+      "training_config": {
+        "path": "results/N6R11_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "b48110566c10c1c5e190372f562d11837a13d38924d74b6a5b72e4216d1c158f"
+      },
+      "checkpoint": "checkpoint-200",
+      "checkpoint_selection": "fixed_prefix_200",
+      "inference_view": "primary_label"
+    },
+    {
+      "run_id": "HN4R9C",
+      "seed": 0,
+      "model": "Qwen/Qwen3.5-2B",
+      "recipe": "zs",
+      "format": "cot",
+      "source_config": {
+        "path": "results/HN4R9C_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "c500dfbcf0b14ef90f8f63d607d81dea7b1affdcaa7aea3bdd7ac87a2429df3c"
+      },
+      "adapter": {
+        "path": "results/N4R9_Qwen3.5-2B_s0/best_adapter",
+        "sha256": "696eaf1beb0e826852142542429b77c536d91143349e25695871c67c9a2a964c"
+      },
+      "training_run": "N4R9",
+      "training_config": {
+        "path": "results/N4R9_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "e9846a33c245205114c204bab1392e5dfc777eb10f80f8d1cd18f8c4dac31790"
+      },
+      "checkpoint": "checkpoint-100",
+      "checkpoint_selection": "full_dev_greedy_macro_f1",
+      "inference_view": "secondary_bounded_reasoning"
+    },
+    {
+      "run_id": "HN6R11C",
+      "seed": 0,
+      "model": "Qwen/Qwen3.5-2B",
+      "recipe": "zs",
+      "format": "cot",
+      "source_config": {
+        "path": "results/HN6R11C_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "1f04ce3bf78ff5a4d29881966fbd2eacd3c4bd877f240c17cb109950a0c92e73"
+      },
+      "adapter": {
+        "path": "results/N6R11_Qwen3.5-2B_s0/best_adapter",
+        "sha256": "39a974b5630ba25385141c9c8205447a71a7e43ef91bd08d0892daefde363018"
+      },
+      "training_run": "N6R11",
+      "training_config": {
+        "path": "results/N6R11_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "b48110566c10c1c5e190372f562d11837a13d38924d74b6a5b72e4216d1c158f"
+      },
+      "checkpoint": "checkpoint-100",
+      "checkpoint_selection": "full_dev_greedy_macro_f1",
+      "inference_view": "secondary_bounded_reasoning"
+    }
+  ],
+  "primary_method": "HN6R11L",
+  "primary_control": "HN1R9L",
+  "rules": "No method,checkpoint,format or hyperparameter updates based on test outcomes. All completed registered views reported."
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "manifest_sha256": "c9b40a3f04e54b8e9849ed3a399bf0516cbc66aa7aa41a542014f8117a5e50e9",
+  "status": "completed",
+  "n": 1000,
+  "artifacts": {
+    "predictions_test.jsonl": "a14e972e7c31e8da7be2ee8d1966a7704280ec805b8988bc5a7a0e2c08f4fce6",
+    "metrics_test.json": "ac64a14d7ab0d36dffc3fa48e5c9b90e5584593de59e9d871955c68f56b698c3",
+    "cost_test.json": "a8a092234c58beec5ca7c80643e5fc465fa1e105f6bc04e0178d684a488313c9"
+  }
+}

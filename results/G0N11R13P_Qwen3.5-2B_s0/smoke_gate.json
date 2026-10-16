@@ -1,0 +1,1 @@
+{"passed": true, "audit": {"policy_norm": 0.008075697059899656, "answer_ce_norm": 0.24785453556980216, "active_tokens": 5528, "ce_tokens": 400, "allocation_norm": 0.297092684956674, "allocation_score_max_difference": 6.722012996673584, "allocation_active_score_max_difference": 0.0, "allocation_groups": 64}, "reference_unchanged": true, "active_dropout_modules": 0}

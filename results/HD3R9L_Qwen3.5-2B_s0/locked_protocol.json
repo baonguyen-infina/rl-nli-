@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "locked": true,
+  "selection_split": "dev",
+  "report_split": "test",
+  "frozen_at_utc": "2026-10-14T22:18:55.777116+00:00",
+  "lane": "warm",
+  "training_seeds": [
+    0
+  ],
+  "model_revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+  "dataset": {
+    "repo": "uitnlp/ViANLI",
+    "file": "vianli_test.jsonl",
+    "revision": "0fec8d6ecb043a61c609f9b51f80401fdf1e84d3",
+    "expected_n": 1000
+  },
+  "runs": [
+    {
+      "run_id": "HD3R9L",
+      "seed": 0,
+      "model": "Qwen/Qwen3.5-2B",
+      "recipe": "zs",
+      "format": "label",
+      "source_config": {
+        "path": "results/HD3R9L_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "04d85d3d81023074af3784b60d3e40efb4198e52a383bbeda0bc14c1e9090cb8"
+      },
+      "adapter": {
+        "path": "results/D3R9_Qwen3.5-2B_s0/best_adapter",
+        "sha256": "38e308e45287bb54da57c01737330ef4b55696ac74be12d45e9bebe0c3c20dfc"
+      },
+      "training_run": "D3R9",
+      "training_config": {
+        "path": "results/D3R9_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "3fb98f0f7a6abb5f87e8f5aba913bdaf07b5c091248cfc8eb7fe9b5f0bc13f25"
+      },
+      "checkpoint": "checkpoint-600",
+      "checkpoint_selection": "full_dev_greedy_macro_f1",
+      "inference_view": "primary_label"
+    },
+    {
+      "run_id": "HN0R11L",
+      "seed": 0,
+      "model": "Qwen/Qwen3.5-2B",
+      "recipe": "zs",
+      "format": "label",
+      "source_config": {
+        "path": "results/HN0R11L_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "2396f1e9f165bc80f8d845ee53434ac9404e0ad246389c5b6141c4c9ba37c051"
+      },
+      "adapter": {
+        "path": "results/N0R11_Qwen3.5-2B_s0/best_adapter",
+        "sha256": "a1a5aff6a3c72c5a66a45cb787fa61fc2dbbe54f4d5cdb58952d2f029ca6598c"
+      },
+      "training_run": "N0R11",
+      "training_config": {
+        "path": "results/N0R11_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "e06e4a97b1ca5486ad201ade5902e4b42008d971f450bb0fa1ac8f28ad0e27b8"
+      },
+      "checkpoint": "checkpoint-100",
+      "checkpoint_selection": "full_dev_greedy_macro_f1",
+      "inference_view": "primary_label"
+    },
+    {
+      "run_id": "HD3R9C",
+      "seed": 0,
+      "model": "Qwen/Qwen3.5-2B",
+      "recipe": "zs",
+      "format": "cot",
+      "source_config": {
+        "path": "results/HD3R9C_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "24353f8b6a48a64e122bebac05ddfbb3e64da0de368c7a8977e2a2648bebc4ed"
+      },
+      "adapter": {
+        "path": "results/D3R9_Qwen3.5-2B_s0/best_adapter",
+        "sha256": "38e308e45287bb54da57c01737330ef4b55696ac74be12d45e9bebe0c3c20dfc"
+      },
+      "training_run": "D3R9",
+      "training_config": {
+        "path": "results/D3R9_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "3fb98f0f7a6abb5f87e8f5aba913bdaf07b5c091248cfc8eb7fe9b5f0bc13f25"
+      },
+      "checkpoint": "checkpoint-600",
+      "checkpoint_selection": "full_dev_greedy_macro_f1",
+      "inference_view": "secondary_bounded_reasoning"
+    },
+    {
+      "run_id": "HN0R11C",
+      "seed": 0,
+      "model": "Qwen/Qwen3.5-2B",
+      "recipe": "zs",
+      "format": "cot",
+      "source_config": {
+        "path": "results/HN0R11C_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "ba57184f00830715f8bf74614ae12e3cca30b677145593c83f117e9aa10c08ca"
+      },
+      "adapter": {
+        "path": "results/N0R11_Qwen3.5-2B_s0/best_adapter",
+        "sha256": "a1a5aff6a3c72c5a66a45cb787fa61fc2dbbe54f4d5cdb58952d2f029ca6598c"
+      },
+      "training_run": "N0R11",
+      "training_config": {
+        "path": "results/N0R11_Qwen3.5-2B_s0/config.yaml",
+        "sha256": "e06e4a97b1ca5486ad201ade5902e4b42008d971f450bb0fa1ac8f28ad0e27b8"
+      },
+      "checkpoint": "checkpoint-100",
+      "checkpoint_selection": "full_dev_greedy_macro_f1",
+      "inference_view": "secondary_bounded_reasoning"
+    }
+  ],
+  "primary_method": "HN6R11L",
+  "primary_control": "HN1R9L",
+  "rules": "No method,checkpoint,format or hyperparameter updates based on test outcomes. All completed registered views reported."
+}

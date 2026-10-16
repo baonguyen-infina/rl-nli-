@@ -1,0 +1,8 @@
+{
+  "mean": 1.0,
+  "std": 0.5533089637756348,
+  "max": 7.755810737609863,
+  "min": 0.3511476516723633,
+  "parameter_gradients_accumulated": false,
+  "sampled_reasoning_tokens": 3518
+}

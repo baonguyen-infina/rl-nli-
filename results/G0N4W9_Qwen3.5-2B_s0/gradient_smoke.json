@@ -1,0 +1,10 @@
+{
+  "policy_norm": 0.052353933217790395,
+  "answer_ce_norm": 0.48983740710391666,
+  "active_tokens": 5574,
+  "ce_tokens": 400,
+  "allocation_norm": 6.050985256974418,
+  "allocation_score_max_difference": 7.4718427658081055,
+  "allocation_active_score_max_difference": 0.11921977996826172,
+  "allocation_groups": 32
+}
