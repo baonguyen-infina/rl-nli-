@@ -1,0 +1,11 @@
+recipe: zs
+format: align
+guess: true
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: null
+priority: PAPER
+seeds:
+- 0
+schema_examples: balanced
+run_id: E2B

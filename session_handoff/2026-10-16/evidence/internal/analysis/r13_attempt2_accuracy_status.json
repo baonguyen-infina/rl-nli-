@@ -1,0 +1,79 @@
+{
+  "recovery_attempt": 2,
+  "lane": "accuracy",
+  "session": "rl-nli-r13-recovery-accuracy-g4",
+  "phase": "complete",
+  "utc_epoch": 1792056660.6148002,
+  "run": "N11R13",
+  "archives_verified": true,
+  "receipts": {
+    "N11R13-complete": {
+      "id": "1wwueN6mKyBMlM_tmZ0WkqxqSgyFTYOF5",
+      "name": "N11R13_s0_attempt2_complete.tar.gz",
+      "md5Checksum": "b04702418a0c9418f017af83db819273",
+      "size": "125337389",
+      "run_id": "N11R13",
+      "event": "complete",
+      "sha256": "877c8e14ccf1a8eb3721267a14525e96e414628aa837521bf598629452da9f01",
+      "saved_at": 1792056415.5195794
+    },
+    "N11R13-complete-metadata": {
+      "id": "1sMJTmUjTeLVkdW7WlScj1lz2JNNYYcxT",
+      "name": "N11R13_s0_attempt2_complete-metadata.tar.gz",
+      "md5Checksum": "c25f9202a48d2767821afa1308c86abc",
+      "size": "847230",
+      "run_id": "N11R13",
+      "event": "complete-metadata",
+      "sha256": "6d5889d58cbf9c50cae3bc3ad117e63a2a289ad379a0b8b721a0b1436a7076fd",
+      "saved_at": 1792056418.0697458
+    },
+    "G0N11R13P-complete": {
+      "id": "17CsOKJyaAko9UenSdYWdg7K8sS6fwHW1",
+      "name": "G0N11R13P_s0_attempt2_complete.tar.gz",
+      "md5Checksum": "c77912cd44c75336bf5eb85ce0f3af66",
+      "size": "113518",
+      "run_id": "G0N11R13P",
+      "event": "complete",
+      "sha256": "d240190b9b29c9a5d2edc143546e9fbf6745e976933c7a9be6787925d3feffe3",
+      "saved_at": 1792045182.723636
+    },
+    "G0N11R13P-complete-metadata": {
+      "id": "1ewMByc6Vad_K7mYSwgVagg1PtFAyf3jg",
+      "name": "G0N11R13P_s0_attempt2_complete-metadata.tar.gz",
+      "md5Checksum": "75cbfab3936c89420647b5e07b66588f",
+      "size": "93997",
+      "run_id": "G0N11R13P",
+      "event": "complete-metadata",
+      "sha256": "a131f896e276b882a1848cf8a7ed6055a175d59506495bb33a910d397813016c",
+      "saved_at": 1792045185.0583992
+    },
+    "HN11R13L-complete": {
+      "id": "19UwfEyIYohWZWbEysY3dy6TJ5ajJVfwg",
+      "name": "HN11R13L_s0_attempt2_complete.tar.gz",
+      "md5Checksum": "b7504d103ea41626dc4b0e7ad178aeb8",
+      "size": "51393",
+      "run_id": "HN11R13L",
+      "event": "complete",
+      "sha256": "b4a094e4e237b79e250979fa55fdee44c7bb3288ff980715b68fcf334114a0af",
+      "saved_at": 1792056620.4050395
+    },
+    "HN11R13L-complete-metadata": {
+      "id": "1DsM1Kv3xi3eaFgyLMLaaLUHB24567MKN",
+      "name": "HN11R13L_s0_attempt2_complete-metadata.tar.gz",
+      "md5Checksum": "2f082db38afd791b4ca67798caa513df",
+      "size": "51402",
+      "run_id": "HN11R13L",
+      "event": "complete-metadata",
+      "sha256": "9d100be1a9b3d34ad2c658b4268406f75c55ae853614f0af4546c02eba6af5fd",
+      "saved_at": 1792056622.7359848
+    }
+  },
+  "wall_seconds": 11981,
+  "cli_pid": 77521,
+  "observed_at": 1792056660.671957,
+  "local_ml": false,
+  "cli_exit_code": 0,
+  "client_exited_at": 1792056661.206184,
+  "release_returncode": 0,
+  "released_at": 1792056665.5995688
+}

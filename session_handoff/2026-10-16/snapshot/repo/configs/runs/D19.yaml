@@ -1,0 +1,15 @@
+recipe: grpo
+format: align
+guess: false
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: D3
+priority: PAPER
+seeds:
+- 0
+- 1
+- 2
+schema_examples: balanced
+run_id: D19
+grpo:
+  max_steps: 200

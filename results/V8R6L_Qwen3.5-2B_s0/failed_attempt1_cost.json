@@ -1,0 +1,6 @@
+{
+  "status": "failed",
+  "error": "CalledProcessError: Command '['/usr/bin/python3', '-m', 'eval.predict', '--run', 'V8R6L', '--seed', '0', '--split', 'dev', '--out-dir', '/content/rl-nli-r6/results/V8R6L_Qwen3.5-2B_s0', '--adapter', '/content/rl-nli-r6/results/N8R6_Qwen3.5-2B_s0/best_adapter', '--config', '/content/rl-nli-r6/results/V8R6L_Qwen3.5-2B_s0/config.yaml']' returned non-zero exit status 1.",
+  "wall_seconds": 11.2,
+  "last_phase": "all"
+}

@@ -1,0 +1,22 @@
+recipe: native
+format: label
+guess: false
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: D3R9
+priority: P0
+seeds:
+- 0
+native_mode: trace_saliency
+bounded_reasoning: false
+scoring_protocol: deterministic_fixed_padding
+native_schedule: long_smoke
+eval_schedule: full_reasoning
+native_grouping: random
+training_format: cot
+validation_protocol: fixed_single_sequence
+run_id: G0N14R17P
+eval:
+  backend: transformers
+  gpu_memory_utilization: 0.65
+  model_revision: 15852e8c16360a2fea060d615a32b45270f8a8fc

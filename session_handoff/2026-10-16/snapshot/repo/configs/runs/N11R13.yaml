@@ -1,0 +1,18 @@
+recipe: native
+format: cot
+guess: false
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: D3R9
+priority: DEV
+seeds:
+- 0
+native_mode: marginal_accuracy
+bounded_reasoning: true
+scoring_protocol: deterministic_fixed_padding
+native_schedule: prefix_200
+eval_schedule: full_reasoning
+run_id: N11R13
+eval:
+  backend: transformers
+  model_revision: 15852e8c16360a2fea060d615a32b45270f8a8fc

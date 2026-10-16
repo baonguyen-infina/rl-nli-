@@ -1,0 +1,36 @@
+{
+  "recovery_attempt": 2,
+  "lane": "primary",
+  "session": "rl-nli-r13-recovery-primary-g4",
+  "phase": "workload",
+  "utc_epoch": 1792055921.321649,
+  "pipeline_pid": 10170,
+  "run": "N10R13",
+  "pipeline": {
+    "phase": "all",
+    "run": "N10R13",
+    "child_pid": 12323,
+    "updated_at": 1792045151.8449523
+  },
+  "last_train": {
+    "step": "200",
+    "loss": "-0.011895596981048584",
+    "grad_norm": "1.1198275089263916",
+    "marginal/reward": "0.028241759166121483",
+    "marginal/zero_advantage_fraction": "0.0",
+    "native/replay_active_score_max_difference": "0.0",
+    "entropy": "1.3701287433505058",
+    "step_time": "23.562497478002115"
+  },
+  "initial_eval": {
+    "n": 1000,
+    "macro_f1": 0.5217665228722886,
+    "accuracy": 0.523,
+    "parse_rate": 1.0
+  },
+  "cli_pid": 77228,
+  "observed_at": 1792055921.383193,
+  "local_ml": false,
+  "cli_exit_code": 1,
+  "client_exited_at": 1792086986.390068
+}

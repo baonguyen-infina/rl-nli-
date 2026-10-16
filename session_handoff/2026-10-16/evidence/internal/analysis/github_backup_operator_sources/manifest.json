@@ -1,0 +1,27 @@
+{
+  "created_at": 1792073271.113492,
+  "files": {
+    "native_github_archive_relay.py": {
+      "bytes": 8167,
+      "sha256": "311de8cdef5624560f746bdccd2f7cf39f49619d8a77d1607ac10ed9b86bb474"
+    },
+    "native_github_archive_supervisor.py": {
+      "bytes": 8102,
+      "sha256": "65390da22bfc64613798d3bd35d9cb17ea8dcdf389d445736fa263f70ad87eec"
+    },
+    "native_checkpoint_backup_pack.py": {
+      "bytes": 3889,
+      "sha256": "748ca1eace193afb3efaa784acb463bb36d9eb855efbce3eea3bdfb4f38af189"
+    },
+    "test_native_github_archive_relay.py": {
+      "bytes": 6267,
+      "sha256": "576dfa457e2c1ba5f7a33a9f0b3267a4318433bf168580893b0850956e82ba52"
+    },
+    "test_native_github_archive_supervisor.py": {
+      "bytes": 1146,
+      "sha256": "3e5a37d1a59753e4a7a7ce3ea7156ed3bf709e89e185c4de9281ad6790b185a4"
+    }
+  },
+  "contains_credentials": false,
+  "local_ml": false
+}

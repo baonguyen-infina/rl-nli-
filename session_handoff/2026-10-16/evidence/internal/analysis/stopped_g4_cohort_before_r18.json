@@ -1,0 +1,115 @@
+{
+  "updated_at": 1792067401.098145,
+  "local_ml": false,
+  "observation_interval_seconds": 60,
+  "max_gpu_sessions": 3,
+  "lanes": {
+    "r17": {
+      "run": "N14R17",
+      "session": "rl-nli-r17-tracesaliency-g4",
+      "remote_state": {
+        "phase": "workload",
+        "updated_at": 1792060700.394345,
+        "active_run": "N14R17",
+        "child_pid": 10243,
+        "last_train": {
+          "step": "53",
+          "loss": "0.14960075914859772",
+          "grad_norm": "6.041183948516846",
+          "native/answer_ce": "0.16047590233696005",
+          "native/answer_accuracy": null,
+          "native/replay_active_score_max_difference": "0.0",
+          "entropy": "1.5417703514297803",
+          "step_time": "36.02011043100174"
+        },
+        "initial_eval": {
+          "n": 1000,
+          "macro_f1": 0.5674942572896857,
+          "accuracy": 0.567,
+          "parse_rate": 1.0
+        }
+      },
+      "observed_at": 1792060715.0938292,
+      "local_ml": false,
+      "archive_downloaded": false,
+      "last_observation_error": {
+        "at": 1792067401.097694,
+        "type": "Exit"
+      }
+    },
+    "r16": {
+      "run": "N13R16",
+      "session": "rl-nli-r16-traceswap-g4",
+      "remote_state": {
+        "phase": "workload",
+        "updated_at": 1792060711.5446124,
+        "active_run": "N13R16",
+        "child_pid": 19700,
+        "last_train": {
+          "step": "104",
+          "loss": "0.0025290455669164658",
+          "grad_norm": "2.8486251831054688",
+          "native/answer_ce": "0.07058024619861196",
+          "native/answer_accuracy": null,
+          "native/replay_active_score_max_difference": "0.0",
+          "entropy": "1.4041678458452225",
+          "step_time": "27.282629182001074"
+        },
+        "initial_eval": {
+          "n": 1000,
+          "macro_f1": 0.5674942572896857,
+          "accuracy": 0.567,
+          "parse_rate": 1.0
+        }
+      },
+      "observed_at": 1792060715.623142,
+      "local_ml": false,
+      "archive_downloaded": false,
+      "last_observation_error": {
+        "at": 1792067401.0980742,
+        "type": "Exit"
+      }
+    },
+    "r15": {
+      "run": "N12R15",
+      "session": "rl-nli-r15-full-random-2b-g4",
+      "remote_state": {
+        "phase": "workload",
+        "updated_at": 1792060689.2988622,
+        "active_run": "N12R15",
+        "child_pid": 27028,
+        "last_train": {
+          "step": "400",
+          "loss": "0.02964646741747856",
+          "grad_norm": "2.3245410919189453",
+          "native/answer_ce": "0.025995231454241246",
+          "native/answer_accuracy": null,
+          "native/replay_active_score_max_difference": "0.0",
+          "entropy": "1.3424833739797275",
+          "step_time": "23.482011573993077"
+        },
+        "initial_eval": {
+          "n": 1000,
+          "macro_f1": 0.5674942572896857,
+          "accuracy": 0.567,
+          "parse_rate": 1.0
+        },
+        "checkpoint_scores": {
+          "checkpoint-100": {
+            "n": 1000,
+            "macro_f1": 0.5692322693918083,
+            "accuracy": 0.568,
+            "parse_rate": 1.0
+          }
+        }
+      },
+      "observed_at": 1792060715.617661,
+      "local_ml": false,
+      "archive_downloaded": false,
+      "last_observation_error": {
+        "at": 1792067401.097936,
+        "type": "Exit"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "run": "N21R20",
+  "event": "logs-1792085707",
+  "name": "N21R20_s0_logs-1792085707.tar.gz",
+  "path": "/content/native_github_staging/N21R20_s0_logs-1792085707.tar.gz",
+  "bytes": 1683300,
+  "sha256": "6f423e906570e55c827c4801cbb8cfff7a74bdfef67ddcf8dcb9c3f5a3a99b80",
+  "md5": "8172e513aab44d9207be536b8624b462",
+  "files": 72,
+  "created_at": 1792085711.0401115,
+  "model_bytes_written_locally": 0
+}

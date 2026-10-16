@@ -1,0 +1,25 @@
+{
+  "packages": {
+    "torch": "2.13.0",
+    "trl": "1.15.0",
+    "transformers": "5.17.0",
+    "peft": "0.21.1",
+    "vllm": "0.31.0"
+  },
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "total_memory_bytes": 101974081536,
+  "model_revision": null,
+  "source_sha256": {
+    "train/native_grpo.py": "1e5058c75205c5ccbe7519877c8c8e7e4180df8196083da360344c407c6a7859",
+    "train/native_groups.py": "0ace37cec6e6fadaa37b42f07b2a0570371f7b01d776b23cf78c934ba8fcd278",
+    "train/native_rollout.py": "5d9ba81a7ca50832d662b6bdbf370f2e4dce6a0853525046de6379dfe495bf13",
+    "train/native_training.py": "23c8ccd412cd32c593fca80c9732ff8d49e972e8f03cfbf5759751a17715a542",
+    "train/native_allocation.py": "e0bfb1e534a6127b5974c32698fc0ac09759c66ffc0d2f3bd46ff83dc688cc90",
+    "train/native_saliency.py": "405b53e94420844477913ef5daa121c197f36f7ab9e65924eb6340deffe7b2fc",
+    "train/native_trace_swap.py": "0de8afd7799942dd6f82a315ce6cff32473d0a51bc785eb16c3e44683dc25114",
+    "formats/parser.py": "db8a4a467d3282a121eb49e5f7a8001b1bd2e2d9aa502a8f4ed78e08f6892bf0",
+    "eval/predict.py": "87259d688ef2480bc96de9d84956692408cb39f0ccb87e0c5a1967e990f7c412"
+  },
+  "seed": 0,
+  "decoding": "two-stage; inserted boundaries excluded from policy likelihood"
+}

@@ -33,7 +33,13 @@ def test_sft_missing_teacher_raises():
             build_sft_dataset(ROWS, "nonexistent_fmt")
 
 
-def test_sft_dataset_align():
+def test_sft_dataset_align(tmp_path, monkeypatch):
+    from common.io import write_jsonl
+    monkeypatch.setattr("train.common.ARTIFACTS", tmp_path)
+    write_jsonl(tmp_path / "teacher" / "rationales_align.jsonl", [{
+        "id": ROWS[0]["id"],
+        "completion": '<align>\nH1: "H1" <-> ∅ | missing\n</align><answer>neutral</answer>'
+    }])
     ds = build_sft_dataset(ROWS, "align")
     assert "<align>" in ds[0]["completion"][0]["content"]
     assert "<answer>" in ds[0]["completion"][0]["content"]
@@ -87,9 +93,15 @@ def test_patch_vllm_sync_weights_for_qwen35():
         def _fix_param_name_to_vllm(self, name: str, extra_prefixes=None):
             return name
         def sync_weights(self):
-            pass
+            raise ValueError("There is no module or parameter named 'model'")
+
+    calls = []
+    def fake_llm(*args, **kwargs):
+        calls.append((args, kwargs))
+        return object()
 
     fake_vllm_gen.VLLMGeneration = FakeVLLMGeneration
+    fake_vllm_gen.LLM = fake_llm
     sys.modules["trl"] = fake_trl
     sys.modules["trl.generation"] = fake_gen
     sys.modules["trl.generation.vllm_generation"] = fake_vllm_gen
@@ -100,6 +112,11 @@ def test_patch_vllm_sync_weights_for_qwen35():
         assert inst._fix_param_name_to_vllm("model.layers.0.weight") == "language_model.model.layers.0.weight"
         # already prefixed should not be duplicated
         assert inst._fix_param_name_to_vllm("language_model.model.layers.0.weight") == "language_model.model.layers.0.weight"
+        with pytest.raises(ValueError, match="There is no module"):
+            inst.sync_weights()
+        inst_llm = fake_vllm_gen.LLM(model="Qwen/Qwen3.5-2B")
+        assert inst_llm is not None
+        assert calls[-1][1]["language_model_only"] is True
     finally:
         sys.modules.pop("trl.generation.vllm_generation", None)
         sys.modules.pop("trl.generation", None)

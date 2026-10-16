@@ -37,3 +37,18 @@ def test_holm():
     assert holm([0.01, 0.04, 0.03]) == pytest.approx([0.03, 0.06, 0.06])
     assert holm([0.5]) == [0.5]
     assert holm([0.04, 0.5]) == pytest.approx([0.08, 0.5])
+
+
+def test_paired_macro_f1_bootstrap_counts_invalid_answers_as_misses():
+    from analysis.stats import paired_macro_f1_bootstrap
+    gold=['entailment','neutral','contradiction']*10
+    a=list(gold);b=[None]*30
+    result=paired_macro_f1_bootstrap(gold,a,b,n_boot=100,seed=7)
+    assert result['diff']==1.0 and result['ci_low']>0.9
+    assert result==paired_macro_f1_bootstrap(gold,a,b,n_boot=100,seed=7)
+
+
+def test_paired_macro_f1_rejects_unaligned_lengths():
+    import pytest
+    from analysis.stats import paired_macro_f1_bootstrap
+    with pytest.raises(ValueError):paired_macro_f1_bootstrap(['neutral'],[],['neutral'])

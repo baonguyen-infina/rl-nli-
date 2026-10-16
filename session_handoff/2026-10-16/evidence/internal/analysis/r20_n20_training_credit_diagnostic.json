@@ -1,0 +1,56 @@
+{
+  "run": "N20R20",
+  "observed_at": 1792087417.1957495,
+  "split": "train",
+  "paper_eligible": false,
+  "test_accessed": false,
+  "source_steps": [
+    0,
+    19
+  ],
+  "prompt_rollout_groups": 386,
+  "mixed_correctness_groups": 222,
+  "wrong_samples_in_mixed_groups": 359,
+  "correct_samples_in_mixed_groups": 529,
+  "wrong_positive_advantage": 36,
+  "correct_negative_advantage": 101,
+  "wrong_advantage_max": 1.443077802658081,
+  "correct_advantage_min": -1.4610646963119507,
+  "training_metric_summary": {
+    "native/trace_gap": {
+      "n": 20,
+      "min": 1.7158923149108887,
+      "mean": 2.831094115972519,
+      "max": 4.1587419509887695
+    },
+    "native/trace_gap_std": {
+      "n": 20,
+      "min": 2.650609016418457,
+      "mean": 3.7580485343933105,
+      "max": 6.098008155822754
+    },
+    "native/rotated_logq": {
+      "n": 20,
+      "min": -5.446623821507963,
+      "mean": -3.378322463446856,
+      "max": -1.9357699611144996
+    },
+    "native/accuracy": {
+      "n": 20,
+      "min": 0.5138888888888888,
+      "mean": 0.6895780937973275,
+      "max": 0.7941176470588235
+    },
+    "native/replay_active_score_max_difference": {
+      "n": 20,
+      "min": 0,
+      "mean": 0,
+      "max": 0
+    }
+  },
+  "partial_lines_skipped": 0,
+  "training_sources_changed": false,
+  "native_grpo_sha256": "5e6afe0b9c19da475c2c630db418933ef25a80da1e6155e5d463020a19cec886",
+  "diagnostic_source_sha256": "8537ba42c276f38cb166980cc32fced9141e0f9edd8bec75f1d44d9ccbaecc44",
+  "limitation": "Stored scalar training advantages diagnose credit transport only, not semantic faithfulness or held-out performance."
+}

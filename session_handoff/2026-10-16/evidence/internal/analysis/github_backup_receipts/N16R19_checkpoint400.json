@@ -1,0 +1,16 @@
+{
+  "provider": "github-private-draft-release",
+  "id": 644444676,
+  "name": "N16R19_s0_checkpoint-400.tar.gz",
+  "size": "129017118",
+  "sha256": "d53029dfb10d738d696d83c9a2b1db0752bb7e38058a3c5e69281fd7e4e3029e",
+  "github_digest": "sha256:d53029dfb10d738d696d83c9a2b1db0752bb7e38058a3c5e69281fd7e4e3029e",
+  "repo": "baonguyen-infina/rl-nli-experiment-archives",
+  "release_id": 413873953,
+  "repo_private": true,
+  "release_draft": true,
+  "model_bytes_written_locally": 0,
+  "bytes_relayed_through_memory": 129017118,
+  "max_buffer_bytes": 16384,
+  "verified_at": 1792081446.2916732
+}

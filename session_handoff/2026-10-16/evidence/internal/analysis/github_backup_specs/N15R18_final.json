@@ -1,0 +1,12 @@
+{
+  "run": "N15R18",
+  "event": "final",
+  "name": "N15R18_s0_final.tar.gz",
+  "path": "/content/native_github_staging/N15R18_s0_final.tar.gz",
+  "bytes": 129544327,
+  "sha256": "421a78f2dec781b01ae1d91581408b22b6a87bf16baa60e0695683ffb5e83267",
+  "md5": "7723edf12cb4ea67ee490ea552bf60c4",
+  "files": 90,
+  "created_at": 1792081283.4100468,
+  "model_bytes_written_locally": 0
+}

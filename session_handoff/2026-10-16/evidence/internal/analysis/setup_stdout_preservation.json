@@ -1,0 +1,72 @@
+{
+  "records": [
+    {
+      "session": "rl-nli-r16-traceswap-g4",
+      "original": "r16_run_full_tests.log",
+      "remote_copy": "full_logs_r16traceswap_setup_r16_run_full_tests.log",
+      "bytes": 580
+    },
+    {
+      "session": "rl-nli-r16-traceswap-g4",
+      "original": "r16_run_configs.log",
+      "remote_copy": "full_logs_r16traceswap_setup_r16_run_configs.log",
+      "bytes": 7083
+    },
+    {
+      "session": "rl-nli-r16-traceswap-g4",
+      "original": "native_r16_traceswap_artifacts.log",
+      "remote_copy": "full_logs_r16traceswap_setup_native_r16_traceswap_artifacts.log",
+      "bytes": 564
+    },
+    {
+      "session": "rl-nli-r17-tracesaliency-g4",
+      "original": "native_r17_tracesaliency_artifacts.log",
+      "remote_copy": "full_logs_r17tracesaliency_setup_native_r17_tracesaliency_artifacts.log",
+      "bytes": 342
+    },
+    {
+      "session": "rl-nli-r17-tracesaliency-g4",
+      "original": "r17_run_red.log",
+      "remote_copy": "full_logs_r17tracesaliency_setup_r17_run_red.log",
+      "bytes": 1265
+    },
+    {
+      "session": "rl-nli-r17-tracesaliency-g4",
+      "original": "r17_run_full_tests.log",
+      "remote_copy": "full_logs_r17tracesaliency_setup_r17_run_full_tests.log",
+      "bytes": 581
+    },
+    {
+      "session": "rl-nli-r17-tracesaliency-g4",
+      "original": "r17_run_dependencies.log",
+      "remote_copy": "full_logs_r17tracesaliency_setup_r17_run_dependencies.log",
+      "bytes": 12367
+    },
+    {
+      "session": "rl-nli-r17-tracesaliency-g4",
+      "original": "r17_run_cache_launch.log",
+      "remote_copy": "full_logs_r17tracesaliency_setup_r17_run_cache_launch.log",
+      "bytes": 109
+    },
+    {
+      "session": "rl-nli-r17-tracesaliency-g4",
+      "original": "r17_run_warm_restore.log",
+      "remote_copy": "full_logs_r17tracesaliency_setup_r17_run_warm_restore.log",
+      "bytes": 228
+    },
+    {
+      "session": "rl-nli-r17-tracesaliency-g4",
+      "original": "r17_run_train_dev_data.log",
+      "remote_copy": "full_logs_r17tracesaliency_setup_r17_run_train_dev_data.log",
+      "bytes": 170
+    },
+    {
+      "session": "rl-nli-r17-tracesaliency-g4",
+      "original": "r17_run_configs.log",
+      "remote_copy": "full_logs_r17tracesaliency_setup_r17_run_configs.log",
+      "bytes": 7168
+    }
+  ],
+  "copied_at": 1792059365.2769861,
+  "local_model_bytes": 0
+}

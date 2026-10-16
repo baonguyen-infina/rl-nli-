@@ -1,0 +1,12 @@
+{
+  "observed_at": 1792079775.2043169,
+  "symptom": "CSV progress reader temporarily reported step207 after step379",
+  "cause": "common.io.write_train_log truncates and rewrites the complete history during on_log; observation can catch a partial write",
+  "verified_global_history_max": 388,
+  "verified_history_rows": 388,
+  "same_live_training_worker_pid": 20626,
+  "same_main_run_pid": 19554,
+  "training_restart": false,
+  "frozen_sources_modified": false,
+  "operator_action": "Retain the maximum observed step for display; final audits use completed logs and checkpoint trainer_state markers. Atomic CSV writes deferred to a future source revision."
+}

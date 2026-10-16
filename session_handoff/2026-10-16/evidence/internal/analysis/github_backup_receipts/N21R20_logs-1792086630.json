@@ -1,0 +1,16 @@
+{
+  "provider": "github-private-draft-release",
+  "id": 644677548,
+  "name": "N21R20_s0_logs-1792086630.tar.gz",
+  "size": "2415588",
+  "sha256": "5c2ac60f6cd757ba3d9671f6736e7f268705f4fb6e8084ac3274979ffe91d4cf",
+  "github_digest": "sha256:5c2ac60f6cd757ba3d9671f6736e7f268705f4fb6e8084ac3274979ffe91d4cf",
+  "repo": "baonguyen-infina/rl-nli-experiment-archives",
+  "release_id": 413873953,
+  "repo_private": true,
+  "release_draft": true,
+  "model_bytes_written_locally": 0,
+  "bytes_relayed_through_memory": 2415588,
+  "max_buffer_bytes": 16384,
+  "verified_at": 1792086642.150141
+}

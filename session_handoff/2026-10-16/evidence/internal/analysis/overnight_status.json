@@ -1,0 +1,258 @@
+{
+  "phase": "report_complete_target_not_met",
+  "started_at_utc": "2026-10-14T19:05:08.733067+00:00",
+  "model": "Qwen/Qwen3.5-2B",
+  "seed": 0,
+  "test_accessed": true,
+  "local_ml": false,
+  "updated_at_utc": "2026-10-15T02:57:51.507219+00:00",
+  "lanes": {
+    "primary": {
+      "lane": "primary",
+      "utc": "2026-10-14T23:26:47.034712+00:00",
+      "hf_dev_complete": {
+        "complete": true,
+        "views": [
+          {
+            "run": "HN4R9L",
+            "n": 1000,
+            "macro_f1": 0.570176145440734,
+            "parse_rate": 1.0
+          },
+          {
+            "run": "HN6R11L",
+            "n": 1000,
+            "macro_f1": 0.5679055502874945,
+            "parse_rate": 1.0
+          },
+          {
+            "run": "HN6R11P200L",
+            "n": 1000,
+            "macro_f1": 0.5725799378132489,
+            "parse_rate": 1.0
+          }
+        ]
+      },
+      "test_complete": null,
+      "test_archives_complete": false,
+      "errors": []
+    },
+    "warm": {
+      "lane": "warm",
+      "utc": "2026-10-14T23:27:06.440189+00:00",
+      "hf_dev_complete": {
+        "complete": true,
+        "views": [
+          {
+            "run": "HD3R9L",
+            "n": 1000,
+            "macro_f1": 0.5674942572896857,
+            "parse_rate": 1.0
+          },
+          {
+            "run": "HN0R11L",
+            "n": 1000,
+            "macro_f1": 0.5660959872163188,
+            "parse_rate": 1.0
+          }
+        ]
+      },
+      "test_complete": null,
+      "test_archives_complete": false,
+      "errors": []
+    },
+    "control": {
+      "lane": "control",
+      "utc": "2026-10-14T23:27:08.958759+00:00",
+      "hf_dev_complete": {
+        "complete": true,
+        "views": [
+          {
+            "run": "HN1R9L",
+            "n": 1000,
+            "macro_f1": 0.5715890493142587,
+            "parse_rate": 1.0
+          },
+          {
+            "run": "HN5R10L",
+            "n": 1000,
+            "macro_f1": 0.5707036293488087,
+            "parse_rate": 1.0
+          },
+          {
+            "run": "HN7R12P200L",
+            "n": 1000,
+            "macro_f1": 0.577200109022618,
+            "parse_rate": 1.0
+          }
+        ]
+      },
+      "test_complete": null,
+      "test_archives_complete": false,
+      "errors": []
+    }
+  },
+  "cohort_sha256": "4a569ddd1e8da7d303e279ab897f5de349297068143bc9a97045f6969dc8cd5d",
+  "registered_runs": [
+    "HN4R9L",
+    "HN6R11L",
+    "HN6R11P200L",
+    "HN4R9C",
+    "HN6R11C",
+    "HD3R9L",
+    "HN0R11L",
+    "HD3R9C",
+    "HN0R11C",
+    "HN1R9L",
+    "HN5R10L",
+    "HN7R12P200L",
+    "HN1R9C",
+    "HN5R10C"
+  ],
+  "test_completed_lanes": {
+    "primary": {
+      "complete": true,
+      "views": [
+        {
+          "run": "HN4R9L",
+          "n": 1000,
+          "macro_f1": 0.5610993773840734,
+          "accuracy": 0.561,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HN6R11L",
+          "n": 1000,
+          "macro_f1": 0.5559095727147086,
+          "accuracy": 0.556,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HN6R11P200L",
+          "n": 1000,
+          "macro_f1": 0.5558698508809384,
+          "accuracy": 0.557,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HN4R9C",
+          "n": 1000,
+          "macro_f1": 0.5617630824418426,
+          "accuracy": 0.56,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HN6R11C",
+          "n": 1000,
+          "macro_f1": 0.5637350419013701,
+          "accuracy": 0.562,
+          "parse_rate": 1.0
+        }
+      ],
+      "source": "verified archived test receipts"
+    },
+    "warm": {
+      "complete": true,
+      "views": [
+        {
+          "run": "HD3R9L",
+          "n": 1000,
+          "macro_f1": 0.5637477952071254,
+          "accuracy": 0.563,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HN0R11L",
+          "n": 1000,
+          "macro_f1": 0.557281736922766,
+          "accuracy": 0.557,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HD3R9C",
+          "n": 1000,
+          "macro_f1": 0.5264469047153636,
+          "accuracy": 0.534,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HN0R11C",
+          "n": 1000,
+          "macro_f1": 0.5681789181109121,
+          "accuracy": 0.566,
+          "parse_rate": 1.0
+        }
+      ],
+      "source": "verified archived test receipts"
+    },
+    "control": {
+      "complete": true,
+      "views": [
+        {
+          "run": "HN1R9L",
+          "n": 1000,
+          "macro_f1": 0.5636748345131792,
+          "accuracy": 0.565,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HN5R10L",
+          "n": 1000,
+          "macro_f1": 0.5560625736478849,
+          "accuracy": 0.556,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HN7R12P200L",
+          "n": 1000,
+          "macro_f1": 0.5637640620249317,
+          "accuracy": 0.565,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HN1R9C",
+          "n": 1000,
+          "macro_f1": 0.5585963036727833,
+          "accuracy": 0.558,
+          "parse_rate": 1.0
+        },
+        {
+          "run": "HN5R10C",
+          "n": 1000,
+          "macro_f1": 0.5613921336380862,
+          "accuracy": 0.559,
+          "parse_rate": 1.0
+        }
+      ],
+      "source": "verified archived test receipts"
+    }
+  },
+  "released_lanes": [],
+  "recovery_started_at_utc": "2026-10-15T02:47:34.254428+00:00",
+  "all_test_views_verified": 14,
+  "active_gpu_assignments": 0,
+  "coordinator_failure_audit": {
+    "error": "RuntimeError: Colab command failed: stop Usage: colab stop [OPTIONS]\nTry 'colab stop -h' for help.\n╭─ Error ──────────────────────────────────────────────────────────────────────╮\n│ Got unexpected extra argument(s) (rl-nli-control-4b-g4)                      │\n╰──────────────────────────────────────────────────────────────────────────────╯\n",
+    "resolved": true,
+    "recovery": "CPU-only report generation from verified archived test predictions"
+  },
+  "paper": "paper/main.pdf",
+  "paper_sha256": "f6355e6bb9c555e8ee79bb118442396803ff7d6ae51a66e6f6ec5cff1b14f130",
+  "visual_review_required": false,
+  "target_macro_f1": 0.58,
+  "target_met": false,
+  "best_observed_test_macro_f1": 0.5681789181109121,
+  "primary_method_test_macro_f1": 0.5559095727147086,
+  "training_seeds": [
+    0
+  ],
+  "publication_readiness": "working draft; native grouping and policy benefit not established; A/A* evidence insufficient",
+  "document_archive": {
+    "id": "1sc84HgOg63BHmh-qlAW-mg75Vw92eVaI",
+    "name": "native_allocation_ACL_test_only_20261015_final.tar.gz",
+    "md5Checksum": "0c7c7c1402e625d6e12e826465d08213",
+    "size": "1709472",
+    "sha256": "f62598aa825d8b2698322214dde743a586c6f32fa71c53d2f8f19c55172b7e74",
+    "scope": "source, manuscript and test metadata only; no model weights"
+  }
+}

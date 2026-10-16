@@ -1,0 +1,18 @@
+[
+  {
+    "recovery_attempt": 2,
+    "lane": "primary",
+    "session": "rl-nli-r13-recovery-primary-g4",
+    "phase": "hardware_verified",
+    "utc_epoch": 1792044660.651927,
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB"
+  },
+  {
+    "recovery_attempt": 2,
+    "lane": "primary",
+    "session": "rl-nli-r13-recovery-primary-g4",
+    "phase": "tests_passed",
+    "utc_epoch": 1792044880.6859558,
+    "output": "........... [ 82%]\n........................................................................ [ 98%]\n.....                                                                    [100%]\n437 passed in 15.06s\n"
+  }
+]

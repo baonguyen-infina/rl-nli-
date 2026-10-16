@@ -7,7 +7,8 @@ from common.labels import LABELS
 from data.prepare import get_rows
 from formats.parser import parse
 from train.common import (build_sft_dataset, load_model_and_tokenizer, make_lora_config,
-                          patch_torchao_compatibility)
+                          patch_torchao_compatibility, tokenize_sft_example,
+                          collate_sft_examples)
 
 
 def pick_best(scores: dict[str, float]) -> str:
@@ -149,14 +150,19 @@ def _make_sft_config(s: dict, seed: int, out_dir: Path):
         "gradient_accumulation_steps": s["grad_accum"], "max_length": s["max_len"],
         "bf16": True, "fp16": False, "logging_steps": 10,
         "save_strategy": "steps", "save_steps": save_steps,
-        "save_total_limit": 3,
+        "save_total_limit": None,
+        "dataset_kwargs": {"skip_prepare_dataset": True},
+        "remove_unused_columns": False,
+        "completion_only_loss": False,
+        "assistant_only_loss": False,
+        "gradient_checkpointing": True,
         "load_best_model_at_end": True,
         "metric_for_best_model": "eval_loss",
         "greater_is_better": False,
         "report_to": [],
     }
     ratio = s.get("warmup_ratio", 0.05)
-    for try_assistant in (True, False):
+    for try_assistant in (False,):
         for eval_key in ("eval_strategy", "evaluation_strategy"):
             curr_kw = dict(kw)
             curr_kw[eval_key] = "steps"
@@ -177,6 +183,16 @@ def _make_sft_config(s: dict, seed: int, out_dir: Path):
         return SFTConfig(**kw)
 
 
+def _sft_callbacks(s: dict) -> list:
+    patience = s.get('early_stopping_patience', 3)
+    if patience is None:
+        return []
+    if isinstance(patience, bool) or not isinstance(patience, int) or patience < 1:
+        raise ValueError('early_stopping_patience must be a positive integer or None')
+    from transformers import EarlyStoppingCallback
+    return [EarlyStoppingCallback(early_stopping_patience=patience)]
+
+
 def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
     patch_torchao_compatibility()
     from datasets import Dataset
@@ -191,44 +207,30 @@ def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
     dev_raw = build_sft_dataset(dev_rows, fmt, guess)
     dev_golds = [r["label"] for r in dev_rows]
 
-    train_ds = Dataset.from_list([{"messages": r["prompt"] + r["completion"]} for r in train_raw])
-    dev_ds = Dataset.from_list([{"messages": r["prompt"] + r["completion"]} for r in dev_raw])
+    train_ds = Dataset.from_list([tokenize_sft_example(r, tok, s["max_len"]) for r in train_raw])
+    dev_ds = Dataset.from_list([tokenize_sft_example(r, tok, s["max_len"]) for r in dev_raw])
 
     args = _make_sft_config(s, seed, out_dir)
 
-    collator = None
-    if not getattr(args, "assistant_only_loss", False):
-        try:
-            from trl import DataCollatorForCompletionOnlyLM
-            collator = DataCollatorForCompletionOnlyLM(
-                response_template="<|im_start|>assistant\n",
-                tokenizer=tok,
-            )
-        except Exception:
-            collator = None
+    from functools import partial
+    collator = partial(collate_sft_examples, pad_token_id=tok.pad_token_id)
 
-    patience = s.get("early_stopping_patience", 3)
-    callbacks = []
-    try:
-        from transformers import EarlyStoppingCallback
-        callbacks.append(EarlyStoppingCallback(early_stopping_patience=patience))
-    except Exception:
-        pass
+    callbacks = _sft_callbacks(s)
 
     kwargs = {
         "model": model, "args": args, "train_dataset": train_ds, "eval_dataset": dev_ds,
         "processing_class": tok, "peft_config": make_lora_config(cfg),
-        "compute_metrics": make_compute_metrics(tok, fmt, guess, dev_golds=dev_golds),
-        "preprocess_logits_for_metrics": preprocess_logits_for_metrics,
         "callbacks": callbacks,
     }
     if collator is not None:
         kwargs["data_collator"] = collator
 
     trainer = SFTTrainer(**kwargs)
-    trainer.train()
-    trainer.save_model(str(out_dir / "best_adapter"))
-    write_train_log(trainer.state.log_history, out_dir / "train_log.csv")
+    try:
+        trainer.train()
+        trainer.save_model(str(out_dir / "best_adapter"))
+    finally:
+        write_train_log(trainer.state.log_history, out_dir / "train_log.csv")
     del trainer, model
     import gc
     gc.collect()

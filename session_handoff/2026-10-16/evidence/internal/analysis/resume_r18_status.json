@@ -1,0 +1,12 @@
+{
+  "observed_at": 1792068228.364276,
+  "session": "rl-nli-resume-r18-g4",
+  "status": {
+    "stage": "workload",
+    "observed_at": 1792068211.678741,
+    "run": "HN12R15P200L",
+    "child_pid": 14833
+  },
+  "local_ml": false,
+  "model_bytes_downloaded_locally": 0
+}

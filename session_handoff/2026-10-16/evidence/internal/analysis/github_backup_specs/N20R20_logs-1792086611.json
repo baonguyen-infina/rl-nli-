@@ -1,0 +1,12 @@
+{
+  "run": "N20R20",
+  "event": "logs-1792086611",
+  "name": "N20R20_s0_logs-1792086611.tar.gz",
+  "path": "/content/native_github_staging/N20R20_s0_logs-1792086611.tar.gz",
+  "bytes": 1558546,
+  "sha256": "163685dd6b17b37b7e010bacad85e6239fded84d4ea27a761331f4c0ff2ac3f7",
+  "md5": "2691dfdad23415bb3364cba2e340635a",
+  "files": 76,
+  "created_at": 1792086615.341694,
+  "model_bytes_written_locally": 0
+}

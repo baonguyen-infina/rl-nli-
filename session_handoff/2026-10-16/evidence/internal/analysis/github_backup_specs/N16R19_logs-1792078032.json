@@ -1,0 +1,12 @@
+{
+  "run": "N16R19",
+  "event": "logs-1792078032",
+  "name": "N16R19_s0_logs-1792078032.tar.gz",
+  "path": "/content/native_github_staging/N16R19_s0_logs-1792078032.tar.gz",
+  "bytes": 5587659,
+  "sha256": "7da0b0ddf519fb6b6fc7a809e1db2b932cb8ea37b885138e75cf7957086c6333",
+  "md5": "2b8c0e3ee36b161abb7ff091f60f6534",
+  "files": 58,
+  "created_at": 1792078036.7180734,
+  "model_bytes_written_locally": 0
+}

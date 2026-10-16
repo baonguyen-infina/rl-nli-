@@ -41,3 +41,16 @@ def test_messages_shape():
 def test_label_with_guess_rejected():
     with pytest.raises(ValueError):
         build_prompt("a", "b", "label", guess=True)
+
+
+@pytest.mark.parametrize('guess',[False,True])
+def test_balanced_schema_examples_are_grounded_and_cover_all_labels(guess):
+    from formats.prompts import balanced_alignment_examples
+    examples=balanced_alignment_examples(guess)
+    assert {e['label'] for e in examples}=={'entailment','neutral','contradiction'}
+    for e in examples:
+        p=parse(e['output'],'align',guess)
+        assert p.format_ok and p.label==e['label']
+        assert struct_ok(p.align_lines,e['premise'],e['hypothesis'],p.label)
+    text=build_prompt('p','h','align',guess,schema_examples='balanced')
+    assert '∅ | missing' in text and 'uit_Adver' not in text

@@ -1,0 +1,34 @@
+{
+  "gradient_smoke.json": {
+    "policy_norm": 0.28962485318106806,
+    "answer_ce_norm": 0.15979151673916525,
+    "active_tokens": 3690,
+    "ce_tokens": 400,
+    "allocation_norm": 0.41404798470467047,
+    "allocation_score_max_difference": 7.452541351318359,
+    "allocation_groups": 32
+  },
+  "trace_swap_smoke.json": {
+    "changed_prefix_rows": 52,
+    "active_rows": 64,
+    "groups": 32,
+    "original_logq_mean": -0.7422070005012859,
+    "rotated_logq_mean": -1.8856972547477806,
+    "gap_mean": 1.143490195274353,
+    "gap_std": 2.702697277069092,
+    "finite": true,
+    "donor_rule": "label-blind cyclic active slots within the same native group and rollout"
+  },
+  "reference_audit.json": {
+    "initial_sha256": "ef2a456431eb6fc665d619f69a8ccaff99e095fa2b747f06d74c26191719df2c",
+    "final_sha256": "ef2a456431eb6fc665d619f69a8ccaff99e095fa2b747f06d74c26191719df2c",
+    "init_from": "D3R3",
+    "frozen": true,
+    "unchanged": true
+  },
+  "dropout_audit.json": {
+    "disable_dropout_requested": true,
+    "active_dropout_modules": {},
+    "reward_scoring": "detached eval"
+  }
+}

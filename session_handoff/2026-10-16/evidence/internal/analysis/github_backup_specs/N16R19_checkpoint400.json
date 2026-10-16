@@ -1,0 +1,12 @@
+{
+  "run": "N16R19",
+  "event": "checkpoint-400",
+  "name": "N16R19_s0_checkpoint-400.tar.gz",
+  "path": "/content/native_github_staging/N16R19_s0_checkpoint-400.tar.gz",
+  "bytes": 129017118,
+  "sha256": "d53029dfb10d738d696d83c9a2b1db0752bb7e38058a3c5e69281fd7e4e3029e",
+  "md5": "f2040bb7b265bcdf31c5196df0c06d54",
+  "files": 70,
+  "created_at": 1792081414.0950038,
+  "model_bytes_written_locally": 0
+}

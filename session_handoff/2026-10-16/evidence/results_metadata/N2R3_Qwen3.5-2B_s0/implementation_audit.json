@@ -1,0 +1,9 @@
+{
+  "source_snapshot_matches_startup_hashes": true,
+  "trl_version": "1.15.0",
+  "grpo_disable_dropout": false,
+  "warm_start_lora_dropout": 0.05,
+  "reward_scoring_mode": "training mode under no_grad; dropout remains active",
+  "classification": "prespecified pilot with stochastic scoring; do not merge with deterministic scoring runs",
+  "active_run_hyperparameters_changed": false
+}

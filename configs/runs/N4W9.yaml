@@ -1,0 +1,19 @@
+recipe: native
+format: cot
+guess: false
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: D3R3
+priority: DEV
+seeds:
+- 0
+native_mode: allocation
+bounded_reasoning: true
+scoring_protocol: deterministic_fixed_padding
+native_schedule: full_reasoning
+eval_schedule: full_reasoning
+run_id: N4W9
+eval:
+  gpu_memory_utilization: 0.65
+  max_new_tokens:
+    cot: 96

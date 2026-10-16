@@ -1,0 +1,12 @@
+{
+  "id": "1sMJTmUjTeLVkdW7WlScj1lz2JNNYYcxT",
+  "name": "N11R13_s0_attempt2_complete-metadata.tar.gz",
+  "md5Checksum": "c25f9202a48d2767821afa1308c86abc",
+  "size": "847230",
+  "run_id": "N11R13",
+  "event": "complete-metadata",
+  "sha256": "6d5889d58cbf9c50cae3bc3ad117e63a2a289ad379a0b8b721a0b1436a7076fd",
+  "saved_at": 1792056418.0697458,
+  "download_verified_at": 1792056704.7622368,
+  "scope": "development metadata only; no model files"
+}

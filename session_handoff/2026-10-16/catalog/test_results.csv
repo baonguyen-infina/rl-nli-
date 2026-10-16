@@ -1,0 +1,17 @@
+run_id,split,seed,n,macro_f1,accuracy,parse_rate,format,native_mode,init_from,evidence,source
+HD3R9C,test,0,1000,0.5264469047153636,0.534,1.0,cot,,D3R9,local predictions recomputed and receipt hashes freshly checked,results/HD3R9C_Qwen3.5-2B_s0
+HD3R9L,test,0,1000,0.5637477952071254,0.563,1.0,label,,D3R9,local predictions recomputed and receipt hashes freshly checked,results/HD3R9L_Qwen3.5-2B_s0
+HN0R11C,test,0,1000,0.5681789181109121,0.566,1.0,cot,allocation_only,N0R11,local predictions recomputed and receipt hashes freshly checked,results/HN0R11C_Qwen3.5-2B_s0
+HN0R11L,test,0,1000,0.557281736922766,0.557,1.0,label,allocation_only,N0R11,local predictions recomputed and receipt hashes freshly checked,results/HN0R11L_Qwen3.5-2B_s0
+HN1R9C,test,0,1000,0.5585963036727833,0.558,1.0,cot,ordinary,N1R9,local predictions recomputed and receipt hashes freshly checked,results/HN1R9C_Qwen3.5-2B_s0
+HN1R9L,test,0,1000,0.5636748345131792,0.565,1.0,label,ordinary,N1R9,local predictions recomputed and receipt hashes freshly checked,results/HN1R9L_Qwen3.5-2B_s0
+HN4R9C,test,0,1000,0.5617630824418426,0.56,1.0,cot,allocation,N4R9,local predictions recomputed and receipt hashes freshly checked,results/HN4R9C_Qwen3.5-2B_s0
+HN4R9L,test,0,1000,0.5610993773840734,0.561,1.0,label,allocation,N4R9,local predictions recomputed and receipt hashes freshly checked,results/HN4R9L_Qwen3.5-2B_s0
+HN5R10C,test,0,1000,0.5613921336380862,0.559,1.0,cot,joint,N5R10,local predictions recomputed and receipt hashes freshly checked,results/HN5R10C_Qwen3.5-2B_s0
+HN5R10L,test,0,1000,0.5560625736478849,0.556,1.0,label,joint,N5R10,local predictions recomputed and receipt hashes freshly checked,results/HN5R10L_Qwen3.5-2B_s0
+HN6R11C,test,0,1000,0.5637350419013701,0.562,1.0,cot,gated_joint,N6R11,local predictions recomputed and receipt hashes freshly checked,results/HN6R11C_Qwen3.5-2B_s0
+HN6R11L,test,0,1000,0.5559095727147086,0.556,1.0,label,gated_joint,N6R11,local predictions recomputed and receipt hashes freshly checked,results/HN6R11L_Qwen3.5-2B_s0
+HN6R11P200L,test,0,1000,0.5558698508809384,0.557,1.0,label,gated_joint,N6R11,local predictions recomputed and receipt hashes freshly checked,results/HN6R11P200L_Qwen3.5-2B_s0
+HN7R12P200L,test,0,1000,0.5637640620249317,0.565,1.0,label,gated_joint,N7R12,local predictions recomputed and receipt hashes freshly checked,results/HN7R12P200L_Qwen3.5-2B_s0
+N15R18,test,0,1000,0.5651534564119155,0.565,1.0,label,,,recorded remote prediction verification plus final private archive receipt; not re-fetched,artifacts/analysis/r18_remote_status.json
+N16R19,test,0,1000,0.5606293810806706,0.561,1.0,label,,,recorded remote prediction verification plus final private archive receipt; not re-fetched,artifacts/analysis/r19_remote_status.json

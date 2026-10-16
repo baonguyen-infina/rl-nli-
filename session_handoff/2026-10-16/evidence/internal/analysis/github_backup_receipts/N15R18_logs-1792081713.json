@@ -1,0 +1,16 @@
+{
+  "provider": "github-private-draft-release",
+  "id": 644458612,
+  "name": "N15R18_s0_logs-1792081713.tar.gz",
+  "size": "8696096",
+  "sha256": "128cf200d24b6c409b7f8f97d614d1e3d54f962991464e645f6407a6b45640bf",
+  "github_digest": "sha256:128cf200d24b6c409b7f8f97d614d1e3d54f962991464e645f6407a6b45640bf",
+  "repo": "baonguyen-infina/rl-nli-experiment-archives",
+  "release_id": 413873953,
+  "repo_private": true,
+  "release_draft": true,
+  "model_bytes_written_locally": 0,
+  "bytes_relayed_through_memory": 8696096,
+  "max_buffer_bytes": 16384,
+  "verified_at": 1792081724.961548
+}

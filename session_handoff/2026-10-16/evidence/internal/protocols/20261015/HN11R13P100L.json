@@ -1,0 +1,13 @@
+{
+  "run": "HN11R13P100L",
+  "source_run": "N11R13",
+  "checkpoint": 100,
+  "split": "dev",
+  "n": 1000,
+  "registered_at": 1792049970.2112288,
+  "primary_selection_unchanged": true,
+  "decoding": "pinned Transformers single-sequence token-greedy label-only",
+  "test_accessed": false,
+  "config_sha256": "61b9df939e33df6a9f3b56de267df1610b487bb52591bf2def4b12aab74824a3",
+  "registration_matrix_sha256": "cb8d6453f786d8e83ff5d45b2167625f4088490eb75ca4557b40d11317903e0e"
+}

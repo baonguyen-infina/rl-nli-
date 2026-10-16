@@ -44,7 +44,25 @@ _FORMAT_HELP = {
 _GUESS_HELP = ("Ngay từ đầu, hãy đoán nhanh nhãn trong <guess>NHÃN</guess>, rồi mới viết phần còn lại.")
 
 
-def build_prompt(premise: str, hypothesis: str, fmt: str, guess: bool = False) -> str:
+def balanced_alignment_examples(guess=False):
+    """Hand-written schema demonstrations; independent of ViANLI and its labels."""
+    premise = EXAMPLE_PREMISE
+    examples = [
+        (EXAMPLE_HYPOTHESIS, 'entailment', _ALIGN_BLOCK),
+        ('Hà Nội là thủ đô của Việt Nam và có một triệu xe đạp.', 'neutral',
+         '<align>\nH1: "Hà Nội là thủ đô của Việt Nam" <-> "Hà Nội là thủ đô của Việt Nam" | match\n'
+         'H2: "có một triệu xe đạp" <-> ∅ | missing\n</align>'),
+        ('Hà Nội không phải thủ đô của Việt Nam.', 'contradiction',
+         '<align>\nH1: "Hà Nội không phải thủ đô của Việt Nam" <-> '
+         '"Hà Nội là thủ đô của Việt Nam" | conflict\n</align>'),
+    ]
+    return [dict(premise=premise, hypothesis=hypothesis, label=label,
+                 output=(f'<guess>{label}</guess>' if guess else '') + block + f'<answer>{label}</answer>')
+            for hypothesis, label, block in examples]
+
+
+def build_prompt(premise: str, hypothesis: str, fmt: str, guess: bool = False,
+                 schema_examples: str = 'single') -> str:
     if fmt not in _FORMAT_HELP:
         raise ValueError(f"format không hợp lệ: {fmt!r}")
     if guess and fmt == "label":
@@ -52,13 +70,24 @@ def build_prompt(premise: str, hypothesis: str, fmt: str, guess: bool = False) -
     parts = [_INTRO, _FORMAT_HELP[fmt]]
     if guess:
         parts.append(_GUESS_HELP)
-    parts.append(
-        f"\nVí dụ định dạng:\nPremise: {EXAMPLE_PREMISE}\nHypothesis: {EXAMPLE_HYPOTHESIS}\n"
-        f"Trả lời: {EXAMPLE_OUTPUTS[(fmt, guess)]}\n"
-    )
+    if schema_examples == 'balanced':
+        if fmt != 'align':
+            raise ValueError('Balanced schema demonstrations are defined only for align')
+        parts.append('Tách các mệnh đề cần kiểm tra; chỉ trích đoạn premise trực tiếp liên quan. '
+                     'Thông tin thiếu phải dùng ∅ | missing, không gán match cho thông tin chưa được hỗ trợ.')
+        for e in balanced_alignment_examples(guess):
+            parts.append(f"\nVí dụ định dạng:\nPremise: {e['premise']}\nHypothesis: {e['hypothesis']}\n"
+                         f"Trả lời: {e['output']}\n")
+    elif schema_examples == 'single':
+        parts.append(
+            f"\nVí dụ định dạng:\nPremise: {EXAMPLE_PREMISE}\nHypothesis: {EXAMPLE_HYPOTHESIS}\n"
+            f"Trả lời: {EXAMPLE_OUTPUTS[(fmt, guess)]}\n")
+    else:
+        raise ValueError(f'Unknown schema_examples: {schema_examples}')
     parts.append(f"Bây giờ hãy làm với cặp sau.\nPremise: {premise}\nHypothesis: {hypothesis}\nTrả lời:")
     return "\n".join(parts)
 
 
-def build_messages(premise: str, hypothesis: str, fmt: str, guess: bool = False) -> list[dict]:
-    return [{"role": "user", "content": build_prompt(premise, hypothesis, fmt, guess)}]
+def build_messages(premise: str, hypothesis: str, fmt: str, guess: bool = False,
+                   schema_examples: str = 'single') -> list[dict]:
+    return [{"role": "user", "content": build_prompt(premise, hypothesis, fmt, guess, schema_examples)}]

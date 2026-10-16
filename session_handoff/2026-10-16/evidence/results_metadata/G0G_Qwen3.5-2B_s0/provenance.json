@@ -1,0 +1,18 @@
+{
+  "recorded_after_run": true,
+  "recorded_at_utc": "2026-10-12T18:37:05.482913+00:00",
+  "python": "3.13.15 (main, Aug  6 2026, 11:06:22) [GCC 13.3.0]",
+  "packages": {
+    "torch": "2.13.0",
+    "transformers": "5.17.0",
+    "trl": "1.15.0",
+    "vllm": "0.31.0",
+    "peft": "0.21.1",
+    "flash-linear-attention": "0.5.2"
+  },
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition, 580.82.07, 97887 MiB",
+  "data_sha256": {
+    "train": "4edd41c3aa8a1d9bdd3bac36a3b80f303c7e973e5db5eb764ae285225f90a5c7",
+    "dev": "a9dbfa914892e2b636bf11660cb91bd4698f7d4a72df8f879e9adf526fb29389"
+  }
+}

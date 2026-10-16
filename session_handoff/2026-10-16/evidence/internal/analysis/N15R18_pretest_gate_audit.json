@@ -1,0 +1,8 @@
+{
+  "run": "N15R18",
+  "source_files_verified": 13,
+  "candidate_fixed_before_test": true,
+  "passed": true,
+  "test_accessed": false,
+  "observed_at": 1792078769.012932
+}

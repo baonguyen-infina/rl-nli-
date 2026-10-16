@@ -1,0 +1,34 @@
+{
+  "recorded_at_utc": "2026-10-16T01:51:33.648718+00:00",
+  "state": "user_reauthentication_required",
+  "evidence": "Existing authorized credentials are expired; direct token refresh rejected with Reauthentication is needed.",
+  "remote_state_currently_verified": false,
+  "new_gpu_allocated": false,
+  "local_ml": false,
+  "model_bytes_written_locally": 0,
+  "n20_last_verified_action": "SIGINT sent to exact owned training worker85155 after checkpoint100 and backup verification; immediate probe showed no train/eval process and GPU0MiB. Final pipeline/test terminal state, fresh final logs archive and session release remain unverified.",
+  "n20_do_not_restart": true,
+  "n20_test_allowed": false,
+  "n21_checkpoint200_review_pending": true,
+  "n21_review_auto_enforced": false,
+  "n21_review_caveat": "The observer only records evidence. The controller has not verified checkpoint200 or executed the stopping decision. Recovery must first inspect whether the registered400-step pipeline or once-only test already completed; never claim that the manual gate executed.",
+  "pending_auth_exec_session_id": 52291,
+  "retired_local_operator_pids": [
+    3063,
+    16140,
+    20558,
+    48713,
+    77862,
+    88631
+  ],
+  "resume_sequence": [
+    "Inspect actual sessions, train/eval processes, cost and test claims without relaunching anything.",
+    "Reconcile N20 intentional abort and preserve final available logs and existing checkpoint100 archive.",
+    "Inspect N21 observer200 and pipeline/test state; apply prospective rule if training is still active.",
+    "Archive verified artifacts before releasing idle G4 sessions; never repeat completed test."
+  ],
+  "verified_test_results_source": [
+    "artifacts/analysis/r18_remote_status.json",
+    "artifacts/analysis/r19_remote_status.json"
+  ]
+}

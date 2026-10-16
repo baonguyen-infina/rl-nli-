@@ -1,0 +1,13 @@
+{
+  "recorded_at_utc": "2026-10-16T03:10:10.609190+00:00",
+  "live_remote_state_verified": false,
+  "blocker": "Google reauthentication required",
+  "latest_effective_target": "ViANLI test Macro-F1 >=0.58",
+  "model": "Qwen/Qwen3.5-2B",
+  "teacher": false,
+  "max_g4_sessions": 3,
+  "n20": "deliberate SIGINT at observed109; cp100 archived; final logs and session release unverified",
+  "n21": "cp100 archived; observer200 launched; actual current train/test status unknown",
+  "goal_status_last_verified": "blocked",
+  "no_new_remote_or_ml_operations_for_this_handoff": true
+}

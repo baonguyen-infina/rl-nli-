@@ -1,0 +1,193 @@
+\documentclass[11pt]{article}
+\usepackage[review]{acl}
+\usepackage{times,latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype,inconsolata}
+\usepackage{amsmath,amssymb,booktabs,graphicx}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\N}{\mathrm{N}}
+\newcommand{\C}{\mathrm{C}}
+\title{Native Label Allocation for Teacher-Free Reinforcement Learning\\in Vietnamese Natural Language Inference}
+\author{Anonymous ACL submission}
+\begin{document}
+\maketitle
+\begin{abstract}
+An independently scored NLI answer does not express how a model distinguishes different human-authored hypotheses about the same premise. We investigate this supervision gap using native premise groups in Vietnamese adversarial NLI. After gold-label supervised fine-tuning, a compact language model samples bounded reasoning and predicts an NLI label. A conditional allocation objective compares the observed assignment of labels to alternative assignments with the same label multiset. It supplies a direct answer-score gradient and an auxiliary policy reward without a teacher model, generated training explanations, or new annotations. We also examine a bounded reward that grants allocation credit only to correct answers. Matched controls separate policy optimization from direct supervision and native grouping from ordinary answer rewards. Model and checkpoint selection use development data; empirical tables and conclusions use held-out test predictions under a frozen inference protocol.
+\IfFileExists{tables/abstract_results.tex}{\input{tables/abstract_results.tex}}{Held-out evaluation is pending in this working draft.}
+The study explicitly distinguishes single-seed evidence, inference reproducibility, and the stronger evidence needed for claims of generalization.
+\end{abstract}
+
+\section{Introduction}
+Natural language inference predicts whether a premise entails, contradicts, or leaves unresolved a hypothesis. Adversarial NLI makes this task challenging by targeting superficial decision rules and gaps in learned linguistic reasoning \citep{nie-etal-2020-adversarial}. ViANLI provides a corresponding Vietnamese benchmark constructed through adversarial human interaction \citep{huynh-etal-2025-vianli}. A compact model must distinguish related hypotheses without relying only on word overlap or annotation patterns.
+
+Reinforcement learning offers a way to train generated reasoning using gold answer labels instead of annotated explanations. This direction is already established: recent work applies group-relative policy optimization to NLI and evaluates adversarial generalization \citep{mirallesgonzalez-etal-2025-grpo-nli}. Combining supervised and reinforcement objectives for text classification is also studied by GTA \citep{zeng-etal-2025-gta}. The question addressed here is narrower: can the structure of the original human-authored training examples provide useful additional supervision for compact NLI reasoning?
+
+Some training hypotheses describe the same premise but carry different gold relations. Scoring each answer separately ignores this relationship. We form bounded groups using premise text and compare the observed assignment of gold labels to alternative assignments over the same hypotheses. Conditioning on the observed label multiset prevents the auxiliary objective from improving merely through a shared preference for one class. The objective does not, however, establish semantic grounding or eliminate hypothesis-specific shortcuts. Independent answer supervision remains necessary to anchor absolute class predictions.
+
+Our study has three aims. First, it specifies a conditional label-allocation objective for existing NLI examples, with no teacher text or rationale labels. Second, it separates the direct score gradient, policy-reward channel, and correctness-gated reward through controlled comparisons. Third, it evaluates whether any classification improvement survives matched controls and an auditable held-out protocol. The contribution is the specific supervision structure and its empirical analysis; ordinary NLI GRPO, answer-likelihood rewards, gradient caching, and correctness gating are not presented as new general techniques.
+
+\section{Related Work}
+\paragraph{Adversarial and Vietnamese NLI.}
+Adversarial NLI tests failures hidden by standard dataset performance \citep{nie-etal-2020-adversarial}. Hypothesis-only classifiers and lexical heuristics expose weaknesses in NLI evaluation \citep{poliak-etal-2018-hypothesis,mccoy-etal-2019-right}. Vietnamese resources include open-domain ViNLI and adversarial ViANLI \citep{huynh-etal-2022-vinli,huynh-etal-2025-vianli}. Our evaluated setting is ViANLI. Results on this dataset alone cannot establish cross-domain or multilingual transfer.
+
+\paragraph{Supervision and reinforcement learning.}
+NLI GRPO can learn reasoning without annotated rationales \citep{mirallesgonzalez-etal-2025-grpo-nli}. GTA combines classification supervision and policy learning \citep{zeng-etal-2025-gta}. Recent likelihood-reward work compares probability and log-probability feedback for reasoning \citep{kwiatkowski-etal-2026-likelihood}. Our critic is a conditional probability over a small set of label assignments, rather than the likelihood of a reference explanation or a long generated answer. This difference motivates the objective but does not by itself establish a predictive advantage.
+
+\paragraph{Shortcuts and coupled objectives.}
+Instance-bundle learning already uses related examples and contrastive normalization as additional supervision for generative reading comprehension \citep{dua-etal-2021-learning}. Our objective specializes this idea to a distribution over complete assignments with a fixed label multiset, conditioned on on-policy NLI reasoning. Related-instance supervision itself is not a new contribution.
+Recent work studies entailment-graph information and shortcut mitigation \citep{cheng-etal-2025-neutralizing,li-etal-2026-shortcuts}. These studies reinforce the need to measure premise dependence instead of inferring it from an algebraic invariance. Our assignment distribution cancels shared class offsets while leaving hypothesis--class interactions intact. The cache-and-replay implementation follows the established principle of decoupling cross-example score derivatives from model backpropagation \citep{gao-etal-2021-scaling}; it is an implementation strategy, not a separate novelty claim.
+
+\section{Native Allocation Framework}
+\subsection{Examples, groups, and sampled reasoning}
+Each example is $x_i=(p_i,h_i)$ with label $y_i\in\{\E,\N,\C\}$. Prompts and input texts are Vietnamese; answer labels are the English strings \texttt{entailment}, \texttt{neutral}, and \texttt{contradiction}. The supervised warm start uses only these gold answers.
+
+We group training rows by premise text after Unicode NFC normalization and whitespace consolidation. Within each premise group, a seeded label-blind permutation is partitioned into blocks of at most three examples. Large premise groups can therefore produce several blocks. A block need not contain every class. Identifiers, intended-label fields, and group membership never enter the model input.
+
+For each member of a block $G$, the policy samples a reasoning prefix $z_i$ using only its original pair $(p_i,h_i)$. Four independent samples per pair are aligned by sample index to form a joint block rollout. This is training-time coupling; inference classifies each pair independently and does not require sibling hypotheses or knowledge of a test label multiset.
+
+\subsection{Conditional label allocation}
+Let $a(c)$ be the canonical answer suffix for class $c$, including the closing answer delimiter and end-of-sequence token. The score after a sampled prefix is
+\begin{equation}
+ s_{ic}=\log\pi_\theta\bigl(a(c)\mid p_i,h_i,z_i\bigr).
+\end{equation}
+It is the sum of suffix token log-probabilities under teacher forcing. Teacher forcing here is an evaluation of the student's own distribution on a gold-label suffix; no external teacher model is used.
+
+For block $G$, let $\mathcal A_G$ be the \emph{distinct} permutations of its observed gold-label multiset. We define
+\begin{equation}
+ Q_G(\mathbf y_G)=
+ \frac{\exp\!\left(\sum_{i\in G}s_{i y_i}\right)}
+ {\sum_{\mathbf a\in\mathcal A_G}\exp\!\left(\sum_{i\in G}s_{i a_i}\right)}.
+ \label{eq:allocation}
+\end{equation}
+There are at most six assignments. The direct loss is $\mathcal L_{\mathrm{alloc}}=-\log Q_G(\mathbf y_G)$, averaged over blocks and joint rollouts. Duplicate label assignments are counted once. Singletons and blocks whose active members all share one label have $Q_G=1$ and zero direct allocation gradient.
+
+The construction preserves the observed class counts inside each candidate assignment. Consequently, replacing $s_{ic}$ with $s_{ic}+u_i+v_c$ leaves Equation~\ref{eq:allocation} unchanged. The row offset $u_i$ contributes the same total to every assignment, and each class offset $v_c$ appears the same number of times. This rules out one particular shortcut in the auxiliary objective: a class preference shared across a block. It does not cancel an arbitrary offset that depends jointly on hypothesis and class.
+
+The score derivative is
+\begin{equation}
+ \frac{\partial\mathcal L_{\mathrm{alloc}}}{\partial s_{ic}}
+ =\Pr_{Q_G}(a_i=c)-\mathbf{1}[c=y_i].
+ \label{eq:gradient}
+\end{equation}
+Thus the loss reallocates probability among the permitted assignments. Absolute correctness is not implied by correct allocation, which motivates retaining answer supervision and accuracy reward.
+
+\subsection{Policy and direct-supervision channels}
+The ordinary sampled-answer reward is
+\begin{equation}
+ R_i^{\mathrm{base}}=a_i+0.2f_i,
+\end{equation}
+where $a_i$ checks the final answer against gold and $f_i$ checks the common output parser. We compare a direct-allocation variant using $R_i^{\mathrm{base}}$ with a joint variant adding $0.2\log Q_G$ to each active member's reward. The latter supplies policy credit for the sampled prefixes, while the direct loss differentiates the conditional answer scores with prefixes held fixed.
+
+Because $\log Q_G\leq0$ is unbounded below, the joint reward can change the ordering induced by answer correctness. We therefore test a bounded alternative:
+\begin{equation}
+ R_i^{\mathrm{bounded}}=a_i+0.2f_i
+       +0.2e_G a_i Q_G,
+ \label{eq:bounded}
+\end{equation}
+where $e_G$ is one only for blocks with at least two distinct active gold labels. The additional term lies in $[0,0.2]$. Every correct completion has raw reward at least one, while every incorrect completion has raw reward at most $0.2$. This property concerns raw rewards; group normalization can still assign negative advantages to relatively weak correct samples. The direct $-\log Q_G$ loss remains active on incorrect sampled prefixes so that the correctness gate does not remove its corrective supervision.
+
+The training surrogate is
+\begin{equation}
+ \mathcal L=\mathcal L_{\mathrm{GRPO}}
+   +0.1\mathcal L_{\mathrm{answer}}
+   +0.2\mathcal L_{\mathrm{alloc}}.
+ \label{eq:loss}
+\end{equation}
+$\mathcal L_{\mathrm{answer}}$ supervises the gold answer suffix after the student's sampled reasoning prefix. The policy term follows GRPO \citep{shao-etal-2024-deepseekmath}, using token-normalized DAPO loss \citep{yu-etal-2025-dapo} with a KL coefficient of $0.01$ against the same frozen SFT warm start. These components constitute a hybrid surrogate; we do not claim an unbiased estimator of a single end-to-end allocation objective. In particular, the direct term does not differentiate through discrete reasoning samples.
+
+\subsection{Exact local score-gradient replay}
+Evaluating all candidate answers jointly would retain a large model graph. Instead, detached scores $\bar s$ determine the small assignment Jacobian $J=\nabla_s\mathcal L_{\mathrm{alloc}}(\bar s)$. During shuffled loss microbatches, we recompute live scores and use
+\begin{equation}
+ \widetilde{\mathcal L}_{\mathrm{alloc}}
+ =\operatorname{sg}(\mathcal L_{\mathrm{alloc}}(\bar s))
+   +\langle\operatorname{sg}(J),s-\operatorname{sg}(\bar s)\rangle.
+\end{equation}
+Here $\operatorname{sg}$ denotes stop-gradient; the scalar and Jacobian contributions are distributed across microbatches with the original block denominator. At the cached point, this surrogate has the original value and score derivative. It is valid for the local update, not an exact global replacement away from that point.
+
+Dropout is disabled during RL. Cache and replay retain the same candidate-sequence padding width to avoid a numerical change caused by shape-dependent kernels. Padding rows have zero policy, KL, answer, and allocation contribution. The implementation audits nonzero component gradients, unchanged frozen-reference weights, and cached-versus-live scores before long runs.
+
+\section{Experimental Protocol}
+\subsection{Data, backbone, and optimization}
+We use the official ViANLI partitions: 8,012 training pairs, 1,000 development pairs, and 1,000 test pairs. Test inputs and labels remain inaccessible during method development. Macro-F1 over the three labels is the primary metric. Accuracy and parse rate are secondary metrics. Invalid outputs count as errors rather than being excluded.
+
+The backbone is the post-trained Qwen3.5-2B language model \citep{qwen-team-2026-qwen35}. The language component is loaded in bfloat16 and adapted with LoRA \citep{hu-etal-2022-lora}, rank 32 and alpha 64, on attention and feed-forward projections. The experiment does not load weights in NF4 and is therefore not described as QLoRA. SFT uses four epochs, learning rate $2\times10^{-5}$, maximum sequence length 512, batch size 32, cosine scheduling and warmup ratio $0.05$. SFT dropout is $0.05$; RL dropout is disabled.
+
+RL uses learning rate $2\times10^{-6}$, up to 400 optimizer updates, four samples per pair, and eight blocks per update. The rectangular generation batch contains 96 slots including zero-weight padding. Loss microbatches contain four completions with 24 accumulation steps; candidate answer scoring uses microbatches of 12. The rollout uses temperature one, top-$p$ one, and no top-$k$ or presence penalty. Every comparison uses the same seed-zero SFT warm start and shared optimization settings. Budgets are matched in examples, rollouts and optimizer updates, rather than FLOPs: candidate scoring and direct replay add computation to allocation variants.
+
+Reasoning generation is capped at 128 tokens with a total completion budget of 160. The two-stage decoder samples reasoning, inserts the closing reasoning and opening answer delimiters, and samples an answer. Inserted delimiters are excluded from policy likelihood. These caps are ceilings, not minimum reasoning lengths.
+
+The implementation uses TRL 1.15.0, Transformers 5.17.0, PEFT 0.21.1, and vLLM 0.31.0 for rollouts. Computation runs on Colab G4 allocations whose actual device is an NVIDIA RTX PRO 6000 Blackwell Server Edition. No model training or inference is performed on the local authoring machine.
+
+\subsection{Matched comparisons and mechanism controls}
+The principal comparisons are gold-label SFT, ordinary SFT-to-GRPO with answer cross-entropy, direct native allocation with ordinary policy reward, joint log-allocation reward, and bounded correctness-gated allocation reward. A no-policy control removes the complete policy/KL loss while preserving answer cross-entropy, direct allocation, rollout generation, and exposure. This control separates reinforcement learning from additional supervised score training.
+
+A grouping control changes only block membership while retaining the bounded policy reward and direct allocation channels. It preserves each update's exact examples, block sizes, label slots and informative-group counts, but separates premise texts inside a block. This differs from a reward-only random-group control, which would change two components simultaneously. The grouping mechanism comparison uses fixed checkpoint 200 with the original 400-update learning-rate horizon; its stop budget does not compress the schedule. The native counterpart is the corresponding checkpoint-200 prefix of the longer run.
+
+We retain failed runs and their frozen configurations. Exploratory warm-start experiments are not substituted for matched comparisons. Run identifiers, selected adapters and evaluation views are recorded in the final manifest so that results can be reconstructed from artifacts instead of manually copied numbers.
+
+\subsection{Selection, inference, and the held-out lock}
+Checkpoints are selected using full-development greedy Macro-F1. Development measurements are retained only in internal records. Before test access, we freeze the candidate cohort, source and evaluation configurations, adapter hashes, dataset revision, decoder and output format. Test results cannot alter the method, checkpoint or inference rule.
+
+The primary reporting view uses greedy label-only inference for every compared adapter. A separately identified secondary view uses the same adapter with bounded reasoning. Inference format is therefore controlled within each table; results across formats are not pooled. The final single-sequence Transformers path is fixed before test, following development-only checks of fresh-process reproducibility. Backend choice is not selected using test scores.
+
+A manifest-validated entry point claims each test run atomically before reading held-out data. It verifies frozen artifact hashes, pins the dataset revision, checks the actual prediction count and records hashes of the resulting predictions and metrics. Repeated invocations reuse a verified completed receipt; they do not silently generate a new result. All reported experimental scores in this manuscript come from these held-out artifacts.
+
+\subsection{Uncertainty and scope}
+This working study uses one training seed. Repeated greedy inference calls are not additional training seeds and cannot support a seed-level standard deviation. Paired uncertainty uses 10,000 bootstrap resamples of whole premise clusters, conditional on the fitted adapters; it cannot substitute for run-to-run training variability. The descriptive percentile intervals are unadjusted for multiple comparisons or the exploratory development search.
+
+We distinguish in-distribution classification from broader robustness. A hypothesis-only diagnostic can reveal label prediction without the premise, but does not establish a causal explanation of the model. A definitive generalization claim requires additional seeds, benchmarks, and carefully controlled interventions.
+
+\section{Held-Out Test Results}
+\IfFileExists{tables/results_test.tex}{%
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{3pt}
+\input{tables/results_test.tex}
+\caption{Held-out test comparison under the locked inference protocol. All scores are percentages. Distinct inference formats and fixed-budget mechanism controls are identified separately. A single training seed provides no estimate of seed variability.}
+\label{tab:test}
+\end{table}
+}{%
+Held-out test evaluation is pending. No development score is used as a substitute. The empirical conclusions below remain unfilled until the registered evaluations finish.
+}
+\IfFileExists{tables/test_discussion.tex}{\input{tables/test_discussion.tex}}{}
+\IfFileExists{tables/ablation_test.tex}{\input{tables/ablation_test.tex}}{}
+\IfFileExists{tables/secondary_test.tex}{\input{tables/secondary_test.tex}}{}
+
+\section{Discussion}
+\paragraph{Attribution to native grouping and policy learning.}
+\IfFileExists{tables/interpretation_test.tex}{\input{tables/interpretation_test.tex}}{A convincing benefit requires improvement over both matched ordinary RL and the no-policy allocation control. The random-group comparison tests whether shared-premise relationships matter beyond generic coupled label scoring.}
+
+\paragraph{What the critic does not verify.}
+A correct label allocation can coexist with incorrect absolute predictions. The critic also conditions on a sampled rationale that may be unfaithful or factually wrong. It supplies comparative label supervision, not a semantic verifier of that rationale. Correctness-gated reward protects raw answer-reward ordering but does not make the explanation faithful. We therefore avoid treating a structured objective or valid output syntax as proof of reasoning quality.
+
+\paragraph{Reproducibility as part of measurement.}
+Compact gains can be difficult to interpret when inference implementations produce different greedy continuations. The final report distinguishes the frozen test evaluator from development-time engineering diagnostics, and retains provenance for both. An inference repeat is never chosen retrospectively because it is the most favorable one.
+
+\section{Limitations}
+The study is restricted to one Vietnamese adversarial dataset, one compact backbone and one training seed. Its premise groups may contain annotation regularities that do not transfer to new domains. Conditional allocation cancels row and shared class offsets but leaves hypothesis-specific patterns available. Missing or same-label blocks provide no assignment contrast, so supervision strength varies with the original dataset structure.
+
+The answer cross-entropy term can teach the gold answer after an incorrect sampled rationale. The policy and direct terms are a hybrid surrogate, and none establishes that the rationale caused the decision. Generation caps constrain the available reasoning. The grouping ablation is a controlled fixed-budget comparison and should not be conflated with independently selected full-budget results.
+
+Paired test intervals measure uncertainty over evaluation examples or premise groups, conditional on these fitted models. They do not resolve training-seed variance. The test set must not become another development set after this report. A broader publication claim requires multi-seed replication, additional tasks or domains, and evidence that an observed advantage is not explained by extra supervision or compute.
+
+\section{Ethics and Reproducibility}
+Training uses the original gold NLI labels and model-generated on-policy prefixes. It does not query a teacher or use distilled explanations. Dataset identifiers and intended-label metadata remain outside prompts and model features. Generated reasoning is not a verified factual explanation and should not be relied on for consequential decisions.
+
+The experiment records model and dataset revisions, source and configuration hashes, frozen-reference audits, prediction files, costs and once-only test receipts. Tables are generated from recorded test artifacts. Source and manuscript artifacts are prepared for inspection; no public release or external publication is implied by this working draft.
+
+\section{Conclusion}
+We formulate conditional native label allocation for teacher-free SFT and reinforcement learning in Vietnamese NLI. The framework separates answer supervision, direct comparative score gradients and policy-reward shaping, including a bounded correctness-gated variant. \IfFileExists{tables/conclusion_test.tex}{\input{tables/conclusion_test.tex}}{The held-out study tests whether these components improve classification beyond matched controls.} Empirical claims are limited to the evaluated setting and do not establish broader robustness.
+
+\bibliography{refs}
+\bibliographystyle{acl_natbib}
+\appendix
+\section{Allocation Invariance and Gradient}
+For any row offsets $u_i$ and class offsets $v_c$, every allowed assignment receives the added score
+\begin{equation}
+ \sum_{i\in G}u_i+\sum_{c\in\{\E,\N,\C\}}n_c v_c,
+\end{equation}
+where $n_c$ is the fixed number of occurrences of class $c$ in the observed multiset. This common term cancels between numerator and denominator of Equation~\ref{eq:allocation}. Differentiating its log-normalizer yields the assignment marginal in Equation~\ref{eq:gradient}. No assumption about semantic correctness follows from either identity.
+
+The implementation enumerates unique permutations, uses log-sum-exp, promotes the small normalization to float32 when necessary, and rejects nonfinite active scores. Ignored padding is masked before arithmetic so that an ignored nonfinite value cannot contaminate a zero-gradient row. The replay tests compare full-batch and shuffled-microbatch score derivatives and verify the local value at the cached point.
+\end{document}

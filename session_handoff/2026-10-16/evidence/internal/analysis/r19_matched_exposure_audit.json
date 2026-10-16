@@ -1,0 +1,10 @@
+{
+  "matched_updates": 400,
+  "active_row_exposures": 7670,
+  "unique_active_ids": 7670,
+  "same_update_row_multisets": true,
+  "same_slot_labels": true,
+  "used_uid_in_prompt": false,
+  "cohort_sha256": "f3f12ec5cfb26eb2df665f6c371869a73460c4fba668a970b11fa4e4dd169f34",
+  "test_read": false
+}

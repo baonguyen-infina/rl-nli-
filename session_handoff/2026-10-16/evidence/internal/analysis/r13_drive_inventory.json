@@ -1,0 +1,72 @@
+[
+  {
+    "md5Checksum": "5025fd1d24ac8783a415fa606431baff",
+    "size": "281614",
+    "id": "1cyiAy4svN7bAwfFu_wqR2dDmLy09NCAw",
+    "name": "N10R13_s0_progress-60.tar.gz",
+    "modifiedTime": "2026-10-15T05:12:04.862Z"
+  },
+  {
+    "md5Checksum": "90b92dfc5c87aec5ce9b29493b606bfb",
+    "size": "271065",
+    "id": "148Re2waYmUPDdrG4tTgVUPMblJdhceUn",
+    "name": "N11R13_s0_progress-20.tar.gz",
+    "modifiedTime": "2026-10-15T05:07:43.154Z"
+  },
+  {
+    "md5Checksum": "0259c9ba16a9227e135d37383af692e6",
+    "size": "276395",
+    "id": "14bv9zRk1bQxXDSj-rw6Ej2o4RcSOkvDs",
+    "name": "N10R13_s0_progress-40.tar.gz",
+    "modifiedTime": "2026-10-15T05:03:42.212Z"
+  },
+  {
+    "md5Checksum": "28a988dba8454f548a9ec7187550c30d",
+    "size": "208268",
+    "id": "1fWMhyXG8BsSfxvBLNEMidpB69D_sFcuN",
+    "name": "N11R13_s0_initial_eval.tar.gz",
+    "modifiedTime": "2026-10-15T04:58:40.348Z"
+  },
+  {
+    "md5Checksum": "2d5ac768ca581f7a61efa6402d0ae2b7",
+    "size": "271092",
+    "id": "1RQPZaK4pO-iHdVRzrXt4TiFdv642-02r",
+    "name": "N10R13_s0_progress-20.tar.gz",
+    "modifiedTime": "2026-10-15T04:55:19.052Z"
+  },
+  {
+    "md5Checksum": "c0db2761fe9b3f3f327df29c375e1c0e",
+    "size": "208271",
+    "id": "13XJ6D6A4yTEmQqE-FKnFMS4KoBNwwn42",
+    "name": "N10R13_s0_initial_eval.tar.gz",
+    "modifiedTime": "2026-10-15T04:46:16.231Z"
+  },
+  {
+    "md5Checksum": "f9a6f5de599cec32b4f02cf59497532b",
+    "size": "93864",
+    "id": "184mOAp-cOKIE4XnR-PnOzIjPmF_qkkIk",
+    "name": "G0N11R13P_s0_complete-metadata.tar.gz",
+    "modifiedTime": "2026-10-15T04:25:37.921Z"
+  },
+  {
+    "md5Checksum": "330c3cd1dbba999a60ec167019b3ff4b",
+    "size": "113458",
+    "id": "1rIgJdobAGFtr2gDVeWRG02YO1e5JBnXH",
+    "name": "G0N11R13P_s0_complete.tar.gz",
+    "modifiedTime": "2026-10-15T04:25:35.048Z"
+  },
+  {
+    "md5Checksum": "b85c60eb49045c5d4ab3c2833000d790",
+    "size": "93829",
+    "id": "1EfUMS59-0JvwVqlCqOi6aO8GSotnLCmC",
+    "name": "G0N10R13P_s0_complete-metadata.tar.gz",
+    "modifiedTime": "2026-10-15T04:13:13.606Z"
+  },
+  {
+    "md5Checksum": "4a2eeb9ad0566242e824ca257716b1dd",
+    "size": "113464",
+    "id": "1U5euJdT4op_6KS7w444o0cKM4fooN4XL",
+    "name": "G0N10R13P_s0_complete.tar.gz",
+    "modifiedTime": "2026-10-15T04:13:10.745Z"
+  }
+]

@@ -1,0 +1,4 @@
+{
+  "attempt": 2,
+  "retry": "same frozen config after VRAM overlap; no weights changed"
+}

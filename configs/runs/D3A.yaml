@@ -1,0 +1,13 @@
+recipe: zs
+format: align
+guess: true
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: D3
+priority: PAPER
+seeds:
+- 0
+- 1
+- 2
+schema_examples: balanced
+run_id: D3A

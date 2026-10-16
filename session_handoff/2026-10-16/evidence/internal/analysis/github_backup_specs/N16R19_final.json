@@ -1,0 +1,12 @@
+{
+  "run": "N16R19",
+  "event": "final",
+  "name": "N16R19_s0_final.tar.gz",
+  "path": "/content/native_github_staging/N16R19_s0_final.tar.gz",
+  "bytes": 129238943,
+  "sha256": "4a1fd0ab9d8d30185e48df411bd9e6792f293814274137fc855d3581973a2d75",
+  "md5": "b015a3751fdefb8a340ef70a3773cc82",
+  "files": 100,
+  "created_at": 1792082503.2383115,
+  "model_bytes_written_locally": 0
+}

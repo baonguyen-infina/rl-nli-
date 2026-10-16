@@ -1,0 +1,24 @@
+{
+  "N10R13": {
+    "status": "infrastructure_interrupted",
+    "last_archived_step": 60,
+    "initial_dev_macro_f1": 0.5217665228722886,
+    "initial_parse_rate": 1.0,
+    "initial_prediction_sha256": "1b5cf0a2f64c448147ecb30125a94fb22b5109ea9e14ce9d4e48cd2d9862dff1",
+    "finite_loss_and_gradient": true,
+    "max_active_replay_drift": 0.0,
+    "trained_checkpoint_available": false,
+    "restart": "same seed and same frozen configs; execution attempt2, not independent run"
+  },
+  "N11R13": {
+    "status": "infrastructure_interrupted",
+    "last_archived_step": 20,
+    "initial_dev_macro_f1": 0.5217665228722886,
+    "initial_parse_rate": 1.0,
+    "initial_prediction_sha256": "1b5cf0a2f64c448147ecb30125a94fb22b5109ea9e14ce9d4e48cd2d9862dff1",
+    "finite_loss_and_gradient": true,
+    "max_active_replay_drift": 0.0,
+    "trained_checkpoint_available": false,
+    "restart": "same seed and same frozen configs; execution attempt2, not independent run"
+  }
+}

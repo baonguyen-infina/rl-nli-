@@ -1,0 +1,11 @@
+{
+  "changed_prefix_rows": 52,
+  "active_rows": 64,
+  "groups": 32,
+  "original_logq_mean": -0.7422070005012859,
+  "rotated_logq_mean": -1.8856972547477806,
+  "gap_mean": 1.143490195274353,
+  "gap_std": 2.702697277069092,
+  "finite": true,
+  "donor_rule": "label-blind cyclic active slots within the same native group and rollout"
+}

@@ -1,0 +1,5 @@
+{
+  "reason": "HF text-only adapter keys were not mapped in the vLLM worker; evaluation invalid until native-namespace export",
+  "preserved_folder": "ckpt_eval_unmapped",
+  "repair": "native Qwen3.5 adapter namespace export"
+}

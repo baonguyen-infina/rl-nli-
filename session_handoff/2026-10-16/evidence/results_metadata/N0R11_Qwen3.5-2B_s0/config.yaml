@@ -1,0 +1,132 @@
+data:
+  dataset: vianli
+  dev_mini_n: 300
+  dev_mini_seed: 42
+model:
+  name: Qwen/Qwen3.5-2B
+lora:
+  r: 32
+  alpha: 64
+  dropout: 0.05
+  target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - qkv_proj
+  - in_proj_qkv
+  - in_proj_qkvz
+  - in_proj_ba
+  - in_proj_z
+  - out_proj
+  - gate_proj
+  - up_proj
+  - gate_up_proj
+  - down_proj
+sft:
+  lr: 2.0e-05
+  epochs: 4
+  warmup_ratio: 0.05
+  scheduler: cosine
+  per_device_batch: 32
+  grad_accum: 1
+  max_len: 512
+  eval_steps: 100
+  save_steps: 100
+  early_stopping_patience: 3
+grpo:
+  lr: 1.0e-05
+  num_generations: 8
+  max_steps: 500
+  beta: 0.0
+  loss_type: dapo
+  temperature: 1.0
+  top_p: 1.0
+  per_device_batch: 8
+  grad_accum: 4
+  max_completion_length: 512
+  use_vllm: true
+  save_steps: 100
+  vllm_mode: colocate
+  vllm_gpu_memory_utilization: 0.3
+  reward_weights:
+  - 1.0
+  - 0.2
+  - 0.3
+eval:
+  split: dev
+  gpu_memory_utilization: 0.65
+  max_model_len: 2048
+  max_new_tokens:
+    label: 16
+    cot: 160
+    align: 512
+gta:
+  sft_weight: 1.0
+  rule_weight: 0.2
+encoder:
+  name: uitnlp/CafeBERT
+  lr: 2.0e-05
+  epochs: 3
+  batch: 32
+  max_len: 256
+  folds: 5
+native_pilot:
+  disable_dropout: true
+  lr: 2.0e-06
+  max_steps: 400
+  num_generations: 4
+  groups_per_update: 8
+  per_device_batch: 4
+  grad_accum: 24
+  reasoning_budget: 128
+  max_completion_length: 160
+  beta: 0.01
+  allocation_weight: 0.2
+  allocation_loss_weight: 0.2
+  saliency_floor: 0.25
+  answer_ce_weight: 0.1
+  score_microbatch: 12
+  vllm_gpu_memory_utilization: 0.3
+  save_steps: 100
+validation_eval:
+  engine_options:
+    max_num_seqs: 1
+    max_num_batched_tokens: 2048
+    enforce_eager: true
+    enable_prefix_caching: false
+    seed: 0
+native_schedules:
+  full_pass:
+    max_steps: 400
+  full_reasoning:
+    max_steps: 400
+    reasoning_budget: 128
+    max_completion_length: 160
+    score_microbatch: 12
+  long_smoke:
+    max_steps: 1
+    save_steps: 1
+    reasoning_budget: 128
+    max_completion_length: 160
+    score_microbatch: 12
+sft_schedules:
+  full_budget:
+    early_stopping_patience: null
+eval_schedules:
+  full_reasoning:
+    max_new_tokens:
+      cot: 160
+recipe: native
+format: cot
+guess: false
+init_from: D3R9
+priority: DEV
+seeds:
+- 0
+native_mode: allocation_only
+bounded_reasoning: true
+scoring_protocol: deterministic_fixed_padding
+native_schedule: full_reasoning
+eval_schedule: full_reasoning
+run_id: N0R11

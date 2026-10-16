@@ -1,0 +1,33 @@
+{
+  "checked_at_utc": "2026-10-15T03:10:43.969051+00:00",
+  "status": "resolved",
+  "blocker": "The current execution environment cannot resolve Google OAuth and Colab endpoints.",
+  "checks": [
+    {
+      "host": "oauth2.googleapis.com",
+      "dns_ok": false,
+      "error": "[Errno 8] nodename nor servname provided, or not known"
+    },
+    {
+      "host": "colab.research.google.com",
+      "dns_ok": false,
+      "error": "[Errno 8] nodename nor servname provided, or not known"
+    },
+    {
+      "host": "colab.pa.googleapis.com",
+      "dns_ok": false,
+      "error": "[Errno 8] nodename nor servname provided, or not known"
+    }
+  ],
+  "account_switch_completed": true,
+  "new_gpu_run_started": false,
+  "last_verified_compute_units": 1483.87,
+  "compute_units_reverified_this_attempt": true,
+  "local_ml_executed": false,
+  "resume_requirement": "Restore outbound network access for the execution environment, then create a fresh OAuth flow and verify the new account's compute balance before any G4 allocation.",
+  "research_target_macro_f1": 0.58,
+  "target_met": false,
+  "test_accessed_this_attempt": false,
+  "resolved_at_utc": "2026-10-15T04:08:23.758703+00:00",
+  "active_remote_setup_session": "rl-nli-dense-2b-g4"
+}

@@ -1,0 +1,15 @@
+recipe: zs
+format: label
+guess: false
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: D3R9
+priority: DEV
+seeds:
+- 0
+sft_schedule: full_budget
+bounded_reasoning: false
+validation_protocol: fixed_single_sequence
+run_id: VDR9L
+eval:
+  gpu_memory_utilization: 0.65

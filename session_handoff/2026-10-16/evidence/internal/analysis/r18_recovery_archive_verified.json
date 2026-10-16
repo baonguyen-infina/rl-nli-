@@ -1,0 +1,14 @@
+{
+  "verified_at": 1792068683.205942,
+  "receipt": {
+    "id": "10CVAht8iu83ozNFf-UEk2w2hCdkLYvMo",
+    "name": "HN12R15P200L_s0_recovery_complete.tar.gz",
+    "md5Checksum": "3061666d094bf296f1ee736d4b94b489",
+    "size": "215386",
+    "sha256": "c8b38aa47a6621617e74b0c800ba65d6816627defda7057ae59f36e45f15f329",
+    "scope": "source and experiment evidence; no model weights",
+    "saved_at": 1792068574.3088856
+  },
+  "drive_metadata_verified": true,
+  "archive_downloaded": false
+}

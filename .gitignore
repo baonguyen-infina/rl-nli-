@@ -6,3 +6,16 @@ __pycache__/
 *.pyc
 .venv/
 wandb/
+.DS_Store
+/*_Qwen*_s[0-9]*/
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.pem
+*.key
+.env
+.env.*
+**/token.json
+**/*credentials*.json

@@ -1,0 +1,12 @@
+{
+  "run": "N15R18",
+  "event": "checkpoint-400",
+  "name": "N15R18_s0_checkpoint-400.tar.gz",
+  "path": "/content/native_github_staging/N15R18_s0_checkpoint-400.tar.gz",
+  "bytes": 129281964,
+  "sha256": "3b3f891f3e66a1efeaf85577e5926ef13dffba06f618f957781a5414a503fc49",
+  "md5": "037be3d9bcccbc95ae4c05841ef6b175",
+  "files": 60,
+  "created_at": 1792080067.4168925,
+  "model_bytes_written_locally": 0
+}

@@ -1,0 +1,6 @@
+{
+  "attempt": 2,
+  "previous_attempt": "runtime lost; log archived through step60",
+  "initialization": "fresh identical D3R3 selected adapter; no checkpoint resume",
+  "archive_namespace": "N2R4; earlier partial archives retained as N2R4_attempt1"
+}

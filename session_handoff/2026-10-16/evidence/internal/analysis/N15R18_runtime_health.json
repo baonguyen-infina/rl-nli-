@@ -1,0 +1,13 @@
+{
+  "run": "N15R18",
+  "observed_at": 1792075392.2364304,
+  "last_completed_step": 231,
+  "training_rows_checked": 231,
+  "nonfinite_fields": [],
+  "active_replay_drift_max": 0.0,
+  "frozen_sources_unchanged": true,
+  "passed": true,
+  "scope": "numerical/provenance diagnostics only; not model accuracy",
+  "test_read": false,
+  "paper_eligible": false
+}

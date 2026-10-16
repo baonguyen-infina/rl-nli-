@@ -1,0 +1,12 @@
+{
+  "id": "1DsM1Kv3xi3eaFgyLMLaaLUHB24567MKN",
+  "name": "HN11R13L_s0_attempt2_complete-metadata.tar.gz",
+  "md5Checksum": "2f082db38afd791b4ca67798caa513df",
+  "size": "51402",
+  "run_id": "HN11R13L",
+  "event": "complete-metadata",
+  "sha256": "9d100be1a9b3d34ad2c658b4268406f75c55ae853614f0af4546c02eba6af5fd",
+  "saved_at": 1792056622.7359848,
+  "download_verified_at": 1792056707.3318431,
+  "scope": "development metadata only; no model files"
+}

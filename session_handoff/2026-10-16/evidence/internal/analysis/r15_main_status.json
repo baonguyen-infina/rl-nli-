@@ -1,0 +1,38 @@
+{
+  "stage": "workload",
+  "local_ml": false,
+  "started_at": 1792049885.083694,
+  "cli_pid": 71937,
+  "run": "N12R15",
+  "session": "rl-nli-r15-full-random-2b-g4",
+  "utc_epoch": 1792059489.1345592,
+  "active_run": "N12R15",
+  "child_pid": 27028,
+  "observed_at": 1792059489.09901,
+  "last_train": {
+    "step": "362",
+    "loss": "0.07177042961120605",
+    "grad_norm": "6.376219272613525",
+    "native/answer_ce": "0.10513966413661062",
+    "native/answer_accuracy": null,
+    "native/replay_active_score_max_difference": "0.0",
+    "entropy": "1.4017774214347203",
+    "step_time": "23.810895266002262"
+  },
+  "gradient": {
+    "policy_norm": 0.14305228116531668,
+    "answer_ce_norm": 0.5971775587563425,
+    "active_tokens": 5926,
+    "ce_tokens": 400,
+    "allocation_norm": 0.5554312339918808,
+    "allocation_score_max_difference": 2.068218231201172,
+    "allocation_active_score_max_difference": 0.0,
+    "allocation_groups": 32
+  },
+  "initial_eval": {
+    "n": 1000,
+    "macro_f1": 0.5674942572896857,
+    "accuracy": 0.567,
+    "parse_rate": 1.0
+  }
+}

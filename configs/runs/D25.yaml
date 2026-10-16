@@ -1,0 +1,19 @@
+recipe: gta
+format: align
+guess: true
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: D3
+priority: DEV
+seeds:
+- 0
+- 1
+- 2
+cos_constraint: false
+flat_fallback: true
+schema_examples: balanced
+rule_supervision: true
+rule_support: schema
+run_id: D25
+grpo:
+  max_steps: 200

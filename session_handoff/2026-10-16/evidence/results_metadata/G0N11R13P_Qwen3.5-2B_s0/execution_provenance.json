@@ -1,0 +1,27 @@
+{
+  "cohort": "R13_finite_label",
+  "execution_attempt": 2,
+  "prior_attempt": "interrupted before first checkpoint; evidence preserved separately",
+  "model": "Qwen/Qwen3.5-2B",
+  "teacher": false,
+  "training_seed": 0,
+  "local_ml": false,
+  "test_split_accessed": false,
+  "accuracy_selection": "greedy Transformers bounded-CoT dev Macro-F1",
+  "budget": "200 updates;400 LR horizon",
+  "source_hashes": {
+    "configs/base.yaml": "bfde016b7917d9de13a86aca3012d3fd680fc395413e0a7834e5d0c278c6f097",
+    "configs/matrix.py": "901547f13fbbe465074954fdbb2811ec1d9c73a20d18239694cebe5b2cde91e6",
+    "train/native_grpo.py": "6e4f69467c4e93fdfc095914c6a585a0e3657e2df774f8cbf4e69bd4d417654b",
+    "train/native_rollout.py": "10b93ac615f1001e5ce8ad855c4cbefdd287ee9a4de68cc2734a87f338c38f85",
+    "train/native_reward.py": "0a6aaa1291babbe57040398c06bf35a0132a1a66b25a1b57705da6bff6b7f2b8",
+    "train/label_marginal.py": "1c7074191292d57892afee05bf3b6ab13e09ff1c0e209b8b280e7f2b60d9ee9f",
+    "train/native_allocation.py": "e0bfb1e534a6127b5974c32698fc0ac09759c66ffc0d2f3bd46ff83dc688cc90",
+    "train/native_training.py": "23c8ccd412cd32c593fca80c9732ff8d49e972e8f03cfbf5759751a17715a542",
+    "formats/parser.py": "db8a4a467d3282a121eb49e5f7a8001b1bd2e2d9aa502a8f4ed78e08f6892bf0",
+    "formats/prompts.py": "5a9f1987dd939aac2cfdcf842960d79e8ce81f3c746757acc3c41287fa99b83b",
+    "eval/hf_generate.py": "6de9ce280878f101e8146238f3aaacde08ee8da644921124a46a6a95d37a450f",
+    "eval/predict.py": "5a90b7a84494dd48c4f0872880bd156d9535537a0a4eddc1b52804af1330a6a4",
+    "scripts/run.py": "1fd8d7ccb4c022d5c91abe30a8ec528ef21d6b8fdcf0132094166f8a4d42dde8"
+  }
+}

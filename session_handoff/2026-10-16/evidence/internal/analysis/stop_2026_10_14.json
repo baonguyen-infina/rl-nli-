@@ -1,0 +1,24 @@
+{
+  "stopped_at_utc": "2026-10-14T01:00:19.362702+00:00",
+  "reason": "User requested stopping all work before going to the office",
+  "terminated_sessions": [
+    "rl-nli-native-direct-g4",
+    "rl-nli-native-clean-g4",
+    "rl-nli-native-joint-g4"
+  ],
+  "incomplete_runs": [
+    "N1R7",
+    "N4R7"
+  ],
+  "cancelled_queues": [
+    "N5R7",
+    "D4R8"
+  ],
+  "R8_RL_started": false,
+  "local_gpu_work": false,
+  "last_observed_steps": {
+    "N1R7": 25,
+    "N4R7": 41
+  },
+  "step_note": "Last observed values; not terminal step counts. R7 has no completed dev evaluation recorded locally."
+}

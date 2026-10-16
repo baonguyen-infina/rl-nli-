@@ -1,0 +1,3 @@
+run_id,model,seed,recipe,format,split,n,accuracy,macro_f1,parse_rate,wall_seconds,rule_consistency,structure_rate,source,init_from,native_mode,scoring_protocol,validation_protocol,eval_engine_options,initial_macro_f1,selected_checkpoint,selection_split,selection_metric
+D3R3,Qwen/Qwen3.5-2B,0,sft,label,dev,1000,0.553,0.552833107492137,1.0,844.9,,,/Users/infina/Documents/rl-nli/results/D3R3_Qwen3.5-2B_s0,,,,,{},,checkpoint-400,dev,macro_f1
+D3R9,Qwen/Qwen3.5-2B,0,sft,label,dev,1000,0.564,0.5646142954922497,1.0,1792.6,,,/Users/infina/Documents/rl-nli/results/D3R9_Qwen3.5-2B_s0,,,,,{},,checkpoint-600,dev,macro_f1

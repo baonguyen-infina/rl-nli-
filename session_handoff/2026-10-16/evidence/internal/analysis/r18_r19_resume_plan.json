@@ -1,0 +1,78 @@
+{
+  "updated_at": 1792070295.671364,
+  "active_objective": "Teacher-free SFT+RL, ViANLI test Macro-F1 >=0.58; report test only",
+  "max_sessions": 3,
+  "current_sessions": 2,
+  "model": "Qwen/Qwen3.5-2B",
+  "heavy_local_work": false,
+  "runs": {
+    "N15R18": {
+      "session": "rl-nli-resume-r18-g4",
+      "grouping": "random",
+      "steps": 400,
+      "cli_session_id": 2875,
+      "test_worker_pid": 22452
+    },
+    "N16R19": {
+      "session": "rl-nli-r19-native-swap-2b-g4",
+      "grouping": "native",
+      "steps": 400,
+      "cli_session_id": 67988,
+      "bootstrap_pid": 2951,
+      "remote_tests_passed": 476,
+      "smoke_passed": true,
+      "main_launched": true
+    }
+  },
+  "checkpoint_selection": "all checkpoints 100,200,300,400; max full-dev Macro-F1; ties choose later; dev metrics remain internal",
+  "heldout_rule": "hash-lock config and selected adapter, one test execution per prespecified candidate, report both outcomes without test-based retuning",
+  "storage": {
+    "old_drive_free_bytes_last_checked": 68186,
+    "r18_recovery_archive_verified": true,
+    "r18_compact_test_target_reserved": true,
+    "new_checkpoints": "retained on their G4 VMs; no off-VM backup until overflow storage works",
+    "external_precondition": "Google Cloud project creation previously failed: Callers must accept Terms of Service; async user action requested",
+    "prepared_helper": "/private/tmp/native_overflow_drive_ready.py"
+  },
+  "monitor": "/private/tmp/native_r18_r19_monitor.py",
+  "no_automatic_runtime_release_before_artifact_backup": true,
+  "paper_status": "Existing exploratory ACL draft is based only on prior test cohort; new method has no test score yet",
+  "test_workers_registered": true,
+  "matched_real_data_audit": "r19_matched_exposure_audit.json",
+  "durable_backup_update": {
+    "provider": "github-private-draft-release",
+    "repo": "baonguyen-infina/rl-nli-experiment-archives",
+    "release_id": 413873953,
+    "periodic_log_seconds": 900,
+    "checkpoint_events": [
+      100,
+      200,
+      300,
+      400
+    ],
+    "final_after_verified_test": true,
+    "model_bytes_written_locally": 0,
+    "operator_sources": "/Users/infina/Documents/rl-nli/artifacts/analysis/github_backup_operator_sources",
+    "verified_first_checkpoint_bytes": 123639954,
+    "updated_at": 1792073271.1140091
+  },
+  "latest_audit": {
+    "observed_at": 1792074032.369954,
+    "goal_turn_classification": "progress_and_verified_wait",
+    "new_test_results": false,
+    "live_training": {
+      "N16R19": {
+        "step": "128",
+        "test_stage": "registered_waiting_for_training"
+      },
+      "N15R18": {
+        "step": "176",
+        "test_stage": "registered_waiting_for_training"
+      }
+    },
+    "periodic_and_failure_logs_backup_enabled": true,
+    "archive_operator_regression_tests_passed": 13,
+    "model_bytes_written_locally": 0,
+    "no_training_restart": true
+  }
+}

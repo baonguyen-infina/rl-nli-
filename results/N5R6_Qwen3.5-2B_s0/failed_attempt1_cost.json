@@ -1,0 +1,6 @@
+{
+  "status": "failed",
+  "error": "CalledProcessError: Command '['/usr/bin/python3', '-m', 'eval.predict', '--run', 'N5R6', '--seed', '0', '--split', 'dev', '--out-dir', '/content/rl-nli-r6/results/N5R6_Qwen3.5-2B_s0/ckpt_eval/checkpoint-100', '--adapter', '/content/rl-nli-r6/results/N5R6_Qwen3.5-2B_s0/grpo_ckpts/checkpoint-100', '--config', '/content/rl-nli-r6/results/N5R6_Qwen3.5-2B_s0/config.yaml']' returned non-zero exit status 1.",
+  "wall_seconds": 4945.5,
+  "last_phase": "all"
+}

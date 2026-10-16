@@ -3,10 +3,10 @@ import sys
 
 from common.io import ARTIFACTS, RESULTS, read_json
 
-REQUIRED = ["E0", "E1", "E2", "E3"]
+REQUIRED = ["E0", "E1", "E2", "E3", "B1"]
 
 
-def evaluate_gate(metrics: dict) -> tuple[bool, list[str]]:
+def evaluate_gate(metrics: dict, probe_complete: bool = False) -> tuple[bool, list[str]]:
     lines, ok = [], True
     for rid in REQUIRED:
         if rid not in metrics:
@@ -14,17 +14,15 @@ def evaluate_gate(metrics: dict) -> tuple[bool, list[str]]:
             ok = False
     if not ok:
         return False, lines
-    zs = max(metrics[r]["accuracy"] for r in ("E0", "E1", "E2"))
+    zs = max(metrics[r]["macro_f1"] for r in ("E0", "E1", "E2"))
     e3 = metrics["E3"]
-    better = e3["accuracy"] > zs
+    better = e3["macro_f1"] > zs
     parse_ok = e3["parse_rate"] >= 0.99
-    lines.append(f"E3 acc {e3['accuracy']:.4f} vs best ZS {zs:.4f}: {'OK' if better else 'FAIL'}")
+    lines.append(f"E3 Macro-F1 {e3['macro_f1']:.4f} vs best ZS {zs:.4f}: {'OK' if better else 'FAIL'}")
     lines.append(f"E3 parse {e3['parse_rate']:.4f} >= 0.99: {'OK' if parse_ok else 'FAIL'}")
-    if "B1" in metrics:
-        lines.append(f"B1 acc {metrics['B1']['accuracy']:.4f} (tham chiếu)")
-    else:
-        lines.append("B1: bỏ qua (tham chiếu encoder)")
-    return better and parse_ok, lines
+    lines.append(f"B1 Macro-F1 {metrics['B1']['macro_f1']:.4f} (tham chiếu)")
+    lines.append(f"hypothesis probe: {'OK' if probe_complete else 'thiếu'}")
+    return better and parse_ok and probe_complete, lines
 
 
 def main() -> None:
@@ -34,9 +32,8 @@ def main() -> None:
             f = d / "metrics_dev.json"
             if f.exists():
                 metrics[rid] = read_json(f)
-    ok, lines = evaluate_gate(metrics)
     probe = (ARTIFACTS / "hyp_probe" / "p_hyp_train.jsonl").exists()
-    lines.append(f"hyp probe p_hyp_train.jsonl: {'OK' if probe else 'bỏ qua (tham chiếu encoder)'}")
+    ok, lines = evaluate_gate(metrics, probe_complete=probe)
     print("\n".join(lines))
     print("G1:", "PASS" if ok else "FAIL")
     sys.exit(0 if ok else 1)

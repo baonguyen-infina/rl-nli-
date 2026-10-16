@@ -1,0 +1,11 @@
+{
+  "run": "N1R5",
+  "n": 50,
+  "selection": "latest active completion per unique prompt, step >=150; uniform seed42",
+  "split": "train",
+  "accuracy": 0.74,
+  "parse_rate": 1.0,
+  "reasoning_tokens_mean": 52.72,
+  "cap_fraction": 0.5,
+  "human_semantic_review": "pending; parser success does not establish rationale correctness"
+}

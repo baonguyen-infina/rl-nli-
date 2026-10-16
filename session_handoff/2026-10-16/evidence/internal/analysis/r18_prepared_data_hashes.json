@@ -1,0 +1,13 @@
+{
+  "prepared_files": {
+    "artifacts/data/vianli_train.jsonl": {
+      "sha256": "4edd41c3aa8a1d9bdd3bac36a3b80f303c7e973e5db5eb764ae285225f90a5c7",
+      "bytes": 3602306
+    },
+    "artifacts/data/vianli_dev.jsonl": {
+      "sha256": "a9dbfa914892e2b636bf11660cb91bd4698f7d4a72df8f879e9adf526fb29389",
+      "bytes": 452907
+    }
+  },
+  "test_read": false
+}
