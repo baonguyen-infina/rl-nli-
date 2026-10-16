@@ -1,0 +1,77 @@
+{
+  "checked_at_utc": "2026-10-16T03:10:10.609190+00:00",
+  "local_test_outputs_checked": [
+    {
+      "run": "HD3R9C",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HD3R9L",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN0R11C",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN0R11L",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN1R9C",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN1R9L",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN4R9C",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN4R9L",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN5R10C",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN5R10L",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN6R11C",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN6R11L",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN6R11P200L",
+      "local_prediction_and_receipt_check": true
+    },
+    {
+      "run": "HN7R12P200L",
+      "local_prediction_and_receipt_check": true
+    }
+  ],
+  "recorded_remote_test_rows": 2,
+  "total_test_rows": 16,
+  "registered_or_observed_run_ids": 190,
+  "files_copied": 1491,
+  "redacted_copies": 0,
+  "oversize_files_not_copied": 0,
+  "paper_pdf_sha256_matches_recorded_visual_qa": true,
+  "fresh_pdf_render_or_compile": false,
+  "forbidden_weight_or_key_files": [],
+  "literal_secret_pattern_matches": [],
+  "broken_top_level_markdown_links": [],
+  "all_current_matrix_ids_catalogued": true,
+  "ml_libraries_imported": false,
+  "new_gpu_jobs_started": false,
+  "remote_state_revalidated": false,
+  "source_status": "uncommitted workspace snapshot; see catalog/git_status.txt"
+}

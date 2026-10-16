@@ -1,0 +1,24 @@
+{
+  "gradient_smoke": {
+    "policy_norm": 0.14234724943460839,
+    "answer_ce_norm": 0.2478896988525346,
+    "active_tokens": 5670,
+    "ce_tokens": 400,
+    "allocation_norm": 2.9408141379176342,
+    "allocation_score_max_difference": 6.722012996673584,
+    "allocation_active_score_max_difference": 0.0,
+    "allocation_groups": 32
+  },
+  "reference_audit": {
+    "initial_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+    "final_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+    "init_from": "D3R9",
+    "frozen": true,
+    "unchanged": true
+  },
+  "dropout_audit": {
+    "disable_dropout_requested": true,
+    "active_dropout_modules": {},
+    "reward_scoring": "detached eval"
+  }
+}

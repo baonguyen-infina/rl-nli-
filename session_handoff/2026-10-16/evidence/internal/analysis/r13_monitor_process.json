@@ -1,0 +1,7 @@
+{
+  "pid": 77862,
+  "attempt": 2,
+  "source": "foreground CLI stream, no queued kernel probes",
+  "started_at": 1792044702.394057,
+  "local_ml": false
+}

@@ -1,0 +1,10 @@
+{
+  "first200_match": true,
+  "first200_rows": 3810,
+  "full400_rows": 7670,
+  "unique_rows": 7670,
+  "all_training_rows": 8012,
+  "no_shared_premise": true,
+  "random_group_schedule_sha256": "f4c6b7eaa6ad1a04d9f37f66473ecdf8bd85acfb0a6dbadf438d102732a2c423",
+  "prior_audit_sha256": "9f7e0c4090a8808e74ed4fe131a48a4bdf927711aaf850e8a0f5d0bd9a6e8606"
+}

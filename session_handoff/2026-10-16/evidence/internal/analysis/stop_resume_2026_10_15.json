@@ -1,0 +1,15 @@
+{
+  "stop_confirmed": true,
+  "all_three_colab_sessions_terminated": true,
+  "user_resumed": true,
+  "resumed_at": 1792067456.018838,
+  "stopped_stale_local_controllers": [
+    38588,
+    59492,
+    67110,
+    71928,
+    71937,
+    89039
+  ],
+  "active_goal_paused": false
+}

@@ -1,0 +1,104 @@
+{
+  "status": "complete",
+  "cohort_sha256": "4a569ddd1e8da7d303e279ab897f5de349297068143bc9a97045f6969dc8cd5d",
+  "analysis_returncode": 0,
+  "analysis_output": "{'test_runs': 14, 'paper_dir': '/content/rl-nli-paper/paper'}\n",
+  "tex_returncode": 0,
+  "tex_output": "note: Running TeX ...\nnote: Running BibTeX on main.aux ...\nnote: Rerunning TeX because bibtex was run ...\nnote: Running xdvipdfmx ...\nnote: Writing `main.out` (3.2294921875 KiB)\nnote: Writing `main.blg` (365 B)\nnote: Writing `main.log` (20.939453125 KiB)\nnote: Writing `main.aux` (15.4306640625 KiB)\nnote: Writing `main.bbl` (7.2529296875 KiB)\nnote: Writing `main.pdf` (93.41796875 KiB)\nwarning: lineno.sty:296: Invalid UTF-8 byte or sequence at line 296 replaced by U+FFFD.\nwarning: main.tex:30: Underfull \\vbox (badness 10000) has occurred while \\output is active\nwarning: main.tex:36: Underfull \\hbox (badness 1400) in paragraph at lines 35--36\nwarning: main.tex:36: Underfull \\hbox (badness 5548) in paragraph at lines 35--36\nwarning: main.tex:40: Underfull \\hbox (badness 2142) in paragraph at lines 38--40\nwarning: main.tex:44: Underfull \\vbox (badness 10000) has occurred while \\output is active\nwarning: main.tex:109: Underfull \\hbox (badness 1371) in paragraph at lines 108--109\nwarning: main.tex:115: Underfull \\hbox (badness 1622) in paragraph at lines 114--115\nwarning: main.tex:124: Underfull \\hbox (badness 1968) in paragraph at lines 123--124\nwarning: main.tex:126: Underfull \\hbox (badness 1092) in paragraph at lines 125--126\nwarning: main.tex:140: Underfull \\hbox (badness 4792) in paragraph at lines 139--140\nwarning: main.tex:156: Underfull \\hbox (badness 2073) in paragraph at lines 1--156\nwarning: tables/interpretation_test.tex:2: Underfull \\hbox (badness 3118) in paragraph at lines 1--2\nwarning: main.tex:166: Underfull \\hbox (badness 10000) in paragraph at lines 165--166\nwarning: main.tex:166: Underfull \\hbox (badness 4279) in paragraph at lines 165--166\nwarning: main.tex:166: Underfull \\hbox (badness 3657) in paragraph at lines 165--166\nwarning: main.tex:166: Underfull \\hbox (badness 1028) in paragraph at lines 165--166\nwarning: main.tex:166: Underfull \\hbox (badness 4954) in paragraph at lines 165--166\nwarning: main.tex:166: Underfull \\hbox (badness 1163) in paragraph at lines 165--166\nwarning: main.tex:176: Underfull \\hbox (badness 1881) in paragraph at lines 175--176\nwarning: main.bbl:69: Underfull \\hbox (badness 1337) in paragraph at lines 65--69\nwarning: main.bbl:86: Underfull \\hbox (badness 1052) in paragraph at lines 80--86\nwarning: main.bbl:86: Underfull \\hbox (badness 1038) in paragraph at lines 80--86\nwarning: main.bbl:86: Underfull \\hbox (badness 1571) in paragraph at lines 80--86\nwarning: main.bbl:96: Underfull \\hbox (badness 1661) in paragraph at lines 89--96\nwarning: errors were issued by BibTeX, but were ignored; use --print and/or --keep-logs for details.\nwarning: lineno.sty:296: Invalid UTF-8 byte or sequence at line 296 replaced by U+FFFD.\nwarning: main.tex:30: Underfull \\vbox (badness 10000) has occurred while \\output is active\nwarning: main.tex:36: Underfull \\hbox (badness 1400) in paragraph at lines 35--36\nwarning: main.tex:36: Underfull \\hbox (badness 5548) in paragraph at lines 35--36\nwarning: main.tex:40: Underfull \\hbox (badness 2142) in paragraph at lines 38--40\nwarning: main.tex:44: Underfull \\vbox (badness 10000) has occurred while \\output is active\nwarning: main.tex:109: Underfull \\hbox (badness 1371) in paragraph at lines 108--109\nwarning: main.tex:115: Underfull \\hbox (badness 1622) in paragraph at lines 114--115\nwarning: main.tex:124: Underfull \\hbox (badness 1968) in paragraph at lines 123--124\nwarning: main.tex:126: Underfull \\hbox (badness 1092) in paragraph at lines 125--126\nwarning: main.tex:140: Underfull \\hbox (badness 4792) in paragraph at lines 139--140\nwarning: main.tex:156: Underfull \\hbox (badness 2073) in paragraph at lines 1--156\nwarning: tables/interpretation_test.tex:2: Underfull \\hbox (badness 3118) in paragraph at lines 1--2\nwarning: main.tex:166: Underfull \\hbox (badness 10000) in paragraph at lines 165--166\nwarning: main.tex:166: Underfull \\hbox (badness 4279) in paragraph at lines 165--166\nwarning: main.tex:166: Underfull \\hbox (badness 3657) in paragraph at lines 165--166\nwarning: main.tex:166: Underfull \\hbox (badness 1028) in paragraph at lines 165--166\nwarning: main.tex:166: Underfull \\hbox (badness 4954) in paragraph at lines 165--166\nwarning: main.tex:166: Underfull \\hbox (badness 1163) in paragraph at lines 165--166\nwarning: main.tex:176: Underfull \\hbox (badness 1881) in paragraph at lines 175--176\nwarning: main.bbl:69: Underfull \\hbox (badness 1337) in paragraph at lines 65--69\nwarning: main.bbl:86: Underfull \\hbox (badness 1052) in paragraph at lines 80--86\nwarning: main.bbl:86: Underfull \\hbox (badness 1038) in paragraph at lines 80--86\nwarning: main.bbl:86: Underfull \\hbox (badness 1571) in paragraph at lines 80--86\nwarning: main.bbl:96: Underfull \\hbox (badness 1661) in paragraph at lines 89--96\nwarning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.\n",
+  "pdfinfo": "Creator:         LaTeX with hyperref\nProducer:        xdvipdfmx (0.1)\nCreationDate:    Thu Oct 15 02:55:49 2026 UTC\nCustom Metadata: no\nMetadata Stream: no\nTagged:          no\nUserProperties:  no\nSuspects:        no\nForm:            none\nJavaScript:      no\nPages:           7\nEncrypted:       no\nPage size:       595.28 x 841.89 pts (A4)\nPage rot:        0\nFile size:       95660 bytes\nOptimized:       no\nPDF version:     1.5\n",
+  "training_seed": 0,
+  "metrics_test": {
+    "HN4R9L": {
+      "n": 1000,
+      "macro_f1": 0.5610993773840734,
+      "accuracy": 0.561,
+      "parse_rate": 1.0
+    },
+    "HN6R11L": {
+      "n": 1000,
+      "macro_f1": 0.5559095727147086,
+      "accuracy": 0.556,
+      "parse_rate": 1.0
+    },
+    "HN6R11P200L": {
+      "n": 1000,
+      "macro_f1": 0.5558698508809384,
+      "accuracy": 0.557,
+      "parse_rate": 1.0
+    },
+    "HN4R9C": {
+      "n": 1000,
+      "macro_f1": 0.5617630824418426,
+      "accuracy": 0.56,
+      "parse_rate": 1.0
+    },
+    "HN6R11C": {
+      "n": 1000,
+      "macro_f1": 0.5637350419013701,
+      "accuracy": 0.562,
+      "parse_rate": 1.0
+    },
+    "HD3R9L": {
+      "n": 1000,
+      "macro_f1": 0.5637477952071254,
+      "accuracy": 0.563,
+      "parse_rate": 1.0
+    },
+    "HN0R11L": {
+      "n": 1000,
+      "macro_f1": 0.557281736922766,
+      "accuracy": 0.557,
+      "parse_rate": 1.0
+    },
+    "HD3R9C": {
+      "n": 1000,
+      "macro_f1": 0.5264469047153636,
+      "accuracy": 0.534,
+      "parse_rate": 1.0
+    },
+    "HN0R11C": {
+      "n": 1000,
+      "macro_f1": 0.5681789181109121,
+      "accuracy": 0.566,
+      "parse_rate": 1.0
+    },
+    "HN1R9L": {
+      "n": 1000,
+      "macro_f1": 0.5636748345131792,
+      "accuracy": 0.565,
+      "parse_rate": 1.0
+    },
+    "HN5R10L": {
+      "n": 1000,
+      "macro_f1": 0.5560625736478849,
+      "accuracy": 0.556,
+      "parse_rate": 1.0
+    },
+    "HN7R12P200L": {
+      "n": 1000,
+      "macro_f1": 0.5637640620249317,
+      "accuracy": 0.565,
+      "parse_rate": 1.0
+    },
+    "HN1R9C": {
+      "n": 1000,
+      "macro_f1": 0.5585963036727833,
+      "accuracy": 0.558,
+      "parse_rate": 1.0
+    },
+    "HN5R10C": {
+      "n": 1000,
+      "macro_f1": 0.5613921336380862,
+      "accuracy": 0.559,
+      "parse_rate": 1.0
+    }
+  },
+  "target_macro_f1": 0.58,
+  "target_met_by_bounded_primary": false,
+  "target_met_by_any_registered_primary": false,
+  "publication_readiness": "exploratory_single_seed_single_benchmark; not established A/A* evidence",
+  "visual_review_required": false,
+  "pdf_sha256": "f6355e6bb9c555e8ee79bb118442396803ff7d6ae51a66e6f6ec5cff1b14f130",
+  "overfull_boxes": [],
+  "visual_qa": "visual_qa.json"
+}

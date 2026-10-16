@@ -1,0 +1,73 @@
+{
+  "recorded_at_utc": "2026-10-15T07:46:56Z",
+  "results": [
+    {
+      "run": "HN10R13P100L",
+      "source_run": "N10R13",
+      "checkpoint": 100,
+      "split": "dev",
+      "n": 1000,
+      "macro_f1": 0.5741875204951111,
+      "accuracy": 0.574,
+      "parse_rate": 1.0,
+      "per_class": {
+        "entailment": {
+          "f1": 0.6368,
+          "support": 334
+        },
+        "neutral": {
+          "f1": 0.5343,
+          "support": 333
+        },
+        "contradiction": {
+          "f1": 0.5515,
+          "support": 333
+        }
+      },
+      "predictions_sha256": "410e7139878f6e7624c14340ef505eb982eb6a4b340a2459652de116cd5e3831",
+      "drive": {
+        "id": "1ckS6-X3CKyURVC2QGDf__Kq02wuNNx1H",
+        "name": "HN10R13P100L_s0_early-dev-metadata.tar.gz",
+        "size": 19182,
+        "md5": "9fb0e94cc727b4f3f202e5ee591f87b1"
+      },
+      "test_accessed": false,
+      "paper_eligible": false,
+      "remote_drive_metadata_verified": true
+    },
+    {
+      "run": "HN11R13P100L",
+      "source_run": "N11R13",
+      "checkpoint": 100,
+      "split": "dev",
+      "n": 1000,
+      "macro_f1": 0.5698206803835054,
+      "accuracy": 0.569,
+      "parse_rate": 1.0,
+      "per_class": {
+        "entailment": {
+          "f1": 0.6248,
+          "support": 334
+        },
+        "neutral": {
+          "f1": 0.5347,
+          "support": 333
+        },
+        "contradiction": {
+          "f1": 0.55,
+          "support": 333
+        }
+      },
+      "predictions_sha256": "102d939c07e70cd4baf676abdd05833b9797cfc415ac1c6449427f3bea051916",
+      "drive": {
+        "id": "1b4lfuGPPfstQJkvsjGR1lEVygMOAjyuH",
+        "name": "HN11R13P100L_s0_early-dev-metadata.tar.gz",
+        "size": 18940,
+        "md5": "ccc6432727c72a2e6398885365862fb3"
+      },
+      "test_accessed": false,
+      "paper_eligible": false,
+      "remote_drive_metadata_verified": true
+    }
+  ]
+}

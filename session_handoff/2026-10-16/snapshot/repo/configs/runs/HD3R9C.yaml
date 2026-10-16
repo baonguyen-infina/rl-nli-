@@ -1,0 +1,19 @@
+recipe: zs
+format: cot
+guess: false
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: D3R9
+priority: DEV
+seeds:
+- 0
+sft_schedule: full_budget
+bounded_reasoning: true
+native_schedule: full_reasoning
+eval_schedule: full_reasoning
+validation_protocol: fixed_single_sequence
+run_id: HD3R9C
+eval:
+  backend: transformers
+  gpu_memory_utilization: 0.65
+  model_revision: 15852e8c16360a2fea060d615a32b45270f8a8fc

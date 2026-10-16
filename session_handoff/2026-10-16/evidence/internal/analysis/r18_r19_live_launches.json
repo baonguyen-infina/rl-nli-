@@ -1,0 +1,74 @@
+{
+  "observed_at": 1792070295.6701949,
+  "lanes": {
+    "r18": {
+      "main_launch": {
+        "pid": 19553,
+        "started_at": 1792068810.4817617,
+        "run": "N15R18",
+        "session": "rl-nli-resume-r18-g4",
+        "stdout": "/content/full_logs_r18_pipeline.log"
+      },
+      "test_launch": {
+        "pid": 22452,
+        "run": "N15R18",
+        "started_at": 1792069328.4651196,
+        "mode": "wait for complete training, lock, test once"
+      },
+      "status": {
+        "run": "N15R18",
+        "phase": "training_or_internal_selection",
+        "observed_at": 1792070251.5520968,
+        "last_train": {
+          "step": "43",
+          "loss": "0.04889823868870735",
+          "grad_norm": "1.1744940280914307",
+          "step_time": "29.55107386799864"
+        },
+        "pid": 19554,
+        "backup_watchers": [],
+        "teacher": false,
+        "new_test_accessed": false,
+        "local_ml": false
+      },
+      "test_state": {
+        "stage": "registered_waiting_for_training",
+        "run": "N15R18",
+        "observed_at": 1792069328.505353,
+        "test_accessed": false
+      }
+    },
+    "r19": {
+      "main_launch": {
+        "pid": 6210,
+        "started_at": 1792070146.724431,
+        "run": "N16R19",
+        "session": "rl-nli-r19-native-swap-2b-g4",
+        "stdout": "/content/full_logs_r19_pipeline.log"
+      },
+      "test_launch": {
+        "pid": 6209,
+        "waiting_for_training": true,
+        "started_at": 1792070146.7239208
+      },
+      "status": {
+        "run": "N16R19",
+        "phase": "training_or_internal_selection",
+        "observed_at": 1792070267.7745323,
+        "last_train": null,
+        "pid": 6211,
+        "backup_watchers": [],
+        "teacher": false,
+        "new_test_accessed": false,
+        "local_ml": false
+      },
+      "test_state": {
+        "stage": "registered_waiting_for_training",
+        "run": "N16R19",
+        "observed_at": 1792070146.7644007,
+        "test_accessed": false
+      }
+    }
+  },
+  "local_ml": false
+}

@@ -1,0 +1,34 @@
+{
+  "phase": "observing",
+  "started_at": 1792038249.4719942,
+  "target_macro_f1": 0.58,
+  "target_met": false,
+  "test_accessed": false,
+  "local_ml": false,
+  "lanes": {
+    "primary": {
+      "session": "rl-nli-dense-2b-g4",
+      "run": "N10R13",
+      "phase": "all",
+      "step": "13",
+      "checked_at": 1792044436.1640902,
+      "child_process": "PID STAT     ELAPSED COMMAND\n  18008 S          39:24 /usr/bin/python3 -m scripts.run --run N10R13 --seed 0 --phase all",
+      "observation_error_type": "RuntimeError",
+      "observation_error": "Colab CLI exec failed with exit 1"
+    },
+    "accuracy": {
+      "session": "rl-nli-marginal-accuracy-2b-g4",
+      "run": "N11R13",
+      "phase": "all",
+      "step": null,
+      "checked_at": 1792044436.530406,
+      "child_process": "PID STAT     ELAPSED COMMAND\n  21053 S          27:03 /usr/bin/python3 -m scripts.run --run N11R13 --seed 0 --phase all",
+      "observation_error_type": "RuntimeError",
+      "observation_error": "Colab CLI exec failed with exit 1"
+    }
+  },
+  "released_sessions": [],
+  "compute_usage": "Current balance: 1464.50 compute units\nUsage rate: 0.00/hr\nActive assignments: 0",
+  "compute_checked_at": 1792044314.052023,
+  "updated_at": 1792044436.530526
+}

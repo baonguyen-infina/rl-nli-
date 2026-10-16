@@ -1,0 +1,16 @@
+{
+  "provider": "github-private-draft-release",
+  "id": 644678338,
+  "name": "N21R20_s0_checkpoint-100.tar.gz",
+  "size": "123264984",
+  "sha256": "b00b55760f6e9624e6bfecf1b735b197861f585015c3b22c6dedaff79bcdb53d",
+  "github_digest": "sha256:b00b55760f6e9624e6bfecf1b735b197861f585015c3b22c6dedaff79bcdb53d",
+  "repo": "baonguyen-infina/rl-nli-experiment-archives",
+  "release_id": 413873953,
+  "repo_private": true,
+  "release_draft": true,
+  "model_bytes_written_locally": 0,
+  "bytes_relayed_through_memory": 123264984,
+  "max_buffer_bytes": 16384,
+  "verified_at": 1792086672.0293992
+}

@@ -1,0 +1,17 @@
+{
+  "run": "HN12R15P200L",
+  "parent_run": "N12R15",
+  "parent_run_interrupted": true,
+  "preserved_checkpoint": 200,
+  "split": "dev",
+  "n": 1000,
+  "macro_f1": 0.5734420945437809,
+  "accuracy": 0.573,
+  "parse_rate": 1.0,
+  "paper_eligible": false,
+  "test_accessed": false,
+  "backend": "transformers",
+  "temperature": 0.0,
+  "target_058_met": false,
+  "predictions_sha256": "d225da0a9fad744f984c7e944b2ba8123c9cccf10794133bb6676673bf078e75"
+}

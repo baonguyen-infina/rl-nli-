@@ -1,0 +1,35 @@
+{
+  "gradient_smoke": {
+    "policy_norm": 0.19343898167701878,
+    "answer_ce_norm": 0.5970645640712706,
+    "active_tokens": 5926,
+    "ce_tokens": 400,
+    "allocation_norm": 0.5554985999784747,
+    "allocation_score_max_difference": 2.068218231201172,
+    "allocation_active_score_max_difference": 0.0,
+    "allocation_groups": 32
+  },
+  "reference_audit": {
+    "initial_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+    "final_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+    "init_from": "D3R9",
+    "frozen": true,
+    "unchanged": true
+  },
+  "dropout_audit": {
+    "disable_dropout_requested": true,
+    "active_dropout_modules": {},
+    "reward_scoring": "detached eval"
+  },
+  "trace_swap_smoke": {
+    "changed_prefix_rows": 52,
+    "active_rows": 64,
+    "groups": 32,
+    "original_logq_mean": -0.39016054396034633,
+    "rotated_logq_mean": -2.3679195975338896,
+    "gap_mean": 1.9777592420578003,
+    "gap_std": 3.5082449913024902,
+    "finite": true,
+    "donor_rule": "label-blind cyclic active slots within the same native group and rollout"
+  }
+}

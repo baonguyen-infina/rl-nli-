@@ -1,0 +1,7 @@
+{
+  "protocol": "legacy_scheduler",
+  "engine_options": {},
+  "temperature": 0.0,
+  "split": "dev",
+  "n": 1000
+}

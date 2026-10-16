@@ -1,0 +1,56 @@
+{
+  "created_at_utc": "2026-10-15T04:24:09.442262+00:00",
+  "cohort": "R13_finite_label",
+  "scope": "development only",
+  "test_access_allowed": false,
+  "training_seed": 0,
+  "model": "Qwen/Qwen3.5-2B",
+  "model_revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+  "warm_start": "D3R9/checkpoint-600",
+  "warm_reference_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+  "target": {
+    "split": "dev",
+    "metric": "macro_f1",
+    "threshold": 0.58
+  },
+  "primary_decoder": "Transformers greedy bounded CoT, single sequence; reasoning128 total160",
+  "checkpoint_selection": "Full dev Macro-F1; ties favor later step",
+  "secondary_decoder": "Greedy label-only; never select checkpoint or format by secondary score",
+  "runs": {
+    "N10R13": "counterfactual minibatch Macro-F1 utility",
+    "N11R13": "correct-label probability utility"
+  },
+  "budget": {
+    "updates": 200,
+    "lr_horizon": 400,
+    "generations": 4,
+    "groups_per_update": 8,
+    "learning_rate": 2e-06,
+    "beta": 0.01,
+    "gold_answer_ce_weight": 0.1,
+    "direct_utility_loss_weight": 0.2
+  },
+  "source_hashes": {
+    "configs/base.yaml": "bfde016b7917d9de13a86aca3012d3fd680fc395413e0a7834e5d0c278c6f097",
+    "configs/matrix.py": "901547f13fbbe465074954fdbb2811ec1d9c73a20d18239694cebe5b2cde91e6",
+    "train/native_grpo.py": "6e4f69467c4e93fdfc095914c6a585a0e3657e2df774f8cbf4e69bd4d417654b",
+    "train/native_rollout.py": "10b93ac615f1001e5ce8ad855c4cbefdd287ee9a4de68cc2734a87f338c38f85",
+    "train/label_marginal.py": "1c7074191292d57892afee05bf3b6ab13e09ff1c0e209b8b280e7f2b60d9ee9f",
+    "train/native_reward.py": "0a6aaa1291babbe57040398c06bf35a0132a1a66b25a1b57705da6bff6b7f2b8",
+    "train/native_allocation.py": "e0bfb1e534a6127b5974c32698fc0ac09759c66ffc0d2f3bd46ff83dc688cc90",
+    "train/native_training.py": "23c8ccd412cd32c593fca80c9732ff8d49e972e8f03cfbf5759751a17715a542",
+    "formats/parser.py": "db8a4a467d3282a121eb49e5f7a8001b1bd2e2d9aa502a8f4ed78e08f6892bf0",
+    "formats/prompts.py": "5a9f1987dd939aac2cfdcf842960d79e8ce81f3c746757acc3c41287fa99b83b",
+    "eval/hf_generate.py": "6de9ce280878f101e8146238f3aaacde08ee8da644921124a46a6a95d37a450f",
+    "eval/predict.py": "5a90b7a84494dd48c4f0872880bd156d9535537a0a4eddc1b52804af1330a6a4",
+    "scripts/run.py": "1fd8d7ccb4c022d5c91abe30a8ec528ef21d6b8fdcf0132094166f8a4d42dde8"
+  },
+  "config_hashes": {
+    "N10R13": "a0b4ff861d686f671abb9de35b3cfe65ba82b0963702aa8b0c45b5d5fc13f4f8",
+    "N11R13": "40ef59e9cd56fe85f26d647abcf41fbbd82dbec2849a14901c9bb255c7421d6b",
+    "G0N10R13P": "4646ced0bb27303b89383645fe710307122e998cb6e44ba252851aa10c8af50d",
+    "G0N11R13P": "7fbe4cd14822b5b849da18b549dac9fbc9b8ac75dd047303d41eb2874739612a",
+    "HN10R13L": "3755859ef3c9951aa9c0503b9ab3d15e84dbb5971ecea6a4c461844f95f70072",
+    "HN11R13L": "f36e3f3103e8af5f9ab6e1be19ceb5d8e1f0e5f0527e1793728e1392fdbcd16c"
+  }
+}

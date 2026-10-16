@@ -1,0 +1,235 @@
+{
+  "utc_epoch": 1792039944.8151584,
+  "model": "Qwen/Qwen3.5-2B",
+  "session": "rl-nli-dense-2b-g4",
+  "pipeline": {
+    "phase": "all",
+    "run": "N10R13",
+    "child_pid": 18008,
+    "updated_at": 1792037580.8033493
+  },
+  "G0N10R13P": {
+    "gradient_smoke.json": {
+      "policy_norm": 0.02549439402354826,
+      "answer_ce_norm": 0.2478655252442416,
+      "active_tokens": 5528,
+      "ce_tokens": 400,
+      "allocation_norm": 0.30953312405176037,
+      "allocation_score_max_difference": 6.722012996673584,
+      "allocation_active_score_max_difference": 0.0,
+      "allocation_groups": 64
+    },
+    "reference_audit.json": {
+      "initial_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+      "final_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+      "init_from": "D3R9",
+      "frozen": true,
+      "unchanged": true
+    },
+    "dropout_audit.json": {
+      "disable_dropout_requested": true,
+      "active_dropout_modules": {},
+      "reward_scoring": "detached eval"
+    },
+    "cost.json": {
+      "status": "trained",
+      "wall_seconds": 211.9,
+      "last_phase": "train"
+    },
+    "smoke_gate.json": {
+      "passed": true,
+      "audit": {
+        "policy_norm": 0.02549439402354826,
+        "answer_ce_norm": 0.2478655252442416,
+        "active_tokens": 5528,
+        "ce_tokens": 400,
+        "allocation_norm": 0.30953312405176037,
+        "allocation_score_max_difference": 6.722012996673584,
+        "allocation_active_score_max_difference": 0.0,
+        "allocation_groups": 64
+      },
+      "reference_unchanged": true,
+      "active_dropout_modules": 0
+    },
+    "last_train": {
+      "loss": "0.059749141335487366",
+      "grad_norm": "1.0192885398864746",
+      "learning_rate": "2e-06",
+      "num_tokens": "33192.0",
+      "completions/mean_length": "57.583335876464844",
+      "completions/min_length": "0.0",
+      "completions/max_length": "128.0",
+      "completions/clipped_ratio": "0.0",
+      "completions/mean_terminated_length": "57.583335876464844",
+      "completions/min_terminated_length": "0.0",
+      "completions/max_terminated_length": "128.0",
+      "marginal/reward": "0.03330013155937195",
+      "marginal/direct_score_gradient_norm": "1.3319196701049805",
+      "native/accuracy": "0.65625",
+      "native/logq": "-0.7904101195093288",
+      "native/active_examples": "16.0",
+      "native/reasoning_tokens": "84.41666666666667",
+      "rewards/<lambda>/mean": "0.0222000852227211",
+      "rewards/<lambda>/std": "0.3528786599636078",
+      "reward": "0.0222000852227211",
+      "reward_std": "0.3528786599636078",
+      "frac_reward_zero_std": "0.3333333432674408",
+      "sampling/sampling_logp_difference/mean": "0.0237309280782938",
+      "sampling/sampling_logp_difference/max": "3.299952507019043",
+      "sampling/importance_sampling_ratio/min": "0.01718655787408352",
+      "sampling/importance_sampling_ratio/mean": "1.0158097743988037",
+      "sampling/importance_sampling_ratio/max": "2.7079570293426514",
+      "marginal/rloo_abs_mean": "0.2875722348690033",
+      "marginal/zero_advantage_fraction": "0.0",
+      "kl": "0.0001662721033426351",
+      "entropy": "1.4087522824605305",
+      "clip_ratio/low_mean": "0.0",
+      "clip_ratio/high_mean": "0.0",
+      "clip_ratio/region_mean": "0.0",
+      "clip_ratio/low_min": "0.0",
+      "clip_ratio/high_max": "0.0",
+      "native/allocation_loss_contribution": "-0.001387505530146882",
+      "native/replay_score_max_difference": "6.029014855623245",
+      "native/replay_active_score_max_difference": "0.0",
+      "native/answer_ce": "0.2106002185125059",
+      "step_time": "77.14509077000048",
+      "epoch": "0.002398081534772182",
+      "step": "1"
+    }
+  },
+  "N10R13": {
+    "gradient_smoke.json": {
+      "policy_norm": 0.025490269317777946,
+      "answer_ce_norm": 0.2480500275789245,
+      "active_tokens": 5528,
+      "ce_tokens": 400,
+      "allocation_norm": 0.30963740498651554,
+      "allocation_score_max_difference": 6.722012996673584,
+      "allocation_active_score_max_difference": 0.0,
+      "allocation_groups": 64
+    },
+    "reference_audit.json": {
+      "initial_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+      "init_from": "D3R9",
+      "frozen": true
+    },
+    "dropout_audit.json": {
+      "disable_dropout_requested": true,
+      "active_dropout_modules": {},
+      "reward_scoring": "detached eval"
+    },
+    "log_tail": "5', 'sampling/importance_sampling_ratio/max': '2.584', 'marginal/rloo_abs_mean': '0.2651', 'marginal/zero_advantage_fraction': '0', 'kl': '0.003453', 'entropy': '1.597', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'native/allocation_loss_contribution': '0.0001417', 'native/replay_score_max_difference': '3.085', 'native/replay_active_score_max_difference': '0', 'native/answer_ce': '0.09714', 'step_time': '24.01', 'epoch': '0.02878'}\n\r  3%|▎         | 12/400 [05:03<2:40:49, 24.87s/it]\r  3%|▎         | 13/400 [05:29<2:41:32, 25.05s/it]\r                                                  \r{'loss': '-0.01198', 'grad_norm': '0.8501', 'learning_rate': '1.94e-06', 'num_tokens': '4.366e+05', 'completions/mean_length': '73.23', 'completions/min_length': '0', 'completions/max_length': '128', 'completions/clipped_ratio': '0', 'completions/mean_terminated_length': '73.23', 'completions/min_terminated_length': '0', 'completions/max_terminated_length': '128', 'marginal/reward': '0.03898', 'marginal/direct_score_gradient_norm': '1.657', 'native/accuracy': '0.6905', 'native/logq': '-0.4353', 'native/active_examples': '21', 'native/reasoning_tokens': '81.29', 'rewards/<lambda>/mean': '0.03411', 'rewards/<lambda>/std': '0.361', 'reward': '0.03411', 'reward_std': '0.361', 'frac_reward_zero_std': '0.125', 'sampling/sampling_logp_difference/mean': '0.0251', 'sampling/sampling_logp_difference/max': '7.064', 'sampling/importance_sampling_ratio/min': '0.0009584', 'sampling/importance_sampling_ratio/mean': '0.9669', 'sampling/importance_sampling_ratio/max': '2.093', 'marginal/rloo_abs_mean': '0.2395', 'marginal/zero_advantage_fraction': '0', 'kl': '0.002952', 'entropy': '1.499', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'native/allocation_loss_contribution': '-0.001624', 'native/replay_score_max_difference': '2.452', 'native/replay_active_score_max_difference': '0', 'native/answer_ce': '0.1102', 'step_time': '24.73', 'epoch': '0.03118'}\n\r  3%|▎         | 13/400 [05:29<2:41:32, 25.05s/it]",
+    "initial_eval": {
+      "n": 1000,
+      "accuracy": 0.523,
+      "macro_f1": 0.5217665228722886,
+      "parse_rate": 1.0,
+      "per_class": {
+        "entailment": {
+          "precision": 0.5942,
+          "recall": 0.5569,
+          "f1": 0.575,
+          "support": 334
+        },
+        "neutral": {
+          "precision": 0.4283,
+          "recall": 0.6276,
+          "f1": 0.5091,
+          "support": 333
+        },
+        "contradiction": {
+          "precision": 0.6432,
+          "recall": 0.3844,
+          "f1": 0.4812,
+          "support": 333
+        }
+      },
+      "report": "\n======================================================================\n                        CLASSIFICATION REPORT                         \n======================================================================\nClass               Precision     Recall   F1-Score      Support\n----------------------------------------------------------------------\nentailment             0.5942     0.5569     0.5750          334\nneutral                0.4283     0.6276     0.5091          333\ncontradiction          0.6432     0.3844     0.4812          333\n----------------------------------------------------------------------\nMacro Avg              0.5552     0.5230     0.5218         1000\nAccuracy                                     0.5230         1000\nParse Rate                                   1.0000         1000\n======================================================================\n",
+      "confusion": {
+        "neutral": {
+          "neutral": 209,
+          "contradiction": 43,
+          "entailment": 81
+        },
+        "contradiction": {
+          "contradiction": 128,
+          "entailment": 46,
+          "neutral": 159
+        },
+        "entailment": {
+          "entailment": 186,
+          "neutral": 120,
+          "contradiction": 28
+        }
+      },
+      "acc_by_topic": {
+        "01": 0.5384615384615384,
+        "02": 0.5617977528089888,
+        "03": 0.5797101449275363,
+        "04": 0.4888888888888889,
+        "05": 0.5476190476190477,
+        "06": 0.5945945945945946,
+        "07": 0.5,
+        "08": 0.5694444444444444,
+        "09": 0.6129032258064516,
+        "10": 0.4142857142857143,
+        "11": 0.4673913043478261,
+        "12": 0.515625,
+        "13": 0.4342105263157895
+      }
+    },
+    "initial_prediction_sha256": "1b5cf0a2f64c448147ecb30125a94fb22b5109ea9e14ce9d4e48cd2d9862dff1",
+    "last_train": {
+      "loss": "-0.011982894502580166",
+      "grad_norm": "0.8500877618789673",
+      "learning_rate": "1.94e-06",
+      "num_tokens": "436570.0",
+      "completions/mean_length": "73.22917175292969",
+      "completions/min_length": "0.0",
+      "completions/max_length": "128.0",
+      "completions/clipped_ratio": "0.0",
+      "completions/mean_terminated_length": "73.22917175292969",
+      "completions/min_terminated_length": "0.0",
+      "completions/max_terminated_length": "128.0",
+      "marginal/reward": "0.0389806292951107",
+      "marginal/direct_score_gradient_norm": "1.6568725109100342",
+      "native/accuracy": "0.6904761904761905",
+      "native/logq": "-0.43527264225639706",
+      "native/active_examples": "21.0",
+      "native/reasoning_tokens": "81.29166666666667",
+      "rewards/<lambda>/mean": "0.034108053892850876",
+      "rewards/<lambda>/std": "0.360955148935318",
+      "reward": "0.034108053892850876",
+      "reward_std": "0.360955148935318",
+      "frac_reward_zero_std": "0.125",
+      "sampling/sampling_logp_difference/mean": "0.025101806968450546",
+      "sampling/sampling_logp_difference/max": "7.063652515411377",
+      "sampling/importance_sampling_ratio/min": "0.000958438788075",
+      "sampling/importance_sampling_ratio/mean": "0.9669469594955444",
+      "sampling/importance_sampling_ratio/max": "2.093381404876709",
+      "marginal/rloo_abs_mean": "0.2395198494195938",
+      "marginal/zero_advantage_fraction": "0.0",
+      "kl": "0.002952020280645229",
+      "entropy": "1.498570481936137",
+      "clip_ratio/low_mean": "0.0",
+      "clip_ratio/high_mean": "0.0",
+      "clip_ratio/region_mean": "0.0",
+      "clip_ratio/low_min": "0.0",
+      "clip_ratio/high_max": "0.0",
+      "native/allocation_loss_contribution": "-0.001624193040091389",
+      "native/replay_score_max_difference": "2.4518203934033713",
+      "native/replay_active_score_max_difference": "0.0",
+      "native/answer_ce": "0.11023064599915718",
+      "step_time": "24.729422784003873",
+      "epoch": "0.03117505995203837",
+      "step": "13"
+    }
+  },
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition, 36981 MiB, 98 %",
+  "child_process": "PID STAT     ELAPSED COMMAND\n  18008 S          39:24 /usr/bin/python3 -m scripts.run --run N10R13 --seed 0 --phase all",
+  "experiment_processes": [
+    "  18008 S          39:24 /usr/bin/python3 -m scripts.run --run N10R13 --seed 0 --phase all",
+    "  26434 SLl        06:23 /usr/bin/python3 -m scripts.train_worker --run N10R13 --seed 0"
+  ],
+  "archives_verified": true
+}

@@ -58,7 +58,20 @@ def load_config(run_id: str) -> dict:
         base = yaml.safe_load(f) or {}
     with open(RUN_CONFIGS / f"{run_id}.yaml", encoding="utf-8") as f:
         run = yaml.safe_load(f) or {}
-    return deep_merge(base, run)
+    cfg = deep_merge(base, run)
+    for selector, profiles_key, section in (
+        ('native_schedule', 'native_schedules', 'native_pilot'),
+        ('sft_schedule', 'sft_schedules', 'sft'),
+        ('eval_schedule', 'eval_schedules', 'eval'),
+    ):
+        schedule = cfg.get(selector)
+        if schedule is None:
+            continue
+        profiles = base.get(profiles_key, {})
+        if schedule not in profiles:
+            raise ValueError(f'Unknown {selector}: {schedule}')
+        cfg[section] = deep_merge(cfg.get(section, {}), profiles[schedule])
+    return cfg
 
 
 def write_train_log(log_history: list[dict], path) -> None:

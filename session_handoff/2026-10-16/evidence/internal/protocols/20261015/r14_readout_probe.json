@@ -1,0 +1,29 @@
+{
+  "run_id": "P0R14",
+  "seed": 0,
+  "registered_at": 1792047511.420584,
+  "split": "dev_subset",
+  "n": 256,
+  "subset_seed": 42,
+  "teacher": false,
+  "test_accessed": false,
+  "selection_allowed": false,
+  "adapter_source": "D3R9 checkpoint600",
+  "primary": "unchanged single-sequence greedy bounded CoT",
+  "secondary": "canonical answer plus closer plus EOS logprob sum MAP",
+  "source_sha256": {
+    "eval/readout_probe.py": "48e9a4509197369944b160f368c185af88a0820f67376e3d24c2104e47bb68f5",
+    "eval/hf_generate.py": "d286a622b7bb1d32641be83406eb39a3085dc6b497ac7366e10b088859df0666",
+    "eval/predict.py": "0029797920bfa230f4debb5a5c19f0e4bc438a41c93ccc93ee09630571875a5c",
+    "configs/base.yaml": "682af5030dfcc7ff14667ca584b68d1faec92e78b122a1bcc9ec18bec50553fd",
+    "configs/matrix.py": "431ad3d572f06de4da843f3f47d8dab78283b4ab90cce3e4e232ed0198a169a2",
+    "configs/runs/P0R14.yaml": "6b4cef6ea62b5897de505b15a4213083261c0adae8c2b139856153e1c3492521",
+    "tests/test_readout_probe.py": "5ec95f4f157f7e7d143e115e9a6251ce9e96d29aca1452b4c0ae9aa785bcd914",
+    "scripts/remote_logs.py": "f24a0f7d9ef5795b71f11050f871670cc2d0bcaaed98c27f7eab9eecd6d4c7ed",
+    "tests/test_remote_logs.py": "4cbe605d1aa3070aefbed5f5e7d4fbb6333762e6e676fd8d3d57dc5bd21305e0"
+  },
+  "revised_before_inference": 1792047789.523921,
+  "subset_file_names": true,
+  "warm_adapter_file_sha256": "d5918ecb23f7f877b718fe34697b3571a8fe9c080383f5840cd0c384eb917e31",
+  "warm_adapter_tensor_fingerprint": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f"
+}

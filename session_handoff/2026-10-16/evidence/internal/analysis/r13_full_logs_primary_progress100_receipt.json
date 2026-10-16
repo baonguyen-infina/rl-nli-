@@ -1,0 +1,12 @@
+{
+  "lane": "primary",
+  "id": "1kPs1_MKl5v-MgvF3WkUGkGNExbYz6tXh",
+  "name": "N10R13_s0_attempt2_full-logs_progress-100.tar.gz",
+  "md5Checksum": "730bc69f550111f985925e59dcc4baed",
+  "size": "2285668",
+  "event": "progress-100",
+  "sha256": "ec0cd7555bf6028d4601e2745003421f758911ac3ca9fa35ac0886117f03a64f",
+  "drive_verified": true,
+  "verified_at": 1792050442.113608,
+  "downloaded": false
+}

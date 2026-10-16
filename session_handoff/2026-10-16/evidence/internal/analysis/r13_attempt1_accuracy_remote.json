@@ -1,0 +1,110 @@
+{
+  "utc_epoch": 1792039947.9876814,
+  "model": "Qwen/Qwen3.5-2B",
+  "session": "rl-nli-marginal-accuracy-2b-g4",
+  "pipeline": {
+    "phase": "all",
+    "run": "N11R13",
+    "child_pid": 21053,
+    "updated_at": 1792038324.0279217
+  },
+  "G0N11R13P": {
+    "gradient_smoke.json": {
+      "policy_norm": 0.00807553151229938,
+      "answer_ce_norm": 0.24785160791016583,
+      "active_tokens": 5528,
+      "ce_tokens": 400,
+      "allocation_norm": 0.2967958273653703,
+      "allocation_score_max_difference": 6.722012996673584,
+      "allocation_active_score_max_difference": 0.0,
+      "allocation_groups": 64
+    },
+    "reference_audit.json": {
+      "initial_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+      "final_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+      "init_from": "D3R9",
+      "frozen": true,
+      "unchanged": true
+    },
+    "dropout_audit.json": {
+      "disable_dropout_requested": true,
+      "active_dropout_modules": {},
+      "reward_scoring": "detached eval"
+    },
+    "cost.json": {
+      "status": "trained",
+      "wall_seconds": 210.8,
+      "last_phase": "train"
+    },
+    "smoke_gate.json": {
+      "passed": true,
+      "audit": {
+        "policy_norm": 0.00807553151229938,
+        "answer_ce_norm": 0.24785160791016583,
+        "active_tokens": 5528,
+        "ce_tokens": 400,
+        "allocation_norm": 0.2967958273653703,
+        "allocation_score_max_difference": 6.722012996673584,
+        "allocation_active_score_max_difference": 0.0,
+        "allocation_groups": 64
+      },
+      "reference_unchanged": true,
+      "active_dropout_modules": 0
+    },
+    "last_train": {
+      "loss": "-0.10163316130638123",
+      "grad_norm": "1.006117582321167",
+      "learning_rate": "2e-06",
+      "num_tokens": "33192.0",
+      "completions/mean_length": "57.583335876464844",
+      "completions/min_length": "0.0",
+      "completions/max_length": "128.0",
+      "completions/clipped_ratio": "0.0",
+      "completions/mean_terminated_length": "57.583335876464844",
+      "completions/min_terminated_length": "0.0",
+      "completions/max_terminated_length": "128.0",
+      "marginal/reward": "0.6783984899520874",
+      "marginal/direct_score_gradient_norm": "1.311766505241394",
+      "native/accuracy": "0.65625",
+      "native/logq": "-0.7904101195093288",
+      "native/active_examples": "16.0",
+      "native/reasoning_tokens": "84.41666666666667",
+      "rewards/<lambda>/mean": "0.4522656500339508",
+      "rewards/<lambda>/std": "0.44089874625205994",
+      "reward": "0.4522656500339508",
+      "reward_std": "0.44089874625205994",
+      "frac_reward_zero_std": "0.3333333432674408",
+      "sampling/sampling_logp_difference/mean": "0.02373119816184044",
+      "sampling/sampling_logp_difference/max": "3.299952507019043",
+      "sampling/importance_sampling_ratio/min": "0.01718841679394245",
+      "sampling/importance_sampling_ratio/mean": "1.0157989263534546",
+      "sampling/importance_sampling_ratio/max": "2.707951307296753",
+      "marginal/rloo_abs_mean": "0.21519392728805542",
+      "marginal/zero_advantage_fraction": "0.0",
+      "kl": "0.0001662721033426351",
+      "entropy": "1.4087522824605305",
+      "clip_ratio/low_mean": "0.0",
+      "clip_ratio/high_mean": "0.0",
+      "clip_ratio/region_mean": "0.0",
+      "clip_ratio/low_min": "0.0",
+      "clip_ratio/high_max": "0.0",
+      "native/allocation_loss_contribution": "-0.028266604412541103",
+      "native/replay_score_max_difference": "6.029014855623245",
+      "native/replay_active_score_max_difference": "0.0",
+      "native/answer_ce": "0.2106002185125059",
+      "step_time": "77.07894568099891",
+      "epoch": "0.002398081534772182",
+      "step": "1"
+    }
+  },
+  "N11R13": {
+    "log_tail": "\rLoading weights:   0%|          | 0/320 [00:00<?, ?it/s]\rLoading weights: 100%|██████████| 320/320 [00:00<00:00, 14294.91it/s]\n[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.\n"
+  },
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition, 4799 MiB, 47 %",
+  "child_process": "PID STAT     ELAPSED COMMAND\n  21053 S          27:03 /usr/bin/python3 -m scripts.run --run N11R13 --seed 0 --phase all",
+  "experiment_processes": [
+    "  21053 S          27:03 /usr/bin/python3 -m scripts.run --run N11R13 --seed 0 --phase all",
+    "  21054 Rl         27:03 /usr/bin/python3 -m eval.predict --run N11R13 --seed 0 --split dev --out-dir /content/rl-nli/results/N11R13_Qwen3.5-2B_s0/initial_eval --adapter /content/rl-nli/results/D3R9_Qwen3.5-2B_s0/best_adapter --config /content/rl-nli/results/N11R13_Qwen3.5-2B_s0/config.yaml"
+  ],
+  "archives_verified": true
+}

@@ -1,0 +1,1919 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 5fdd5cf..2e2ad51 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -6,7 +6,7 @@ Mỗi file .py hiện chỉ có docstring nói nó phải làm gì. Implement th
+ 
+ ## Quy tắc bất di bất dịch
+ 1. **Không đưa `uid` vào prompt hay feature.** Trường thứ 5 của uid ViANLI (11/21/31) là nhãn annotator được yêu cầu viết — gần như là đáp án.
+-2. **Không chạm test split trước giai đoạn G4.** Chọn checkpoint bằng dev; dev-mini chỉ để vẽ đường cong.
++2. **Không chạm test split trước giai đoạn G4.** Chọn checkpoint bằng dev; dev-mini chỉ để vẽ đường cong nội bộ. **Mọi kết quả thực nghiệm ghi trong paper (bảng, hình, abstract, discussion) chỉ lấy từ tập test.** Số dev và training log chỉ lưu nội bộ; không dùng thay số test khi chưa mở G4.
+ 3. **Một parser duy nhất** (`formats/parser.py`) cho reward, eval và teacher filter.
+ 4. **Mọi run đi qua `scripts/run.py --run <ID> --seed <S>`** và ghi vào `results/<run_id>_<model>_s<seed>/`. Không chép số tay vào paper; bảng/hình sinh từ `analysis/`.
+ 5. Không tune riêng từng ô. Hyperparameter nằm ở `configs/base.yaml`; khác biệt giữa các run chỉ ở `configs/matrix.py`.
+diff --git a/analysis/collect.py b/analysis/collect.py
+index 483a7ac..39ada69 100644
+--- a/analysis/collect.py
++++ b/analysis/collect.py
+@@ -1,4 +1,70 @@
+-"""Gom results/*/ thành bảng thống nhất (run_id, seed, split, metric).
++"""Collect completed runs from frozen configs and recorded metrics; never infer missing results."""
++import argparse
++import csv
++import json
++import re
++from pathlib import Path
++import yaml
++from common.io import RESULTS, ARTIFACTS, read_json, read_jsonl
+ 
+-Xem SPEC.md. TODO: implement.
+-"""
++
++def collect_runs(root=RESULTS, split='dev'):
++    rows=[]
++    for out in sorted(Path(root).iterdir()):
++        cost_name='cost_test.json' if split=='test' else 'cost.json'
++        if not out.is_dir() or not all((out/p).exists() for p in ['config.yaml',cost_name,f'metrics_{split}.json']):
++            continue
++        if split=='test':
++            receipt_path=out/'.test_claim/receipt.json'
++            if not receipt_path.exists():continue
++            receipt=read_json(receipt_path)
++            if receipt.get('status')!='completed':continue
++            from eval.final_protocol import _verified_outputs
++            n,artifacts=_verified_outputs(out)
++            if receipt.get('n')!=n or receipt.get('artifacts')!=artifacts:
++                raise ValueError(f'Changed held-out artifacts: {out}')
++        cost=read_json(out/cost_name)
++        if cost.get('status')!='complete':continue
++        cfg=yaml.safe_load((out/'config.yaml').read_text())
++        match=re.search(r'_s(\d+)$',out.name)
++        if not match:continue
++        m=read_json(out/f'metrics_{split}.json')
++        row={'run_id':cfg['run_id'],'model':cfg['model']['name'],'seed':int(match[1]),
++             'recipe':cfg['recipe'],'format':cfg['format'],'split':split,
++             **{k:m[k] for k in ['n','accuracy','macro_f1','parse_rate']},
++             'wall_seconds':cost.get('wall_seconds'),'rule_consistency':None,'structure_rate':None,
++             'source':str(out)}
++        protocol=cfg.get('validation_protocol')
++        engine=cfg.get('validation_eval' if protocol=='fixed_single_sequence' else 'eval',{}).get('engine_options',{})
++        initial=out/'initial_eval'/f'metrics_{split}.json'
++        selection=read_json(out/'ckpt_scores.json') if (out/'ckpt_scores.json').exists() else {}
++        row.update(init_from=cfg.get('init_from'),native_mode=cfg.get('native_mode'),
++                   scoring_protocol=cfg.get('scoring_protocol'),validation_protocol=protocol,
++                   eval_engine_options=json.dumps(engine,sort_keys=True),
++                   initial_macro_f1=read_json(initial).get('macro_f1') if initial.exists() else None,
++                   selected_checkpoint=selection.get('best'),selection_split=selection.get('selection_split'),
++                   selection_metric=selection.get('selection_metric'))
++        predictions=out/f'predictions_{split}.jsonl'
++        if cfg['format']=='align' and predictions.exists():
++            records=read_jsonl(predictions)
++            if len(records)!=m['n']:raise ValueError(f'Prediction count mismatch: {out}')
++            row['rule_consistency']=sum(r.get('rule_label') is not None and r['rule_label']==r.get('pred') for r in records)/len(records)
++            row['structure_rate']=sum(r.get('grounded') is True and (r.get('coverage') or 0)>=.5 and r.get('rule_label') is not None and r['rule_label']==r.get('pred') for r in records)/len(records)
++        rows.append(row)
++    return rows
++
++
++def main():
++    ap=argparse.ArgumentParser();ap.add_argument('--results',type=Path,default=RESULTS)
++    ap.add_argument('--runs',nargs='+')
++    ap.add_argument('--split',choices=['dev','test'],default='dev')
++    ap.add_argument('--out',type=Path,default=ARTIFACTS/'analysis'/'runs.csv');a=ap.parse_args()
++    rows=collect_runs(a.results,a.split)
++    if a.runs:rows=[row for row in rows if row['run_id'] in a.runs]
++    if not rows:raise SystemExit('No completed runs with metrics')
++    a.out.parent.mkdir(parents=True,exist_ok=True)
++    with a.out.open('w',newline='') as f:
++        w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
++    print(f'{len(rows)} runs -> {a.out}')
++
++if __name__=='__main__':main()
+diff --git a/analysis/make_figs.py b/analysis/make_figs.py
+index 5a72451..aeeb9f6 100644
+--- a/analysis/make_figs.py
++++ b/analysis/make_figs.py
+@@ -1,4 +1,37 @@
+-"""Xuất Fig 2–3 dạng .pdf vào paper/figures/.
++"""Plot internal training diagnostics outside the test-only paper artifacts."""
++import argparse
++import csv
++from pathlib import Path
++from common.io import RESULTS,ROOT
+ 
+-Xem SPEC.md. TODO: implement.
+-"""
++OUTPUT=ROOT/'artifacts/analysis/figures/training.pdf'
++
++
++def main():
++    import matplotlib
++    matplotlib.use('Agg')
++    import matplotlib.pyplot as plt
++    ap=argparse.ArgumentParser();ap.add_argument('--runs',nargs='+',default=['D16','D18'])
++    a=ap.parse_args();fig,axes=plt.subplots(1,2,figsize=(7,2.7))
++    found=False
++    for rid in a.runs:
++        for folder in sorted(RESULTS.glob(rid+'_*_s*')):
++            p=folder/'train_log.csv'
++            if not p.exists():continue
++            rows=[r for r in csv.DictReader(p.open()) if r.get('reward')]
++            if not rows:continue
++            found=True
++            for ax,key in zip(axes,['reward','frac_reward_zero_std']):
++                values=[float(r[key]) for r in rows]
++                smooth=[sum(values[max(0,i-19):i+1])/len(values[max(0,i-19):i+1]) for i in range(len(values))]
++                ax.plot(range(1,len(smooth)+1),smooth,label=folder.name.split('_')[0]+' '+folder.name.rsplit('_',1)[-1],lw=1)
++                ax.set_xlabel('Optimizer step')
++    if not found:raise SystemExit('No recorded curves')
++    axes[0].set_ylabel('Training reward (20-step mean)')
++    axes[1].set_ylabel('Groups with zero reward variance')
++    axes[1].set_ylim(0,1);axes[0].legend(fontsize=7)
++    for ax in axes:ax.grid(alpha=.2)
++    fig.tight_layout();out=OUTPUT;out.parent.mkdir(parents=True,exist_ok=True)
++    fig.savefig(out,bbox_inches='tight');print(out)
++
++if __name__=='__main__':main()
+diff --git a/analysis/make_tables.py b/analysis/make_tables.py
+index 110c8a9..7716252 100644
+--- a/analysis/make_tables.py
++++ b/analysis/make_tables.py
+@@ -1,4 +1,41 @@
+-"""Xuất Table 1–5 dạng .tex (booktabs) vào paper/tables/.
++"""Generate an ACL results table from completed held-out test artifacts only."""
++import argparse
++from pathlib import Path
++from statistics import mean,stdev
++from analysis.collect import collect_runs
++from common.io import ROOT
+ 
+-Xem SPEC.md. TODO: implement.
+-"""
++
++def escape(text):
++    return str(text).replace('_',r'\_').replace('%',r'\%').replace('&',r'\&')
++
++
++def render(rows,split='test'):
++    if split!='test' or any(row.get('split')!='test' for row in rows):
++        raise ValueError('Paper results require split=test on every recorded row')
++    if not rows:
++        raise ValueError('No completed test results; keep the paper results pending')
++    lines=[r'% Generated by analysis.make_tables; split=test; no manually copied scores.',r'\begin{tabular}{lrrrr}',r'\toprule',r'Run & Seeds & Macro-F1 & Accuracy & Parse \\',r'\midrule']
++    keys=sorted({r['run_id'] for r in rows})
++    for key in keys:
++        group=[r for r in rows if r['run_id']==key]
++        values=[]
++        for metric in ['macro_f1','accuracy','parse_rate']:
++            v=[100*r[metric] for r in group]
++            values.append(f'{mean(v):.2f}' + (f' $\\pm$ {stdev(v):.2f}' if len(v)>1 else ''))
++        lines.append(escape(key)+' & '+str(len(group))+' & '+' & '.join(values)+r' \\')
++    lines += [r'\bottomrule',r'\end{tabular}']
++    return '\n'.join(lines)+'\n'
++
++
++def main():
++    ap=argparse.ArgumentParser();ap.add_argument('--split',choices=['test'],default='test')
++    ap.add_argument('--runs',nargs='*');a=ap.parse_args()
++    rows=collect_runs(split=a.split)
++    if a.runs:rows=[r for r in rows if r['run_id'] in a.runs]
++    try:table=render(rows,a.split)
++    except ValueError as exc:ap.error(str(exc))
++    out=ROOT/'paper'/'tables'/'results_test.tex';out.parent.mkdir(parents=True,exist_ok=True)
++    out.write_text(table);print(out)
++
++if __name__=='__main__':main()
+diff --git a/analysis/stats.py b/analysis/stats.py
+index d8e21da..d1dc873 100644
+--- a/analysis/stats.py
++++ b/analysis/stats.py
+@@ -38,3 +38,90 @@ def holm(pvals: list[float]) -> list[float]:
+         running = max(running, min(1.0, pvals[i] * (m - rank)))
+         adj[i] = running
+     return adj
++
++
++def paired_macro_f1_bootstrap(gold, pred_a, pred_b, n_boot=10000, seed=0):
++    """Paired percentile CI over examples, with a fixed three-label denominator.
++
++    Invalid predictions remain false negatives for their gold class. Arrays must
++    already be aligned by example ID; callers must not compare unrelated rows.
++    This interval measures example uncertainty, not variability across seeds.
++    """
++    from common.labels import LABELS
++    if not len(gold) or not (len(gold)==len(pred_a)==len(pred_b)):
++        raise ValueError('Nonempty aligned predictions required')
++    if n_boot<1:raise ValueError('n_boot must be positive')
++    y=np.array([LABELS.index(x) for x in gold])
++    a=np.array([LABELS.index(x) if x in LABELS else -1 for x in pred_a])
++    b=np.array([LABELS.index(x) if x in LABELS else -1 for x in pred_b])
++    def score(indices,pred):
++        actual=y[indices];guessed=pred[indices]
++        f=[]
++        for label in range(3):
++            tp=((actual==label)&(guessed==label)).sum(axis=-1)
++            denom=(actual==label).sum(axis=-1)+(guessed==label).sum(axis=-1)
++            f.append(np.divide(2*tp,denom,out=np.zeros_like(tp,dtype=float),where=denom!=0))
++        return np.stack(f).mean(axis=0)
++    rng=np.random.default_rng(seed);diffs=[]
++    for start in range(0,n_boot,256):
++        ix=rng.integers(0,len(y),size=(min(256,n_boot-start),len(y)))
++        diffs.extend((score(ix,a)-score(ix,b)).tolist())
++    original=np.arange(len(y))[None,:]
++    return {'diff':float((score(original,a)-score(original,b))[0]),
++            'ci_low':float(np.percentile(diffs,2.5)),
++            'ci_high':float(np.percentile(diffs,97.5)),
++            'n_boot':n_boot,'seed':seed}
++
++
++def paired_cluster_macro_f1_bootstrap(gold, pred_a, pred_b, groups,
++                                      n_boot=10000, seed=0):
++    """Paired percentile interval resampling whole premise clusters.
++
++    Keep all hypotheses from a sampled premise together, including repeated
++    copies when that premise is sampled more than once. This quantifies test
++    sample uncertainty conditional on the fitted models, not training-seed
++    variability. Invalid predictions count as false negatives for the gold
++    label. The caller must align every array by example ID before calling.
++    """
++    from common.labels import LABELS
++    if not len(gold) or not (len(gold) == len(pred_a) == len(pred_b) == len(groups)):
++        raise ValueError('Nonempty aligned predictions and groups required')
++    if type(n_boot) is not int or n_boot < 1:
++        raise ValueError('n_boot must be a positive integer')
++    if any(label not in LABELS for label in gold):
++        raise ValueError('Unknown gold label')
++    index = {}
++    try:
++        for group in groups:
++            if group is None or group == '':
++                raise ValueError('Missing premise cluster')
++            if group not in index:
++                index[group] = len(index)
++    except TypeError as exc:
++        raise ValueError('Premise clusters must be hashable') from exc
++    counts = np.zeros((2, len(index), 3, 4), dtype=np.int64)
++    for row, label in enumerate(gold):
++        cluster, actual = index[groups[row]], LABELS.index(label)
++        for method, predictions in enumerate((pred_a, pred_b)):
++            prediction = predictions[row]
++            guessed = LABELS.index(prediction) if prediction in LABELS else 3
++            counts[method, cluster, actual, guessed] += 1
++
++    def macro_f1(confusion):
++        tp = np.diagonal(confusion[..., :3], axis1=-2, axis2=-1)
++        denominator = confusion.sum(axis=-1) + confusion[..., :3].sum(axis=-2)
++        return np.divide(2 * tp, denominator, out=np.zeros_like(tp, dtype=float),
++                         where=denominator != 0).mean(axis=-1)
++
++    original = macro_f1(counts.sum(axis=1))
++    rng = np.random.default_rng(seed)
++    diffs = []
++    for start in range(0, n_boot, 128):
++        draw = rng.integers(0, len(index), size=(min(128, n_boot-start), len(index)))
++        scores = macro_f1(counts[:, draw].sum(axis=2))
++        diffs.extend((scores[0] - scores[1]).tolist())
++    return {'diff': float(original[0] - original[1]),
++            'ci_low': float(np.percentile(diffs, 2.5)),
++            'ci_high': float(np.percentile(diffs, 97.5)),
++            'n_boot': n_boot, 'seed': seed, 'n_clusters': len(index),
++            'bootstrap_unit': 'premise_cluster'}
+diff --git a/common/io.py b/common/io.py
+index 53f9c40..5d67ade 100644
+--- a/common/io.py
++++ b/common/io.py
+@@ -58,7 +58,20 @@ def load_config(run_id: str) -> dict:
+         base = yaml.safe_load(f) or {}
+     with open(RUN_CONFIGS / f"{run_id}.yaml", encoding="utf-8") as f:
+         run = yaml.safe_load(f) or {}
+-    return deep_merge(base, run)
++    cfg = deep_merge(base, run)
++    for selector, profiles_key, section in (
++        ('native_schedule', 'native_schedules', 'native_pilot'),
++        ('sft_schedule', 'sft_schedules', 'sft'),
++        ('eval_schedule', 'eval_schedules', 'eval'),
++    ):
++        schedule = cfg.get(selector)
++        if schedule is None:
++            continue
++        profiles = base.get(profiles_key, {})
++        if schedule not in profiles:
++            raise ValueError(f'Unknown {selector}: {schedule}')
++        cfg[section] = deep_merge(cfg.get(section, {}), profiles[schedule])
++    return cfg
+ 
+ 
+ def write_train_log(log_history: list[dict], path) -> None:
+diff --git a/configs/base.yaml b/configs/base.yaml
+index 5e2e08a..9d08065 100644
+--- a/configs/base.yaml
++++ b/configs/base.yaml
+@@ -34,6 +34,7 @@ grpo:
+   grad_accum: 4
+   max_completion_length: 512
+   use_vllm: true
++  save_steps: 100
+   vllm_mode: colocate
+   vllm_gpu_memory_utilization: 0.3
+   reward_weights: [1.0, 0.2, 0.3]
+@@ -42,6 +43,9 @@ eval:
+   gpu_memory_utilization: 0.85
+   max_model_len: 2048
+   max_new_tokens: {label: 16, cot: 512, align: 512}
++gta:
++  sft_weight: 1.0
++  rule_weight: 0.2
+ encoder:
+   name: uitnlp/CafeBERT
+   lr: 2.0e-5
+@@ -49,3 +53,57 @@ encoder:
+   batch: 32
+   max_len: 256
+   folds: 5
++native_pilot:
++  disable_dropout: true
++  lr: 2.0e-6
++  max_steps: 200
++  num_generations: 4
++  groups_per_update: 8
++  per_device_batch: 4
++  grad_accum: 24
++  reasoning_budget: 64
++  max_completion_length: 96
++  beta: 0.01
++  allocation_weight: 0.2
++  allocation_loss_weight: 0.2
++  saliency_floor: 0.25
++  answer_ce_weight: 0.1
++  score_microbatch: 4
++  vllm_gpu_memory_utilization: 0.3
++  save_steps: 100
++validation_eval:
++  engine_options:
++    max_num_seqs: 1
++    max_num_batched_tokens: 2048
++    enforce_eager: true
++    enable_prefix_caching: false
++    seed: 0
++native_schedules:
++  full_pass:
++    max_steps: 400
++  full_reasoning:
++    max_steps: 400
++    reasoning_budget: 128
++    max_completion_length: 160
++    score_microbatch: 12
++  long_smoke:
++    max_steps: 1
++    save_steps: 1
++    reasoning_budget: 128
++    max_completion_length: 160
++    score_microbatch: 12
++  prefix_200:
++    max_steps: 400
++    stop_after_steps: 200
++    reasoning_budget: 128
++    max_completion_length: 160
++    score_microbatch: 12
++sft_schedules:
++  full_budget:
++    early_stopping_patience: null
++eval_schedules:
++  full_reasoning:
++    max_new_tokens: {cot: 160}
++readout_probe:
++  n: 256
++  subset_seed: 42
+diff --git a/configs/matrix.py b/configs/matrix.py
+index 433fd48..c7a666c 100644
+--- a/configs/matrix.py
++++ b/configs/matrix.py
+@@ -8,6 +8,24 @@ BASE_MODEL = "Qwen/Qwen3.5-2B"
+ ENCODER_MODEL = "uitnlp/CafeBERT"
+ 
+ RUNS = {
++    "D3": dict(recipe="sft", format="label", guess=False, model=BASE_MODEL, init_from=None,
++               priority="DEV", seeds=[0], overrides={}),
++    "D16": dict(recipe="gta", format="align", guess=True, model=BASE_MODEL, init_from="D3",
++                priority="DEV", seeds=[0], cos_constraint=True, flat_fallback=True,
++                schema_examples="balanced", overrides={"grpo": {"max_steps": 200}}),
++    "D18": dict(recipe="gta", format="align", guess=True, model=BASE_MODEL, init_from="D3",
++                priority="DEV", seeds=[0], cos_constraint=True, flat_fallback=True,
++                schema_examples="balanced", rule_supervision=True,
++                overrides={"grpo": {"max_steps": 200}}),
++    "G0S": dict(recipe="gta", format="align", guess=True, model=BASE_MODEL, init_from="D3",
++                priority="P0", seeds=[0], cos_constraint=True, flat_fallback=True,
++                schema_examples="balanced", rule_supervision=True,
++                overrides={"grpo": {"max_steps": 1}}),
++    "G0G": dict(recipe="gta", format="align", guess=True, model=BASE_MODEL, init_from="D3",
++                priority="P0", seeds=[0], cos_constraint=True, flat_fallback=True,
++                overrides={"grpo": {"max_steps": 1}}),
++    "G0R": dict(recipe="grpo", format="label", guess=False, model=BASE_MODEL, init_from=None,
++                priority="P0", seeds=[0], overrides={"grpo": {"max_steps": 1}}),
+     "G0": dict(recipe="grpo", format="label", guess=False, model=BASE_MODEL, init_from=None,
+                priority="P0", seeds=[0], overrides={"grpo": {"max_steps": 1}}),
+     "E0": dict(recipe="zs", format="label", guess=False, model=BASE_MODEL, init_from=None,
+@@ -43,6 +61,247 @@ RUNS = {
+ }
+ 
+ 
++# Teacher-free development recipes, separate from the original locked grid.
++for dev_id, fmt, guess, flat in (("D9", "label", False, False),
++                               ("D10", "cot", False, False),
++                               ("D11", "align", False, False),
++                               ("D12", "cot", True, False),
++                               ("D13", "align", True, False),
++                               ("D14", "align", True, True)):
++    RUNS[dev_id] = dict(recipe="gta" if guess else "grpo", format=fmt, guess=guess,
++                       model=BASE_MODEL, init_from="D3", priority="DEV", seeds=[0],
++                       cos_constraint=True, flat_fallback=flat,
++                       overrides={"grpo": {"max_steps": 200}})
++
++
++
++RUNS['E2B'] = dict(recipe='zs', format='align', guess=True, model=BASE_MODEL,
++                    init_from=None, priority='PAPER', seeds=[0], schema_examples='balanced', overrides={})
++RUNS['D3A'] = dict(recipe='zs', format='align', guess=True, model=BASE_MODEL,
++                    init_from='D3', priority='PAPER', seeds=[0,1,2], schema_examples='balanced', overrides={})
++
++# Matched paper comparisons: the same gold-only warm start and shared schedule.
++RUNS['D19'] = dict(recipe='grpo', format='align', guess=False, model=BASE_MODEL,
++                    init_from='D3', priority='PAPER', seeds=[0, 1, 2],
++                    schema_examples='balanced', overrides={'grpo': {'max_steps': 200}})
++for rid, changes in {
++    'D20': {'rule_supervision': False, 'flat_fallback': False},
++    'D21': {'cos_constraint': False},
++    'D23': {'overrides': {'grpo': {'max_steps': 200, 'reward_weights': [1.0, 0.2, 0.0]}}},
++}.items():
++    RUNS[rid] = {**RUNS['D18'], 'priority': 'PAPER', 'seeds': [0, 1, 2], **changes}
++
++
++
++# Registered after observing quote/status binding failures in D18 training rollouts.
++RUNS['D24'] = {**RUNS['D18'], 'rule_support': 'schema', 'seeds': [0,1,2]}
++RUNS['G0T'] = {**RUNS['D24'], 'priority': 'P0', 'seeds': [0],
++              'overrides': {'grpo': {'max_steps': 1}}}
++RUNS['D25'] = {**RUNS['D24'], 'cos_constraint': False}
++RUNS['D26'] = {**RUNS['D24'], 'overrides': {'grpo': {'max_steps': 200, 'reward_weights': [1.0,0.2,0.0]}}}
++
++# Prespecified teacher-free native-contrast pilot and matched controls.
++RUNS['D3R'] = {**RUNS['D3']}
++for rid, mode in [('N0', 'ce'), ('N1', 'ordinary'), ('N2', 'native'), ('N3', 'random')]:
++    RUNS[rid] = dict(recipe='native', format='cot', guess=False, model=BASE_MODEL,
++                    init_from='D3R', priority='DEV', seeds=[0], native_mode=mode,
++                    bounded_reasoning=True,
++                    overrides={'eval': {'gpu_memory_utilization': 0.65, 'max_new_tokens': {'cot': 96}}})
++RUNS['G0N'] = {**RUNS['N2'], 'priority': 'P0',
++              'overrides': {'native_pilot': {'max_steps': 1, 'save_steps': 1},
++                            'eval': {'gpu_memory_utilization': 0.65, 'max_new_tokens': {'cot': 96}}}}
++RUNS['G0N2'] = {**RUNS['G0N']}
++RUNS['G0N3'] = {**RUNS['G0N']}
++RUNS['N2R'] = {**RUNS['N2']}
++RUNS['D3R3'] = {**RUNS['D3']}
++RUNS['N2R3'] = {**RUNS['N2'], 'init_from': 'D3R3'}
++
++# Fresh IDs for deterministic scoring; never overwrite the R3 frozen pilot.
++for parent in ['N0','N1','N2','N3']:
++    RUNS[parent+'R4'] = {**RUNS[parent], 'init_from':'D3R3',
++                         'scoring_protocol':'deterministic'}
++RUNS['G0N4'] = {**RUNS['G0N3'], 'init_from':'D3R3',
++               'scoring_protocol':'deterministic'}
++
++# Allocation channel comparison: keep data, initialization and budgets fixed.
++RUNS['N4R4'] = {**RUNS['N2R4'], 'native_mode':'allocation'}
++RUNS['N5R4'] = {**RUNS['N2R4'], 'native_mode':'joint'}
++RUNS['G0N5'] = {**RUNS['G0N4'], 'native_mode':'allocation'}
++RUNS['G0N6'] = {**RUNS['G0N4'], 'native_mode':'joint'}
++
++# Read-only fixed-adapter validation, using one shared runtime preset in base.yaml.
++for number in (2,4,5):
++    for repeat in ('A','B'):
++        RUNS[f'V{number}R4{repeat}'] = {**RUNS[f'N{number}R4'], 'recipe':'zs',
++            'init_from':f'N{number}R4', 'validation_protocol':'fixed_single_sequence'}
++for repeat in ('A','B'):
++    RUNS[f'VDR4{repeat}'] = {**RUNS['N2R4'], 'recipe':'zs', 'init_from':'D3R3',
++                           'validation_protocol':'fixed_single_sequence'}
++RUNS['VDR4L'] = {**RUNS['VDR4A'], 'format':'label', 'bounded_reasoning':False}
++for number in (2,4,5):
++    RUNS[f'V{number}R4L'] = {**RUNS[f'V{number}R4A'], 'format':'label', 'bounded_reasoning':False}
++
++# Native token-credit hypothesis and matched200-step controls.
++RUNS['N1R5'] = {**RUNS['N1R4']}
++RUNS['N4R5'] = {**RUNS['N4R4']}
++RUNS['N7R5'] = {**RUNS['N4R4'], 'native_mode':'saliency'}
++RUNS['G0N7'] = {**RUNS['G0N5'], 'native_mode':'saliency'}
++for number in (1,4,7):
++    for repeat in ('A','B'):
++        RUNS[f'V{number}R5{repeat}'] = {**RUNS[f'N{number}R5'], 'recipe':'zs',
++            'init_from':f'N{number}R5', 'validation_protocol':'fixed_single_sequence'}
++    RUNS[f'V{number}R5L'] = {**RUNS[f'V{number}R5A'], 'format':'label','bounded_reasoning':False}
++
++# Context specificity of student reasoning; same shared native pilot budget.
++RUNS['N5R6'] = {**RUNS['N5R4']}
++RUNS['N8R6'] = {**RUNS['N5R4'], 'native_mode':'trace_swap'}
++RUNS['N9R6'] = {**RUNS['N8R6'], 'native_mode':'trace_saliency'}
++RUNS['G0N8'] = {**RUNS['G0N6'], 'native_mode':'trace_swap'}
++RUNS['G0N9'] = {**RUNS['G0N6'], 'native_mode':'trace_saliency'}
++for number in (5,8,9):
++    for repeat in ('A','B'):
++        RUNS[f'V{number}R6{repeat}'] = {**RUNS[f'N{number}R6'], 'recipe':'zs',
++            'init_from':f'N{number}R6', 'validation_protocol':'fixed_single_sequence'}
++    RUNS[f'V{number}R6L'] = {**RUNS[f'V{number}R6A'], 'format':'label','bounded_reasoning':False}
++
++
++# Shared near-full-data schedule; change only the horizon for matched controls.
++for number, parent in ((1, 'N1R5'), (4, 'N4R5'), (5, 'N5R6')):
++    RUNS[f'N{number}R7'] = {**RUNS[parent], 'native_schedule': 'full_pass'}
++    for repeat in ('A', 'B'):
++        RUNS[f'V{number}R7{repeat}'] = {**RUNS[f'N{number}R7'], 'recipe': 'zs',
++            'init_from': f'N{number}R7', 'validation_protocol': 'fixed_single_sequence'}
++    RUNS[f'V{number}R7L'] = {**RUNS[f'V{number}R7A'], 'format': 'label', 'bounded_reasoning': False}
++
++
++# A5-style capacity check of the existing method; no teacher-derived targets.
++RUNS['D4R8'] = {**RUNS['D3R3'], 'model': 'Qwen/Qwen3.5-4B'}
++RUNS['N4R8'] = {**RUNS['N4R7'], 'model': 'Qwen/Qwen3.5-4B', 'init_from': 'D4R8'}
++RUNS['G0N4R8'] = {**RUNS['G0N5'], 'model': 'Qwen/Qwen3.5-4B', 'init_from': 'D4R8'}
++for repeat in ('A', 'B'):
++    RUNS[f'V4R8{repeat}'] = {**RUNS['N4R8'], 'recipe': 'zs', 'init_from': 'N4R8',
++                           'validation_protocol': 'fixed_single_sequence'}
++RUNS['V4R8L'] = {**RUNS['V4R8A'], 'format': 'label', 'bounded_reasoning': False}
++
++
++# R9 is restricted to the post-trained2B backbone by the user's capacity cap.
++# R8 capacity-check entries above are historical, unlaunched configurations.
++RUNS['D3R9'] = {**RUNS['D3R3'], 'sft_schedule': 'full_budget'}
++for rid, parent, warm in (
++    ('N4R9', 'N4R5', 'D3R9'),
++    ('N4W9', 'N4R5', 'D3R3'),
++    ('N1R9', 'N1R5', 'D3R9'),
++):
++    RUNS[rid] = {**RUNS[parent], 'model': BASE_MODEL, 'init_from': warm,
++                 'scoring_protocol': 'deterministic_fixed_padding',
++                 'native_schedule': 'full_reasoning', 'eval_schedule': 'full_reasoning'}
++    smoke = 'G0' + rid
++    RUNS[smoke] = {**RUNS[rid], 'priority': 'P0', 'native_schedule': 'long_smoke'}
++    RUNS[smoke + 'P'] = {**RUNS[smoke]}
++    for repeat in ('A', 'B'):
++        RUNS['V' + rid[1:] + repeat] = {
++            **RUNS[rid], 'recipe': 'zs', 'init_from': rid,
++            'validation_protocol': 'fixed_single_sequence'}
++    RUNS['V' + rid[1:] + 'L'] = {
++        **RUNS['V' + rid[1:] + 'A'], 'format': 'label', 'bounded_reasoning': False}
++RUNS['VDR9L'] = {**RUNS['D3R9'], 'recipe': 'zs', 'init_from': 'D3R9',
++                 'bounded_reasoning': False, 'validation_protocol': 'fixed_single_sequence',
++                 'overrides': {'eval': {'gpu_memory_utilization': 0.65}}}
++
++# Test both channels of the same native critic after the ordinary-RL lane frees.
++# Group score reward reaches sampled reasoning; direct replay reaches label scores.
++RUNS['N5R10'] = {**RUNS['N4R9'], 'native_mode': 'joint'}
++RUNS['G0N5R10P'] = {**RUNS['N5R10'], 'priority': 'P0', 'native_schedule': 'long_smoke'}
++for repeat in ('A', 'B'):
++    RUNS['V5R10' + repeat] = {**RUNS['N5R10'], 'recipe': 'zs', 'init_from': 'N5R10',
++                             'validation_protocol': 'fixed_single_sequence'}
++RUNS['V5R10L'] = {**RUNS['V5R10A'], 'format': 'label', 'bounded_reasoning': False}
++
++# Fixed next method and its no-policy-gradient control; no per-cell tuning.
++RUNS['N6R11'] = {**RUNS['N5R10'], 'native_mode':'gated_joint'}
++RUNS['N0R11'] = {**RUNS['N4R9'], 'native_mode':'allocation_only'}
++RUNS['N7R12'] = {**RUNS['N6R11'], 'native_grouping':'random','native_schedule':'prefix_200'}
++for rid in ('N6R11','N0R11'):
++    RUNS['G0'+rid+'P'] = {**RUNS[rid], 'priority':'P0','native_schedule':'long_smoke'}
++    RUNS['V'+rid[1:]+'L'] = {**RUNS[rid], 'recipe':'zs','init_from':rid,
++                            'format':'label','bounded_reasoning':False,
++                            'validation_protocol':'fixed_single_sequence'}
++RUNS['G0N7R12P'] = {**RUNS['N7R12'],'priority':'P0','native_schedule':'long_smoke'}
++RUNS['V7R12L'] = {**RUNS['N7R12'],'recipe':'zs','init_from':'N7R12',
++                  'format':'label','bounded_reasoning':False,'validation_protocol':'fixed_single_sequence'}
++
++# One shared HF greedy protocol, registered before any held-out evaluation.
++# H views first run on dev; the exact same frozen config is then hash-locked.
++for source in ('D3R9','N1R9','N4R9','N5R10','N6R11','N0R11','N7R12'):
++    for suffix,fmt in (('L','label'),('C','cot')):
++        RUNS['H'+source+suffix] = {
++            **RUNS[source], 'recipe':'zs','init_from':source,'format':fmt,
++            'bounded_reasoning':fmt=='cot','native_schedule':'full_reasoning',
++            'eval_schedule':'full_reasoning','validation_protocol':'fixed_single_sequence',
++            'overrides':{'eval':{'backend':'transformers','gpu_memory_utilization':0.65,
++                'model_revision':'15852e8c16360a2fea060d615a32b45270f8a8fc'}}}
++RUNS['HN6R11P200L'] = {**RUNS['HN6R11L'],'init_checkpoint':200}
++RUNS['HN7R12P200L'] = {**RUNS['HN7R12L'],'init_checkpoint':200}
++
++# R13 tests finite-label marginalization, without a native allocation objective.
++for rid,mode in (('N10R13','marginal_f1'),('N11R13','marginal_accuracy')):
++    RUNS[rid]={**RUNS['N4R9'],'native_mode':mode,'native_schedule':'prefix_200',
++        'overrides':{'eval':{'backend':'transformers',
++            'model_revision':'15852e8c16360a2fea060d615a32b45270f8a8fc'}}}
++    RUNS['G0'+rid+'P']={**RUNS[rid],'priority':'P0','native_schedule':'long_smoke'}
++    RUNS['H'+rid+'L']={**RUNS[rid],'recipe':'zs','init_from':rid,
++        'format':'label','bounded_reasoning':False}
++
++
++RUNS['P0R14'] = {**RUNS['HD3R9C'], 'priority': 'P0', 'readout_diagnostic': True}
++
++# Fresh full400 schedule; native trainer explicitly generates CoT, while the
++# prospectively selected inference interface is the existing greedy label view.
++RUNS['N12R15'] = {**RUNS['N7R12'], 'format': 'label', 'training_format': 'cot',
++    'bounded_reasoning': False, 'native_schedule': 'full_reasoning',
++    'validation_protocol': 'fixed_single_sequence',
++    'overrides': {'eval': {'backend': 'transformers', 'gpu_memory_utilization': 0.65,
++        'model_revision': '15852e8c16360a2fea060d615a32b45270f8a8fc'}}}
++RUNS['G0N12R15P'] = {**RUNS['N12R15'], 'priority': 'P0', 'native_schedule': 'long_smoke'}
++
++# Counterfactual trace-swap credit assignment, matched to N12R15 on every
++# backbone, data, rollout, optimizer, training-format and readout setting.
++RUNS['N13R16'] = {**RUNS['N12R15'], 'native_mode': 'trace_swap'}
++RUNS['G0N13R16P'] = {**RUNS['N13R16'], 'priority': 'P0', 'native_schedule': 'long_smoke'}
++
++# Short trace-saliency follow-up, matched to R15 except attribution and horizon.
++RUNS['N14R17'] = {**RUNS['N12R15'], 'native_mode': 'trace_saliency', 'native_schedule': 'prefix_200'}
++RUNS['G0N14R17P'] = {**RUNS['N14R17'], 'priority': 'P0', 'native_schedule': 'long_smoke'}
++
++# Bounded correctness-gated probability contrast; later source revision also
++# fixes original/rotated/saliency score geometry. Earlier frozen VMs are unchanged.
++RUNS['N15R18'] = {**RUNS['N12R15'], 'native_mode': 'gated_trace_swap'}
++RUNS['G0N15R18P'] = {**RUNS['N15R18'], 'priority': 'P0', 'native_schedule': 'long_smoke'}
++
++# The same bounded method on shared-premise groups; scheduled examples and
++# label-slot templates stay matched to its random-group counterpart.
++RUNS['N16R19'] = {**RUNS['N15R18'], 'native_grouping':'native'}
++RUNS['G0N16R19P'] = {**RUNS['N16R19'], 'priority':'P0', 'native_schedule':'long_smoke'}
++
++# Registered teacher-free follow-up: full-horizon native token credit and
++# macro-F1-aligned label marginalization, both from the same SFT warm start.
++RUNS['N20R20'] = {**RUNS['N12R15'], 'native_mode':'trace_saliency',
++                  'native_schedule':'full_reasoning'}
++RUNS['N21R20'] = {**RUNS['N12R15'], 'native_mode':'marginal_f1',
++                  'native_schedule':'full_reasoning'}
++RUNS['G0N20R20P'] = {**RUNS['N20R20'], 'priority':'P0', 'native_schedule':'long_smoke'}
++RUNS['G0N21R20P'] = {**RUNS['N21R20'], 'priority':'P0', 'native_schedule':'long_smoke'}
++
++# Explicit development readouts of preserved checkpoints after the requested VM
++# shutdown. These views do not claim completion of either interrupted parent.
++RUNS['HN12R15P200L'] = {**RUNS['N12R15'], 'recipe':'zs', 'init_from':'N12R15', 'init_checkpoint':200}
++RUNS['HN13R16P100L'] = {**RUNS['N13R16'], 'recipe':'zs', 'init_from':'N13R16', 'init_checkpoint':100}
++
++# Early readout of the running R13 methods; primary CoT selection stays frozen.
++for source in ('N10R13', 'N11R13'):
++    RUNS['H'+source+'P100L'] = {**RUNS['H'+source+'L'], 'init_checkpoint': 100}
++
++
+ def build_run_config(run_id: str) -> dict:
+     spec = dict(RUNS[run_id])
+     overrides = spec.pop("overrides")
+diff --git a/eval/predict.py b/eval/predict.py
+index 83c5f1c..be6436d 100644
+--- a/eval/predict.py
++++ b/eval/predict.py
+@@ -3,6 +3,8 @@
+ import argparse
+ from pathlib import Path
+ 
++import yaml
++
+ from common.io import load_config, run_dir, write_json, write_jsonl
+ from data.prepare import get_rows
+ from eval.metrics import compute_metrics
+@@ -19,32 +21,73 @@ def assemble_records(rows, outputs, fmt, guess) -> list[dict]:
+ 
+ 
+ def generate(model_name, messages_list, max_new_tokens, adapter=None,
+-             gpu_mem=0.85, max_model_len=2048):
++             gpu_mem=0.85, max_model_len=2048, reasoning_budget=None, engine_options=None, backend='vllm',
++             model_revision=None):
++    if backend=='transformers':
++        from eval.hf_generate import generate_transformers
++        return generate_transformers(model_name,messages_list,max_new_tokens,adapter,
++                                     reasoning_budget=reasoning_budget,model_revision=model_revision)
++    if backend!='vllm':raise ValueError('Unsupported evaluation backend')
++    options = dict(engine_options or {})
++    allowed = {'max_num_seqs', 'max_num_batched_tokens', 'enforce_eager', 'enable_prefix_caching', 'seed'}
++    if set(options) - allowed:
++        raise ValueError('Unsupported eval engine controls')
++    for key in ('max_num_seqs', 'max_num_batched_tokens', 'seed'):
++        if key in options and (type(options[key]) is not int or options[key] < (0 if key == 'seed' else 1)):
++            raise ValueError('Invalid integer eval engine control: ' + key)
++    for key in ('enforce_eager', 'enable_prefix_caching'):
++        if key in options and type(options[key]) is not bool:
++            raise ValueError('Invalid boolean eval engine control: ' + key)
++    from tempfile import TemporaryDirectory
+     from vllm import LLM, SamplingParams
+     from vllm.lora.request import LoRARequest
+-    llm = LLM(model=model_name, language_model_only=True, dtype="bfloat16",
+-              enable_lora=adapter is not None, max_lora_rank=64,
+-              gpu_memory_utilization=gpu_mem, max_model_len=max_model_len)
+-    sp = SamplingParams(temperature=0.0, max_tokens=max_new_tokens)
+-    lora = LoRARequest("adapter", 1, str(adapter)) if adapter else None
+-    outs = llm.chat(messages_list, sp, lora_request=lora,
+-                    chat_template_kwargs={"enable_thinking": False})
+-    return [(o.outputs[0].text, len(o.outputs[0].token_ids)) for o in outs]
++    with TemporaryDirectory(prefix='rl-nli-vllm-adapter-') as temp:
++        if adapter and model_name.lower().startswith('qwen/qwen3.5'):
++            from eval.adapters import export_qwen35_adapter
++            adapter = export_qwen35_adapter(adapter, temp)
++        llm = LLM(model=model_name, language_model_only=True, dtype="bfloat16",
++                  enable_lora=adapter is not None, max_lora_rank=64,
++                  gpu_memory_utilization=gpu_mem, max_model_len=max_model_len, **options)
++        sp = SamplingParams(temperature=0.0, max_tokens=max_new_tokens)
++        lora = LoRARequest("adapter", 1, str(adapter)) if adapter else None
++        if reasoning_budget is not None:
++            from train.common import chat_template_ids
++            from train.native_rollout import bounded_generate
++            tok = llm.get_tokenizer()
++            prompts = [chat_template_ids(tok, messages) for messages in messages_list]
++            rows = bounded_generate(llm, prompts, tok, temperature=0.,
++                                    reasoning_budget=reasoning_budget, total_budget=max_new_tokens,
++                                    lora_request=lora)
++            return [(r['raw_output'], len(r['completion_ids'])) for r in rows]
++        outs = llm.chat(messages_list, sp, lora_request=lora,
++                       chat_template_kwargs={"enable_thinking": False})
++        return [(o.outputs[0].text, len(o.outputs[0].token_ids)) for o in outs]
+ 
+ 
+ def predict_split(cfg: dict, split: str, out_dir, adapter=None) -> dict:
+     assert split_allowed(split), f"split {split!r} không được phép ở giai đoạn này"
++    if cfg.get('readout_diagnostic'):
++        from eval.readout_probe import predict_probe
++        return predict_probe(cfg, split, out_dir, adapter)
+     fmt, guess = cfg["format"], cfg.get("guess", False)
+     rows = get_rows(split)
+-    msgs = [build_messages(r["premise"], r["hypothesis"], fmt, guess) for r in rows]
++    msgs = [build_messages(r["premise"], r["hypothesis"], fmt, guess,
++                           cfg.get('schema_examples', 'single')) for r in rows]
+     ev = cfg["eval"]
++    options = (cfg['validation_eval']['engine_options']
++               if cfg.get('validation_protocol') == 'fixed_single_sequence' else ev.get('engine_options'))
+     outputs = generate(cfg["model"]["name"], msgs, ev["max_new_tokens"][fmt], adapter,
+-                       ev["gpu_memory_utilization"], ev["max_model_len"])
++                       ev["gpu_memory_utilization"], ev["max_model_len"],
++                       reasoning_budget=cfg['native_pilot']['reasoning_budget'] if cfg.get('bounded_reasoning') else None,
++                       engine_options=options,backend=ev.get('backend','vllm'),
++                       model_revision=ev.get('model_revision'))
+     recs = assemble_records(rows, outputs, fmt, guess)
+     out_dir = Path(out_dir)
+     write_jsonl(out_dir / f"predictions_{split}.jsonl", recs)
+     metrics = compute_metrics(recs)
+     write_json(out_dir / f"metrics_{split}.json", metrics)
++    write_json(out_dir / 'eval_runtime.json', dict(protocol=cfg.get('validation_protocol','legacy_scheduler'),
++               engine_options=options or {},backend=ev.get('backend','vllm'),temperature=0., split=split, n=len(rows)))
+     if "report" in metrics:
+         print(metrics["report"])
+     return metrics
+@@ -57,8 +100,16 @@ def main(argv=None) -> None:
+     ap.add_argument("--split", default="dev")
+     ap.add_argument("--adapter", default=None)
+     ap.add_argument("--out-dir", default=None)
++    ap.add_argument("--config", default=None,
++                    help="Frozen config copied into the run directory")
+     a = ap.parse_args(argv)
+-    cfg = load_config(a.run)
++    if a.config:
++        with open(a.config, encoding="utf-8") as f:
++            cfg = yaml.safe_load(f)
++        if not isinstance(cfg, dict):
++            raise ValueError(f"Invalid frozen run config: {a.config}")
++    else:
++        cfg = load_config(a.run)
+     out = a.out_dir or run_dir(a.run, cfg["model"]["name"], a.seed)
+     m = predict_split(cfg, a.split, out, a.adapter)
+     print({k: m[k] for k in ("n", "accuracy", "macro_f1", "parse_rate")})
+diff --git a/formats/prompts.py b/formats/prompts.py
+index ad137e6..e0e77b6 100644
+--- a/formats/prompts.py
++++ b/formats/prompts.py
+@@ -44,7 +44,25 @@ _FORMAT_HELP = {
+ _GUESS_HELP = ("Ngay từ đầu, hãy đoán nhanh nhãn trong <guess>NHÃN</guess>, rồi mới viết phần còn lại.")
+ 
+ 
+-def build_prompt(premise: str, hypothesis: str, fmt: str, guess: bool = False) -> str:
++def balanced_alignment_examples(guess=False):
++    """Hand-written schema demonstrations; independent of ViANLI and its labels."""
++    premise = EXAMPLE_PREMISE
++    examples = [
++        (EXAMPLE_HYPOTHESIS, 'entailment', _ALIGN_BLOCK),
++        ('Hà Nội là thủ đô của Việt Nam và có một triệu xe đạp.', 'neutral',
++         '<align>\nH1: "Hà Nội là thủ đô của Việt Nam" <-> "Hà Nội là thủ đô của Việt Nam" | match\n'
++         'H2: "có một triệu xe đạp" <-> ∅ | missing\n</align>'),
++        ('Hà Nội không phải thủ đô của Việt Nam.', 'contradiction',
++         '<align>\nH1: "Hà Nội không phải thủ đô của Việt Nam" <-> '
++         '"Hà Nội là thủ đô của Việt Nam" | conflict\n</align>'),
++    ]
++    return [dict(premise=premise, hypothesis=hypothesis, label=label,
++                 output=(f'<guess>{label}</guess>' if guess else '') + block + f'<answer>{label}</answer>')
++            for hypothesis, label, block in examples]
++
++
++def build_prompt(premise: str, hypothesis: str, fmt: str, guess: bool = False,
++                 schema_examples: str = 'single') -> str:
+     if fmt not in _FORMAT_HELP:
+         raise ValueError(f"format không hợp lệ: {fmt!r}")
+     if guess and fmt == "label":
+@@ -52,13 +70,24 @@ def build_prompt(premise: str, hypothesis: str, fmt: str, guess: bool = False) -
+     parts = [_INTRO, _FORMAT_HELP[fmt]]
+     if guess:
+         parts.append(_GUESS_HELP)
+-    parts.append(
+-        f"\nVí dụ định dạng:\nPremise: {EXAMPLE_PREMISE}\nHypothesis: {EXAMPLE_HYPOTHESIS}\n"
+-        f"Trả lời: {EXAMPLE_OUTPUTS[(fmt, guess)]}\n"
+-    )
++    if schema_examples == 'balanced':
++        if fmt != 'align':
++            raise ValueError('Balanced schema demonstrations are defined only for align')
++        parts.append('Tách các mệnh đề cần kiểm tra; chỉ trích đoạn premise trực tiếp liên quan. '
++                     'Thông tin thiếu phải dùng ∅ | missing, không gán match cho thông tin chưa được hỗ trợ.')
++        for e in balanced_alignment_examples(guess):
++            parts.append(f"\nVí dụ định dạng:\nPremise: {e['premise']}\nHypothesis: {e['hypothesis']}\n"
++                         f"Trả lời: {e['output']}\n")
++    elif schema_examples == 'single':
++        parts.append(
++            f"\nVí dụ định dạng:\nPremise: {EXAMPLE_PREMISE}\nHypothesis: {EXAMPLE_HYPOTHESIS}\n"
++            f"Trả lời: {EXAMPLE_OUTPUTS[(fmt, guess)]}\n")
++    else:
++        raise ValueError(f'Unknown schema_examples: {schema_examples}')
+     parts.append(f"Bây giờ hãy làm với cặp sau.\nPremise: {premise}\nHypothesis: {hypothesis}\nTrả lời:")
+     return "\n".join(parts)
+ 
+ 
+-def build_messages(premise: str, hypothesis: str, fmt: str, guess: bool = False) -> list[dict]:
+-    return [{"role": "user", "content": build_prompt(premise, hypothesis, fmt, guess)}]
++def build_messages(premise: str, hypothesis: str, fmt: str, guess: bool = False,
++                   schema_examples: str = 'single') -> list[dict]:
++    return [{"role": "user", "content": build_prompt(premise, hypothesis, fmt, guess, schema_examples)}]
+diff --git a/paper/refs.bib b/paper/refs.bib
+index 8cfd5d8..c642a82 100644
+--- a/paper/refs.bib
++++ b/paper/refs.bib
+@@ -60,14 +60,14 @@
+ }
+ 
+ % TODO: add volume/pages once the ESWA version is online (accepted per arXiv v3, Oct 2025)
+-@article{huynh-etal-2025-vianli,
++@misc{huynh-etal-2025-vianli,
+     title = "A New Benchmark Dataset and Mixture-of-Experts Language Models for Adversarial Natural Language Inference in Vietnamese",
+     author = "Tin Van Huynh and Kiet Van Nguyen and Ngan Luu-Thuy Nguyen",
+     year = "2025",
+-    journal = "Expert Systems with Applications",
++    note = "Version 3; accepted by Expert Systems with Applications",
+     eprint = "2406.17716",
+     archivePrefix = "arXiv",
+-    url = "https://arxiv.org/abs/2406.17716"
++    url = "https://arxiv.org/abs/2406.17716v3"
+ }
+ 
+ %% ===== Vietnamese encoders =====
+@@ -545,11 +545,11 @@
+ @misc{mirallesgonzalez-etal-2025-grpo-nli,
+     title = "Evaluating the Scalability and Adversarial Generalization of {GRPO-Trained} {NLI} Models",
+     author = "Pablo Miralles-González and Javier Huertas-Tato and Alejandro Martín and David Camacho",
+-    year = "2025",
+-    howpublished = "arXiv preprint arXiv:2504.18376",
++    year = "2026",
++    note = "Version 3, revised September 2026",
+     eprint = "2504.18376",
+     archivePrefix = "arXiv",
+-    url = "https://arxiv.org/abs/2504.18376"
++    url = "https://arxiv.org/abs/2504.18376v3"
+ }
+ 
+ %% ===== Faithfulness =====
+@@ -580,7 +580,6 @@
+     title = "{DeepSeekMath}: Pushing the Limits of Mathematical Reasoning in Open Language Models",
+     author = "Zhihong Shao and Peiyi Wang and Qihao Zhu and Runxin Xu and Junxiao Song and Xiao Bi and Haowei Zhang and Mingchuan Zhang and Y. K. Li and Y. Wu and Daya Guo",
+     year = "2024",
+-    howpublished = "arXiv preprint arXiv:2402.03300",
+     eprint = "2402.03300",
+     archivePrefix = "arXiv",
+     url = "https://arxiv.org/abs/2402.03300"
+@@ -610,7 +609,6 @@
+     title = "{DAPO}: An Open-Source {LLM} Reinforcement Learning System at Scale",
+     author = "Qiying Yu and Zheng Zhang and Ruofei Zhu and Yufeng Yuan and Xiaochen Zuo and Yu Yue and Weinan Dai and Tiantian Fan and Gaohong Liu and Lingjun Liu and Xin Liu and Haibin Lin and Zhiqi Lin and Bole Ma and Guangming Sheng and Yuxuan Tong and Chi Zhang and Mofan Zhang and Wang Zhang and Hang Zhu and Jinhua Zhu and Jiaze Chen and Jiangjie Chen and Chengyi Wang and Hongli Yu and Yuxuan Song and Xiangpeng Wei and Hao Zhou and Jingjing Liu and Wei-Ying Ma and Ya-Qin Zhang and Lin Yan and Mu Qiao and Yonghui Wu and Mingxuan Wang",
+     year = "2025",
+-    howpublished = "arXiv preprint arXiv:2503.14476",
+     eprint = "2503.14476",
+     archivePrefix = "arXiv",
+     url = "https://arxiv.org/abs/2503.14476"
+@@ -626,3 +624,147 @@
+     url = "https://arxiv.org/abs/2001.06782"
+ }
+ 
++
++@inproceedings{jiang-etal-2021-alignment,
++    title = "Alignment Rationale for Natural Language Inference",
++    author = "Jiang, Zhongtao  and
++      Zhang, Yuanzhe  and
++      Yang, Zhao  and
++      Zhao, Jun  and
++      Liu, Kang",
++    editor = "Zong, Chengqing  and
++      Xia, Fei  and
++      Li, Wenjie  and
++      Navigli, Roberto",
++    booktitle = "Proceedings of the 59th Annual Meeting of the {A}ssociation for {C}omputational {L}inguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers)",
++    month = aug,
++    year = "2021",
++    address = "Online",
++    publisher = "Association for Computational Linguistics",
++    url = "https://aclanthology.org/2021.acl-long.417/",
++    doi = "10.18653/v1/2021.acl-long.417",
++    pages = "5372--5387"
++}
++
++
++@article{feng-etal-2022-neuro,
++    title = "Neuro-symbolic Natural Logic with Introspective Revision for Natural Language Inference",
++    author = "Feng, Yufei  and
++      Yang, Xiaoyu  and
++      Zhu, Xiaodan  and
++      Greenspan, Michael",
++    editor = "Roark, Brian  and
++      Nenkova, Ani",
++    journal = "Transactions of the Association for Computational Linguistics",
++    volume = "10",
++    year = "2022",
++    address = "Cambridge, MA",
++    publisher = "MIT Press",
++    url = "https://aclanthology.org/2022.tacl-1.14/",
++    doi = "10.1162/tacl_a_00458",
++    pages = "240--256"
++}
++
++
++@inproceedings{li-etal-2019-logic,
++    title = "A Logic-Driven Framework for Consistency of Neural Models",
++    author = "Li, Tao  and
++      Gupta, Vivek  and
++      Mehta, Maitrey  and
++      Srikumar, Vivek",
++    editor = "Inui, Kentaro  and
++      Jiang, Jing  and
++      Ng, Vincent  and
++      Wan, Xiaojun",
++    booktitle = "Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing ({EMNLP}-{IJCNLP})",
++    month = nov,
++    year = "2019",
++    address = "Hong Kong, China",
++    publisher = "Association for Computational Linguistics",
++    url = "https://aclanthology.org/D19-1405/",
++    doi = "10.18653/v1/D19-1405",
++    pages = "3924--3935"
++}
++
++
++@inproceedings{xu-etal-2018-semantic,
++ title={A Semantic Loss Function for Deep Learning with Symbolic Knowledge},
++ author={Xu, Jingyi and Zhang, Zilu and Friedman, Tal and Liang, Yitao and Van den Broeck, Guy},
++ booktitle={Proceedings of the 35th International Conference on Machine Learning},
++ volume={80}, pages={5502--5511}, year={2018}, publisher={PMLR},
++ url={https://proceedings.mlr.press/v80/xu18h.html}
++}
++
++@inproceedings{gao-etal-2021-scaling,
++    title = "Scaling Deep Contrastive Learning Batch Size under Memory Limited Setup",
++    author = "Gao, Luyu  and
++      Zhang, Yunyi  and
++      Han, Jiawei  and
++      Callan, Jamie",
++    editor = "Rogers, Anna  and
++      Calixto, Iacer  and
++      Vuli{\'c}, Ivan  and
++      Saphra, Naomi  and
++      Kassner, Nora  and
++      Camburu, Oana-Maria  and
++      Bansal, Trapit  and
++      Shwartz, Vered",
++    booktitle = "Proceedings of the 6th Workshop on Representation Learning for {NLP} ({R}ep{L}4{NLP}-2021)",
++    month = aug,
++    year = "2021",
++    address = "Online",
++    publisher = "Association for Computational Linguistics",
++    url = "https://aclanthology.org/2021.repl4nlp-1.31/",
++    doi = "10.18653/v1/2021.repl4nlp-1.31",
++    pages = "316--321"
++}
++
++
++
++@inproceedings{cheng-etal-2025-neutralizing,
++    title = "Neutralizing Bias in {LLM} Reasoning using Entailment Graphs",
++    author = "Cheng, Liang  and
++      Li, Tianyi  and
++      Wang, Zhaowei  and
++      Liu, Tianyang  and
++      Steedman, Mark",
++    editor = "Che, Wanxiang  and
++      Nabende, Joyce  and
++      Shutova, Ekaterina  and
++      Pilehvar, Mohammad Taher",
++    booktitle = "Findings of the {A}ssociation for {C}omputational {L}inguistics: {ACL} 2025",
++    month = jul,
++    year = "2025",
++    address = "Vienna, Austria",
++    publisher = "Association for Computational Linguistics",
++    url = "https://aclanthology.org/2025.findings-acl.705/",
++    doi = "10.18653/v1/2025.findings-acl.705",
++    pages = "13714--13730",
++    ISBN = "979-8-89176-256-5"
++}
++
++
++
++@misc{kwiatkowski-etal-2026-likelihood,
++  title={Likelihood-Based Reward Designs for General LLM Reasoning},
++  author={Ariel Kwiatkowski and Natasha Butt and Ismail Labiad and Julia Kempe and Yann Ollivier},
++  year={2026}, eprint={2602.03979}, archivePrefix={arXiv},
++  url={https://arxiv.org/abs/2602.03979}
++}
++@misc{li-etal-2026-shortcuts,
++  title={Models Know Their Shortcuts: Deployment-Time Shortcut Mitigation},
++  author={Jiayi Li and Shijie Tang and G{\"u}n Kaynar and Shiyi Du and Carl Kingsford},
++  year={2026}, eprint={2604.12277}, archivePrefix={arXiv},
++  url={https://arxiv.org/abs/2604.12277v2}
++}
++
++@inproceedings{dua-etal-2021-learning,
++  title = {Learning with Instance Bundles for Reading Comprehension},
++  author = {Dua, Dheeru and Dasigi, Pradeep and Singh, Sameer and Gardner, Matt},
++  booktitle = {Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing},
++  year = {2021},
++  pages = {7347--7357},
++  publisher = {Association for Computational Linguistics},
++  doi = {10.18653/v1/2021.emnlp-main.584},
++  url = {https://aclanthology.org/2021.emnlp-main.584/}
++}
+diff --git a/scripts/check_g1.py b/scripts/check_g1.py
+index e4b9721..271847f 100644
+--- a/scripts/check_g1.py
++++ b/scripts/check_g1.py
+@@ -3,10 +3,10 @@ import sys
+ 
+ from common.io import ARTIFACTS, RESULTS, read_json
+ 
+-REQUIRED = ["E0", "E1", "E2", "E3"]
++REQUIRED = ["E0", "E1", "E2", "E3", "B1"]
+ 
+ 
+-def evaluate_gate(metrics: dict) -> tuple[bool, list[str]]:
++def evaluate_gate(metrics: dict, probe_complete: bool = False) -> tuple[bool, list[str]]:
+     lines, ok = [], True
+     for rid in REQUIRED:
+         if rid not in metrics:
+@@ -14,17 +14,15 @@ def evaluate_gate(metrics: dict) -> tuple[bool, list[str]]:
+             ok = False
+     if not ok:
+         return False, lines
+-    zs = max(metrics[r]["accuracy"] for r in ("E0", "E1", "E2"))
++    zs = max(metrics[r]["macro_f1"] for r in ("E0", "E1", "E2"))
+     e3 = metrics["E3"]
+-    better = e3["accuracy"] > zs
++    better = e3["macro_f1"] > zs
+     parse_ok = e3["parse_rate"] >= 0.99
+-    lines.append(f"E3 acc {e3['accuracy']:.4f} vs best ZS {zs:.4f}: {'OK' if better else 'FAIL'}")
++    lines.append(f"E3 Macro-F1 {e3['macro_f1']:.4f} vs best ZS {zs:.4f}: {'OK' if better else 'FAIL'}")
+     lines.append(f"E3 parse {e3['parse_rate']:.4f} >= 0.99: {'OK' if parse_ok else 'FAIL'}")
+-    if "B1" in metrics:
+-        lines.append(f"B1 acc {metrics['B1']['accuracy']:.4f} (tham chiếu)")
+-    else:
+-        lines.append("B1: bỏ qua (tham chiếu encoder)")
+-    return better and parse_ok, lines
++    lines.append(f"B1 Macro-F1 {metrics['B1']['macro_f1']:.4f} (tham chiếu)")
++    lines.append(f"hypothesis probe: {'OK' if probe_complete else 'thiếu'}")
++    return better and parse_ok and probe_complete, lines
+ 
+ 
+ def main() -> None:
+@@ -34,9 +32,8 @@ def main() -> None:
+             f = d / "metrics_dev.json"
+             if f.exists():
+                 metrics[rid] = read_json(f)
+-    ok, lines = evaluate_gate(metrics)
+     probe = (ARTIFACTS / "hyp_probe" / "p_hyp_train.jsonl").exists()
+-    lines.append(f"hyp probe p_hyp_train.jsonl: {'OK' if probe else 'bỏ qua (tham chiếu encoder)'}")
++    ok, lines = evaluate_gate(metrics, probe_complete=probe)
+     print("\n".join(lines))
+     print("G1:", "PASS" if ok else "FAIL")
+     sys.exit(0 if ok else 1)
+diff --git a/scripts/run.py b/scripts/run.py
+index 7ca43d0..dceaf47 100644
+--- a/scripts/run.py
++++ b/scripts/run.py
+@@ -1,6 +1,7 @@
+ """Điểm vào duy nhất: --run E11 --seed 0 -> đọc config, gọi đúng trainer, rồi predict trên dev.
+ """
+ import argparse
++import os
+ import shutil
+ import subprocess
+ import sys
+@@ -8,34 +9,110 @@ import time
+ 
+ import yaml
+ 
+-from common.io import load_config, read_json, run_dir, write_json, write_jsonl
++from common.io import RESULTS, load_config, read_json, run_dir, write_json, write_jsonl
+ 
+ 
+-def _predict_cli(run_id, seed, split, out_dir, adapter=None):
++def resolve_initial_adapter(cfg, seed, results=RESULTS):
++    if not cfg.get('init_from'):
++        return None
++    checkpoint=cfg.get('init_checkpoint')
++    if checkpoint is not None and (type(checkpoint) is not int or checkpoint<1):
++        raise ValueError('init_checkpoint must be a positive integer')
++    suffix='best_adapter' if checkpoint is None else f'grpo_ckpts/checkpoint-{checkpoint}'
++    candidates = list(results.glob(f"{cfg['init_from']}_*_s{seed}/{suffix}"))
++    if not candidates:
++        raise FileNotFoundError(f"Missing same-seed warm start: {cfg['init_from']} seed {seed}")
++    if len(candidates) != 1:
++        raise ValueError(f"Ambiguous warm start: {candidates}")
++    return candidates[0]
++
++
++def run_training_process(cmd):
++    """All training GPU allocations belong to a child that exits before eval."""
++    subprocess.run(cmd, check=True)
++
++
++def select_checkpoint(checkpoints, scores):
++    return max(checkpoints, key=lambda p: (scores[p.name]["macro_f1"],
++                                          int(p.name.rsplit("-", 1)[-1])))
++
++
++def frozen_config(path):
++    """Read the immutable config copied into a run directory."""
++    with open(path, encoding="utf-8") as f:
++        cfg = yaml.safe_load(f)
++    if not isinstance(cfg, dict):
++        raise ValueError(f"Invalid frozen run config: {path}")
++    return cfg
++
++
++def _predict_cli(run_id, seed, split, out_dir, adapter=None, config_path=None):
+     cmd = [sys.executable, "-m", "eval.predict", "--run", run_id, "--seed", str(seed),
+            "--split", split, "--out-dir", str(out_dir)]
+     if adapter:
+         cmd += ["--adapter", str(adapter)]
++    if config_path:
++        cmd += ["--config", str(config_path)]
+     subprocess.run(cmd, check=True)  # tiến trình riêng để giải phóng GPU sau khi train
+ 
+ 
+-def _run_sft(run_id, seed, cfg, out):
+-    from train.sft import pick_best, train_sft
+-    ckpts = train_sft(cfg, seed, out)
++def _predict_final_cli(entry,protocol_path):
++    env={**os.environ,'HF_HUB_OFFLINE':'0','TRANSFORMERS_OFFLINE':'1'}
++    subprocess.run([sys.executable,'-m','eval.final_predict','--run',entry['run_id'],
++                    '--seed',str(entry['seed']),'--protocol',str(protocol_path)],check=True,env=env)
++
++
++def run_final_test(run_id,seed,protocol_path):
++    from eval.final_protocol import validate_protocol,sha256_path,claim_test_run,complete_test_run
++    protocol_path=__import__('pathlib').Path(protocol_path)
++    entries=validate_protocol(read_json(protocol_path),root=RESULTS.parent)
++    selected=[e for e in entries if e['run_id']==run_id and e['seed']==seed]
++    if len(selected)!=1:raise ValueError('Run/seed absent from locked test protocol')
++    entry=selected[0];out=entry['source_config_path'].parent
++    digest=sha256_path(protocol_path)
++    claim=claim_test_run(out,digest)
++    if claim['reused']:
++        print({'test_results_reused':True,'run':run_id});return
++    t0=time.time();cost={'status':'in_progress','manifest_sha256':digest}
++    try:
++        _predict_final_cli(entry,protocol_path)
++        cost.update(status='complete',wall_seconds=round(time.time()-t0,1))
++        write_json(out/'cost_test.json',cost)
++        complete_test_run(out,digest)
++        original=read_json(out/'cost.json') if (out/'cost.json').exists() else {}
++        if original.get('status')=='prepared':
++            write_json(out/'cost.json',{**original,'status':'complete','last_phase':'test',
++                                      'wall_seconds':cost['wall_seconds']})
++    except Exception as exc:
++        cost.update(status='failed',error=f'{type(exc).__name__}: {exc}',wall_seconds=round(time.time()-t0,1))
++        write_json(out/'cost_test.json',cost)
++        raise
++
++
++def _evaluate_checkpoints(run_id, seed, cfg, out):
++    recipe = cfg["recipe"]
++    folder = "sft_ckpts" if recipe == "sft" else "grpo_ckpts"
++    ckpts = sorted((out / folder).glob("checkpoint-*"))
+     if ckpts:
+         scores = {}
+         for ck in ckpts:
+             ev = out / "ckpt_eval" / ck.name
+-            _predict_cli(run_id, seed, "dev", ev, adapter=ck)
+-            scores[ck.name] = read_json(ev / "metrics_dev.json")["macro_f1"]
+-        best = pick_best(scores)
+-        write_json(out / "ckpt_scores.json", {"scores": scores, "best": best})
+-        shutil.copytree(out / "sft_ckpts" / best, out / "best_adapter", dirs_exist_ok=True)
++            if not (ev / "metrics_dev.json").exists():
++                _predict_cli(run_id, seed, "dev", ev, adapter=ck,
++                             config_path=out / "config.yaml")
++            scores[ck.name] = read_json(ev / "metrics_dev.json")
++        best = select_checkpoint(ckpts, scores)
++        write_json(out / "ckpt_scores.json", {"scores": scores, "best": best.name,
++                                              "selection_split": "dev", "selection_metric": "macro_f1"})
++        if (out / "best_adapter").exists():
++            shutil.rmtree(out / "best_adapter")
++        shutil.copytree(best, out / "best_adapter")
+         for name in ("predictions_dev.jsonl", "metrics_dev.json"):
+-            shutil.copy(out / "ckpt_eval" / best / name, out / name)
++            shutil.copy(out / "ckpt_eval" / best.name / name, out / name)
+     else:
+         best = out / "best_adapter"
+-        _predict_cli(run_id, seed, "dev", out, adapter=best)
++        _predict_cli(run_id, seed, "dev", out, adapter=best,
++                     config_path=out / "config.yaml")
+ 
+ 
+ def _run_encoder(cfg, seed, out):
+@@ -52,45 +129,56 @@ def _run_encoder(cfg, seed, out):
+ 
+ 
+ def main(argv=None) -> None:
+-    try:
+-        from train.common import patch_torchao_compatibility, patch_vllm_sync_weights_for_qwen35
+-        patch_torchao_compatibility()
+-        patch_vllm_sync_weights_for_qwen35()
+-    except Exception:
+-        pass
+     ap = argparse.ArgumentParser()
+     ap.add_argument("--run", required=True)
+     ap.add_argument("--seed", type=int, default=0)
++    ap.add_argument("--phase", choices=["all", "train", "eval", "prepare", "test"], default="all")
++    ap.add_argument('--protocol',default=None)
+     a = ap.parse_args(argv)
++    if a.phase=='test':
++        if not a.protocol:raise ValueError('A locked test protocol is required')
++        run_final_test(a.run,a.seed,a.protocol);return
+     cfg = load_config(a.run)
+     out = run_dir(a.run, cfg["model"]["name"], a.seed)
++    if a.phase == "eval":
++        if not (out / "config.yaml").exists():
++            raise FileNotFoundError(f"No frozen run config in {out}")
++        cfg = frozen_config(out / "config.yaml")
++    elif (out / "config.yaml").exists():
++        raise FileExistsError(f"Run exists: {out}; use --phase eval or a new matrix ID")
+     out.mkdir(parents=True, exist_ok=True)
+-    with open(out / "config.yaml", "w", encoding="utf-8") as f:
+-        yaml.safe_dump(cfg, f, allow_unicode=True, sort_keys=False)
++    if a.phase != "eval":
++        with open(out / "config.yaml", "w", encoding="utf-8") as f:
++            yaml.safe_dump(cfg, f, allow_unicode=True, sort_keys=False)
++    if a.phase=='prepare':
++        write_json(out/'cost.json',{'status':'prepared','wall_seconds':0.,'last_phase':'prepare'})
++        return
+     t0 = time.time()
+     recipe = cfg["recipe"]
+-    if recipe == "zs":
+-        _predict_cli(a.run, a.seed, cfg["eval"]["split"], out)
+-    elif recipe == "sft":
+-        _run_sft(a.run, a.seed, cfg, out)
+-    elif recipe == "grpo":
+-        from train.grpo import train_grpo
+-        train_grpo(cfg, a.seed, out)
+-        if a.run != "G0":
+-            adapter_path = out / "best_adapter"
+-            _predict_cli(a.run, a.seed, cfg["eval"]["split"], out,
+-                         adapter=adapter_path if adapter_path.exists() else None)
+-    elif recipe == "encoder":
+-        _run_encoder(cfg, a.seed, out)
+-    else:
+-        raise ValueError(f"recipe không hỗ trợ: {recipe}")
+-    cost = {"wall_seconds": round(time.time() - t0, 1)}
++    cost = read_json(out / "cost.json") if (out / "cost.json").exists() else {}
+     try:
+-        import torch
+-        cost["gpu"] = torch.cuda.get_device_name(0) if torch.cuda.is_available() else None
+-    except ImportError:
+-        cost["gpu"] = None
+-    write_json(out / "cost.json", cost)
++        if a.phase != "eval" and recipe != "zs":
++            if recipe == 'native' and not a.run.startswith('G0'):
++                _predict_cli(a.run, a.seed, 'dev', out / 'initial_eval',
++                             adapter=resolve_initial_adapter(cfg, a.seed),
++                             config_path=out / 'config.yaml')
++            run_training_process([sys.executable, "-m", "scripts.train_worker", "--run", a.run,
++                                  "--seed", str(a.seed)])
++        if a.phase != "train":
++            if recipe == "zs":
++                _predict_cli(a.run, a.seed, cfg["eval"]["split"], out,
++                             adapter=resolve_initial_adapter(cfg, a.seed),
++                             config_path=out / "config.yaml")
++            elif recipe in ("sft", "grpo", "gta", 'native') and a.run != "G0":
++                _evaluate_checkpoints(a.run, a.seed, cfg, out)
++        cost["status"] = "trained" if a.phase == "train" else "complete"
++    except Exception as exc:
++        cost.update(status="failed", error=f"{type(exc).__name__}: {exc}")
++        raise
++    finally:
++        cost["wall_seconds"] = cost.get("wall_seconds", 0) + round(time.time() - t0, 1)
++        cost["last_phase"] = a.phase
++        write_json(out / "cost.json", cost)
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/tests/test_gate.py b/tests/test_gate.py
+index 743dd1c..95f13e5 100644
+--- a/tests/test_gate.py
++++ b/tests/test_gate.py
+@@ -2,24 +2,37 @@ from scripts.check_g1 import evaluate_gate
+ 
+ 
+ def _m(acc, parse=1.0):
+-    return {"accuracy": acc, "parse_rate": parse}
++    return {"accuracy": acc, "macro_f1": acc, "parse_rate": parse}
+ 
+ 
+ def test_gate_pass():
+-    ok, lines = evaluate_gate({"E0": _m(0.4), "E1": _m(0.45), "E2": _m(0.42), "E3": _m(0.6), "B1": _m(0.5)})
++    ok, lines = evaluate_gate({"E0": _m(0.4), "E1": _m(0.45), "E2": _m(0.42), "E3": _m(0.6), "B1": _m(0.5)}, probe_complete=True)
+     assert ok
+ 
+ 
+ def test_gate_fail_not_better_than_zs():
+-    ok, _ = evaluate_gate({"E0": _m(0.4), "E1": _m(0.65), "E2": _m(0.42), "E3": _m(0.6), "B1": _m(0.5)})
++    ok, _ = evaluate_gate({"E0": _m(0.4), "E1": _m(0.65), "E2": _m(0.42), "E3": _m(0.6), "B1": _m(0.5)}, probe_complete=True)
+     assert not ok
+ 
+ 
+ def test_gate_fail_parse_rate():
+-    ok, _ = evaluate_gate({"E0": _m(0.4), "E1": _m(0.4), "E2": _m(0.4), "E3": _m(0.6, 0.98), "B1": _m(0.5)})
++    ok, _ = evaluate_gate({"E0": _m(0.4), "E1": _m(0.4), "E2": _m(0.4), "E3": _m(0.6, 0.98), "B1": _m(0.5)}, probe_complete=True)
+     assert not ok
+ 
+ 
+ def test_gate_fail_missing_run():
+     ok, lines = evaluate_gate({"E0": _m(0.4), "E3": _m(0.6)})
+     assert not ok and any("thiếu" in l for l in lines)
++
++
++def test_gate_requires_encoder_and_probe():
++    metrics = {"E0": _m(.4), "E1": _m(.4), "E2": _m(.4), "E3": _m(.6)}
++    assert not evaluate_gate(metrics, probe_complete=True)[0]
++    metrics["B1"] = _m(.5)
++    assert not evaluate_gate(metrics, probe_complete=False)[0]
++
++
++def test_gate_uses_macro_f1_even_if_accuracy_increases():
++    metrics = {"E0": _m(.4), "E1": _m(.4), "E2": _m(.4), "E3": _m(.6), "B1": _m(.5)}
++    metrics["E3"]["macro_f1"] = .3
++    assert not evaluate_gate(metrics, probe_complete=True)[0]
+diff --git a/tests/test_prompts.py b/tests/test_prompts.py
+index 1390b84..46b53e8 100644
+--- a/tests/test_prompts.py
++++ b/tests/test_prompts.py
+@@ -41,3 +41,16 @@ def test_messages_shape():
+ def test_label_with_guess_rejected():
+     with pytest.raises(ValueError):
+         build_prompt("a", "b", "label", guess=True)
++
++
++@pytest.mark.parametrize('guess',[False,True])
++def test_balanced_schema_examples_are_grounded_and_cover_all_labels(guess):
++    from formats.prompts import balanced_alignment_examples
++    examples=balanced_alignment_examples(guess)
++    assert {e['label'] for e in examples}=={'entailment','neutral','contradiction'}
++    for e in examples:
++        p=parse(e['output'],'align',guess)
++        assert p.format_ok and p.label==e['label']
++        assert struct_ok(p.align_lines,e['premise'],e['hypothesis'],p.label)
++    text=build_prompt('p','h','align',guess,schema_examples='balanced')
++    assert '∅ | missing' in text and 'uit_Adver' not in text
+diff --git a/tests/test_stats.py b/tests/test_stats.py
+index cedc7f6..0c10ba3 100644
+--- a/tests/test_stats.py
++++ b/tests/test_stats.py
+@@ -37,3 +37,18 @@ def test_holm():
+     assert holm([0.01, 0.04, 0.03]) == pytest.approx([0.03, 0.06, 0.06])
+     assert holm([0.5]) == [0.5]
+     assert holm([0.04, 0.5]) == pytest.approx([0.08, 0.5])
++
++
++def test_paired_macro_f1_bootstrap_counts_invalid_answers_as_misses():
++    from analysis.stats import paired_macro_f1_bootstrap
++    gold=['entailment','neutral','contradiction']*10
++    a=list(gold);b=[None]*30
++    result=paired_macro_f1_bootstrap(gold,a,b,n_boot=100,seed=7)
++    assert result['diff']==1.0 and result['ci_low']>0.9
++    assert result==paired_macro_f1_bootstrap(gold,a,b,n_boot=100,seed=7)
++
++
++def test_paired_macro_f1_rejects_unaligned_lengths():
++    import pytest
++    from analysis.stats import paired_macro_f1_bootstrap
++    with pytest.raises(ValueError):paired_macro_f1_bootstrap(['neutral'],[],['neutral'])
+diff --git a/tests/test_train_data.py b/tests/test_train_data.py
+index d1d47e4..1e0cdce 100644
+--- a/tests/test_train_data.py
++++ b/tests/test_train_data.py
+@@ -33,7 +33,13 @@ def test_sft_missing_teacher_raises():
+             build_sft_dataset(ROWS, "nonexistent_fmt")
+ 
+ 
+-def test_sft_dataset_align():
++def test_sft_dataset_align(tmp_path, monkeypatch):
++    from common.io import write_jsonl
++    monkeypatch.setattr("train.common.ARTIFACTS", tmp_path)
++    write_jsonl(tmp_path / "teacher" / "rationales_align.jsonl", [{
++        "id": ROWS[0]["id"],
++        "completion": '<align>\nH1: "H1" <-> ∅ | missing\n</align><answer>neutral</answer>'
++    }])
+     ds = build_sft_dataset(ROWS, "align")
+     assert "<align>" in ds[0]["completion"][0]["content"]
+     assert "<answer>" in ds[0]["completion"][0]["content"]
+@@ -87,9 +93,15 @@ def test_patch_vllm_sync_weights_for_qwen35():
+         def _fix_param_name_to_vllm(self, name: str, extra_prefixes=None):
+             return name
+         def sync_weights(self):
+-            pass
++            raise ValueError("There is no module or parameter named 'model'")
++
++    calls = []
++    def fake_llm(*args, **kwargs):
++        calls.append((args, kwargs))
++        return object()
+ 
+     fake_vllm_gen.VLLMGeneration = FakeVLLMGeneration
++    fake_vllm_gen.LLM = fake_llm
+     sys.modules["trl"] = fake_trl
+     sys.modules["trl.generation"] = fake_gen
+     sys.modules["trl.generation.vllm_generation"] = fake_vllm_gen
+@@ -100,6 +112,11 @@ def test_patch_vllm_sync_weights_for_qwen35():
+         assert inst._fix_param_name_to_vllm("model.layers.0.weight") == "language_model.model.layers.0.weight"
+         # already prefixed should not be duplicated
+         assert inst._fix_param_name_to_vllm("language_model.model.layers.0.weight") == "language_model.model.layers.0.weight"
++        with pytest.raises(ValueError, match="There is no module"):
++            inst.sync_weights()
++        inst_llm = fake_vllm_gen.LLM(model="Qwen/Qwen3.5-2B")
++        assert inst_llm is not None
++        assert calls[-1][1]["language_model_only"] is True
+     finally:
+         sys.modules.pop("trl.generation.vllm_generation", None)
+         sys.modules.pop("trl.generation", None)
+diff --git a/train/common.py b/train/common.py
+index 60cc5ab..cd90862 100644
+--- a/train/common.py
++++ b/train/common.py
+@@ -4,6 +4,48 @@ from common.io import ARTIFACTS, read_jsonl
+ from formats.prompts import build_messages
+ 
+ 
++def chat_template_ids(tok, messages) -> list[int]:
++    """Normalize Transformers' list and BatchEncoding chat-template outputs."""
++    encoded = tok.apply_chat_template(messages, tokenize=True,
++                                     add_generation_prompt=True, enable_thinking=False)
++    if isinstance(encoded, dict):
++        if "input_ids" not in encoded:
++            raise ValueError("apply_chat_template returned a mapping without input_ids")
++        encoded = encoded["input_ids"]
++    elif hasattr(encoded, "input_ids"):
++        encoded = encoded.input_ids
++    if hasattr(encoded, "tolist"):
++        encoded = encoded.tolist()
++    if encoded and isinstance(encoded[0], (list, tuple)):
++        if len(encoded) != 1:
++            raise ValueError("Expected one chat-template sequence, got a batch")
++        encoded = encoded[0]
++    ids = list(encoded)
++    if any(not isinstance(token, int) for token in ids):
++        raise TypeError("Chat-template input_ids must contain integer token IDs")
++    return ids
++
++
++def tokenize_sft_example(row: dict, tok, max_length: int) -> dict:
++    """Use the same non-thinking prefix as greedy eval; never truncate the target."""
++    prefix = chat_template_ids(tok, row["prompt"])
++    target = tok.encode(row["completion"][0]["content"], add_special_tokens=False)
++    if not target or target[-1] != tok.eos_token_id:
++        target.append(tok.eos_token_id)
++    ids = list(prefix) + target
++    if len(ids) > max_length:
++        raise ValueError(f"SFT example needs {len(ids)} tokens; max_length={max_length}")
++    return {"input_ids": ids, "attention_mask": [1] * len(ids),
++            "labels": [-100] * len(prefix) + target}
++
++
++def collate_sft_examples(examples, pad_token_id):
++    import torch
++    n = max(len(x["input_ids"]) for x in examples)
++    return {key: torch.tensor([x[key] + [pad] * (n - len(x[key])) for x in examples])
++            for key, pad in (("input_ids", pad_token_id), ("attention_mask", 0), ("labels", -100))}
++
++
+ def build_sft_dataset(rows: list[dict], fmt: str, guess: bool = False) -> list[dict]:
+     if fmt == "label":
+         return [{"prompt": build_messages(r["premise"], r["hypothesis"], fmt, guess),
+@@ -38,8 +80,9 @@ def build_sft_dataset(rows: list[dict], fmt: str, guess: bool = False) -> list[d
+     return out
+ 
+ 
+-def build_grpo_dataset(rows: list[dict], fmt: str, guess: bool = False) -> list[dict]:
+-    return [{"prompt": build_messages(r["premise"], r["hypothesis"], fmt, guess),
++def build_grpo_dataset(rows: list[dict], fmt: str, guess: bool = False,
++                       schema_examples: str = 'single') -> list[dict]:
++    return [{"prompt": build_messages(r["premise"], r["hypothesis"], fmt, guess, schema_examples),
+              "gold": r["label"], "premise": r["premise"], "hypothesis": r["hypothesis"]}
+             for r in rows]
+ 
+@@ -77,41 +120,37 @@ def patch_torchao_compatibility() -> None:
+ 
+ 
+ def patch_vllm_sync_weights_for_qwen35() -> None:
+-    """Vá lỗi TRL sync_weights cho Qwen3.5 khi vLLM dùng Qwen3_5ForConditionalGeneration."""
++    """Map Qwen3.5 LM weights to vLLM's language_model namespace, surfacing sync errors."""
+     try:
+         import trl.generation.vllm_generation as tvg
+-        orig_fix = tvg.VLLMGeneration._fix_param_name_to_vllm
++    except ImportError:
++        return
++    if getattr(tvg, "_rl_nli_qwen35_sync_patch", False):
++        return
+ 
+-        def patched_fix(self, name: str, extra_prefixes: list[str] | None = None) -> str:
+-            name = orig_fix(self, name, extra_prefixes)
+-            if not name.startswith("language_model.") and not name.startswith("visual."):
+-                return f"language_model.{name}"
++    original_fix = tvg.VLLMGeneration._fix_param_name_to_vllm
++
++    def patched_fix(self, name: str, extra_prefixes: list[str] | None = None) -> str:
++        name = original_fix(self, name, extra_prefixes)
++        if name.startswith(("language_model.", "visual.")):
+             return name
++        return f"language_model.{name}"
+ 
+-        tvg.VLLMGeneration._fix_param_name_to_vllm = patched_fix
+-
+-        orig_sync = tvg.VLLMGeneration.sync_weights
+-
+-        def safe_sync_weights(self):
+-            try:
+-                orig_sync(self)
+-            except ValueError as e:
+-                if "There is no module or parameter named" in str(e):
+-                    if hasattr(self, "llm") and hasattr(self.llm, "llm_engine"):
+-                        runner = self.llm.llm_engine.model_executor.driver_worker.model_runner
+-                        for name, param in self._iter_named_params():
+-                            target_name = name if name.startswith("language_model.") else f"language_model.{name}"
+-                            try:
+-                                runner.model.load_weights([(target_name, param)])
+-                            except Exception:
+-                                pass
+-                        self.llm.reset_prefix_cache()
+-                else:
+-                    raise
+-
+-        tvg.VLLMGeneration.sync_weights = safe_sync_weights
+-    except Exception:
+-        pass
++    tvg.VLLMGeneration._fix_param_name_to_vllm = patched_fix
++
++    # TRL imports LLM as a module-level symbol. Restrict language-only loading to
++    # this trainer path and this model family; eval uses its own explicit setting.
++    original_llm = getattr(tvg, "LLM", None)
++    if original_llm is not None:
++        def qwen35_language_only_llm(*args, **kwargs):
++            model_name = kwargs.get("model", args[0] if args else "")
++            if str(model_name).lower().startswith("qwen/qwen3.5"):
++                kwargs["language_model_only"] = True
++            return original_llm(*args, **kwargs)
++
++        tvg.LLM = qwen35_language_only_llm
++
++    tvg._rl_nli_qwen35_sync_patch = True
+ 
+ 
+ def make_lora_config(cfg: dict):
+diff --git a/train/grpo.py b/train/grpo.py
+index d5c355f..10a0b29 100644
+--- a/train/grpo.py
++++ b/train/grpo.py
+@@ -6,19 +6,22 @@ from common.io import write_train_log
+ from data.prepare import get_rows
+ from rewards.trl_rewards import make_reward_funcs
+ from train.common import (build_grpo_dataset, load_model_and_tokenizer, make_lora_config,
+-                          patch_torchao_compatibility, patch_vllm_sync_weights_for_qwen35)
++                          patch_torchao_compatibility,
++                          patch_vllm_sync_weights_for_qwen35)
+ 
+ 
+ def train_grpo(cfg: dict, seed: int, out_dir) -> None:
+     patch_torchao_compatibility()
+-    patch_vllm_sync_weights_for_qwen35()
+     from datasets import Dataset
+     from trl import GRPOConfig, GRPOTrainer
+     out_dir = Path(out_dir)
+     g = cfg["grpo"]
+     fmt, guess = cfg["format"], cfg.get("guess", False)
++    if g["use_vllm"] and cfg["model"]["name"].lower().startswith("qwen/qwen3.5"):
++        patch_vllm_sync_weights_for_qwen35()
+     model, tok = load_model_and_tokenizer(cfg["model"]["name"])
+-    ds = Dataset.from_list(build_grpo_dataset(get_rows("train"), fmt, guess))
++    ds = Dataset.from_list(build_grpo_dataset(get_rows("train"), fmt, guess,
++                                            cfg.get('schema_examples', 'single')))
+     args = GRPOConfig(
+         output_dir=str(out_dir / "grpo_ckpts"), seed=seed,
+         learning_rate=g["lr"], max_steps=g["max_steps"], beta=g["beta"], loss_type=g["loss_type"],
+@@ -29,27 +32,39 @@ def train_grpo(cfg: dict, seed: int, out_dir) -> None:
+         use_vllm=g["use_vllm"], vllm_mode=g["vllm_mode"],
+         vllm_gpu_memory_utilization=g["vllm_gpu_memory_utilization"],
+         reward_weights=g["reward_weights"], bf16=True, fp16=False, logging_steps=1,
+-        save_strategy="no", report_to=[],
++        chat_template_kwargs={"enable_thinking": False},
++        top_k=0, save_strategy="steps", save_steps=g.get("save_steps", 100),
++        gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False},
++        report_to=[],
+     )
+     init_run = cfg.get("init_from")
+     if init_run:
+         from common.io import RESULTS
+         from peft import PeftModel
+         candidates = list(RESULTS.glob(f"{init_run}_*_s{seed}/best_adapter"))
+-        if not candidates:
+-            candidates = list(RESULTS.glob(f"{init_run}_*/best_adapter"))
+         if not candidates:
+             raise FileNotFoundError(
+                 f"Không tìm thấy adapter khởi tạo từ {init_run} trong results/. "
+                 f"Bạn cần chạy SFT cho {init_run} trước: `python -m scripts.run --run {init_run} --seed {seed}`"
+             )
++        if len(candidates) != 1:
++            raise ValueError(f"Ambiguous init adapter: {candidates}")
+         model = PeftModel.from_pretrained(model, str(candidates[0]), is_trainable=True)
+         peft_cfg = None
+     else:
+         peft_cfg = make_lora_config(cfg)
+ 
+-    trainer = GRPOTrainer(model=model, reward_funcs=make_reward_funcs(fmt, guess), args=args,
+-                          train_dataset=ds, processing_class=tok, peft_config=peft_cfg)
+-    trainer.train()
+-    trainer.save_model(str(out_dir / "best_adapter"))
+-    write_train_log(trainer.state.log_history, out_dir / "train_log.csv")
++    trainer_cls = GRPOTrainer
++    if guess:
++        from train.gta import make_gta_trainer
++        trainer_cls = make_gta_trainer(cfg)
++    from train.audit import with_rollout_audit, train_log_callback
++    trainer_cls = with_rollout_audit(trainer_cls, cfg, out_dir)
++    trainer = trainer_cls(model=model, reward_funcs=make_reward_funcs(fmt, guess), args=args,
++                          train_dataset=ds, processing_class=tok, peft_config=peft_cfg,
++                          callbacks=[train_log_callback(out_dir)])
++    try:
++        trainer.train()
++        trainer.save_model(str(out_dir / "final_adapter"))
++    finally:
++        write_train_log(trainer.state.log_history, out_dir / "train_log.csv")
+diff --git a/train/gta.py b/train/gta.py
+index 42cdf1a..517e2da 100644
+--- a/train/gta.py
++++ b/train/gta.py
+@@ -1,4 +1,139 @@
+-"""Subclass GRPOTrainer cho E12, E13: CE trên <guess>gold</guess>, mask đoạn guess qua tool_mask, luật cos(grad) < 0 thì bỏ L_SFT (tắt ở A3).
++"""Gold-label guess supervision and RL reasoning; no teacher rationales.
+ 
+-Xem SPEC.md. TODO: implement.
++flat_fallback is a separately ablated variant that retains supervision when
++the RL gradient is zero. The vanilla GTA cosine gate is also available.
+ """
++
++
++def guess_content_mask(text, offsets):
++    start = text.find("<guess>")
++    if start < 0:
++        return [1] * len(offsets)
++    start += len("<guess>")
++    end = text.find("</guess>", start)
++    if end < 0:
++        end = len(text)
++    return [0 if b > start and a < end else 1 for a, b in offsets]
++
++
++def use_supervised_loss(dot, rl_norm_squared, sft_norm_squared,
++                        cos_constraint=True, flat_fallback=False):
++    if not cos_constraint:
++        return True
++    if rl_norm_squared == 0:
++        return flat_fallback and sft_norm_squared > 0
++    return dot > 0
++
++
++def make_gta_trainer(cfg):
++    from train.common import chat_template_ids
++    from common.labels import LABELS
++    from formats.parser import parse
++    import torch
++    import torch.nn.functional as F
++    from trl import GRPOTrainer
++
++    class GTATrainer(GRPOTrainer):
++        def _generate_and_score_completions(self, inputs):
++            result = super()._generate_and_score_completions(inputs)
++            tok = self.processing_class
++            device = result["completion_ids"].device
++            ids_list, labels_list, masks, rule_positions, supports = [], [], [], [], []
++            if cfg.get('rule_supervision'):
++                encoded = [tok.encode(' ' + status, add_special_tokens=False)
++                           for status in ['match', 'missing', 'conflict']]
++                if any(len(ids) != 1 for ids in encoded):
++                    raise ValueError('Rule supervision requires one-token space-prefixed status words')
++                self.rule_status_ids = [ids[0] for ids in encoded]
++            for row, ids, active in zip(inputs, result["completion_ids"], result["completion_mask"]):
++                prefix = chat_template_ids(tok, row["prompt"]) + tok.encode(
++                    "<guess>", add_special_tokens=False)
++                gold = tok.encode(row["gold"], add_special_tokens=False)
++                ids_list.append(prefix + gold)
++                labels_list.append([-100] * len(prefix) + gold)
++
++                tokens = ids[:int(active.sum())].tolist()
++                raw = tok.decode(tokens, skip_special_tokens=False, clean_up_tokenization_spaces=False)
++                if cfg.get('rule_supervision'):
++                    from train.rule_supervision import alignment_status_positions
++                    parsed = parse(tok.decode(tokens, skip_special_tokens=True,
++                                              clean_up_tokenization_spaces=False), 'align', True)
++                    positions = alignment_status_positions(tokens, tok, self.rule_status_ids) if parsed.format_ok else []
++                    if len(positions) != len(parsed.align_lines or []):
++                        positions = []
++                    rule_positions.append(positions + [-1] * (6 - len(positions)))
++                    if cfg.get('rule_support') == 'schema':
++                        from train.rule_supervision import schema_status_support
++                        allowed = schema_status_support(parsed.align_lines or []) if positions else []
++                        supports.append(allowed + [[True, True, True]] * (6 - len(allowed)))
++                end = raw.find("</guess>")
++                end = len(raw) if end < 0 else end
++                offsets, previous = [], 0
++                if "<guess>" in raw:
++                    for j in range(len(tokens)):
++                        if previous >= end:
++                            break
++                        current = len(tok.decode(tokens[:j + 1], skip_special_tokens=False,
++                                                 clean_up_tokenization_spaces=False))
++                        offsets.append((previous, current))
++                        previous = current
++                mask = guess_content_mask(raw, offsets)
++                masks.append(mask + [1] * (ids.numel() - len(mask)))
++
++            length = max(map(len, ids_list))
++            result["guess_input_ids"] = torch.tensor(
++                [[tok.pad_token_id] * (length - len(x)) + x for x in ids_list], device=device)
++            result["guess_labels"] = torch.tensor(
++                [[-100] * (length - len(x)) + x for x in labels_list], device=device)
++            result["guess_attention_mask"] = torch.tensor(
++                [[0] * (length - len(x)) + [1] * len(x) for x in ids_list], device=device)
++            mask = torch.tensor(masks, device=device, dtype=result["completion_mask"].dtype)
++            result["tool_mask"] = mask * result.get("tool_mask", torch.ones_like(mask))
++            if cfg.get('rule_supervision'):
++                result['rule_positions'] = torch.tensor(rule_positions, device=device)
++                result['rule_gold'] = torch.tensor([LABELS.index(row['gold']) for row in inputs], device=device)
++                if cfg.get('rule_support') == 'schema':
++                    result['rule_support'] = torch.tensor(supports, device=device, dtype=torch.bool)
++            return result
++
++        def _compute_loss(self, model, inputs):
++            rl_loss = super()._compute_loss(model, inputs)
++            if not model.training:
++                return rl_loss
++            labels = inputs["guess_labels"]
++            keep = int((labels != -100).sum(dim=1).max()) + 1
++            output = model(input_ids=inputs["guess_input_ids"],
++                           attention_mask=inputs["guess_attention_mask"],
++                           use_cache=False, logits_to_keep=keep)
++            logits = output.logits[:, :-1].contiguous()
++            targets = labels[:, -logits.size(1):].contiguous()
++            ce = F.cross_entropy(logits.float().view(-1, logits.size(-1)),
++                                 targets.view(-1), ignore_index=-100)
++            sft_loss = ce / self.current_gradient_accumulation_steps
++            params = [p for p in model.parameters() if p.requires_grad]
++            rgrads = torch.autograd.grad(rl_loss, params, retain_graph=True, allow_unused=True)
++            sgrads = torch.autograd.grad(sft_loss, params, retain_graph=True, allow_unused=True)
++            zero = torch.zeros((), device=rl_loss.device)
++            rn = sum((g.float().square().sum() for g in rgrads if g is not None), zero)
++            sn = sum((g.float().square().sum() for g in sgrads if g is not None), zero)
++            dot = sum(((r.float() * s.float()).sum() for r, s in zip(rgrads, sgrads)
++                       if r is not None and s is not None), zero)
++            include = use_supervised_loss(dot.item(), rn.item(), sn.item(),
++                                           cfg.get("cos_constraint", True),
++                                           cfg.get("flat_fallback", False))
++            cosine = (dot / (rn.sqrt() * sn.sqrt()).clamp(min=1e-20)).item()
++            for key, value in (("gta/guess_ce", ce.item()), ("gta/gradient_cosine", cosine),
++                               ("gta/used_supervised", float(include)),
++                               ("gta/flat_rl", float(rn.item() == 0))):
++                self._metrics["train"][key].append(value)
++            total = rl_loss + cfg["gta"]["sft_weight"] * sft_loss if include else rl_loss
++            if cfg.get('rule_supervision'):
++                from train.rule_supervision import rule_supervision_loss
++                rule_ce, fraction = rule_supervision_loss(model, inputs, self.rule_status_ids)
++                self._metrics['train']['gta/rule_example_fraction'].append(fraction)
++                self._metrics['train']['gta/rule_ce'].append(0.0 if rule_ce is None else rule_ce.item())
++                if rule_ce is not None:
++                    total = total + cfg['gta']['rule_weight'] * rule_ce / self.current_gradient_accumulation_steps
++            return total
++
++    return GTATrainer
+diff --git a/train/sft.py b/train/sft.py
+index feea0fc..58b8052 100644
+--- a/train/sft.py
++++ b/train/sft.py
+@@ -7,7 +7,8 @@ from common.labels import LABELS
+ from data.prepare import get_rows
+ from formats.parser import parse
+ from train.common import (build_sft_dataset, load_model_and_tokenizer, make_lora_config,
+-                          patch_torchao_compatibility)
++                          patch_torchao_compatibility, tokenize_sft_example,
++                          collate_sft_examples)
+ 
+ 
+ def pick_best(scores: dict[str, float]) -> str:
+@@ -149,14 +150,19 @@ def _make_sft_config(s: dict, seed: int, out_dir: Path):
+         "gradient_accumulation_steps": s["grad_accum"], "max_length": s["max_len"],
+         "bf16": True, "fp16": False, "logging_steps": 10,
+         "save_strategy": "steps", "save_steps": save_steps,
+-        "save_total_limit": 3,
++        "save_total_limit": None,
++        "dataset_kwargs": {"skip_prepare_dataset": True},
++        "remove_unused_columns": False,
++        "completion_only_loss": False,
++        "assistant_only_loss": False,
++        "gradient_checkpointing": True,
+         "load_best_model_at_end": True,
+         "metric_for_best_model": "eval_loss",
+         "greater_is_better": False,
+         "report_to": [],
+     }
+     ratio = s.get("warmup_ratio", 0.05)
+-    for try_assistant in (True, False):
++    for try_assistant in (False,):
+         for eval_key in ("eval_strategy", "evaluation_strategy"):
+             curr_kw = dict(kw)
+             curr_kw[eval_key] = "steps"
+@@ -177,6 +183,16 @@ def _make_sft_config(s: dict, seed: int, out_dir: Path):
+         return SFTConfig(**kw)
+ 
+ 
++def _sft_callbacks(s: dict) -> list:
++    patience = s.get('early_stopping_patience', 3)
++    if patience is None:
++        return []
++    if isinstance(patience, bool) or not isinstance(patience, int) or patience < 1:
++        raise ValueError('early_stopping_patience must be a positive integer or None')
++    from transformers import EarlyStoppingCallback
++    return [EarlyStoppingCallback(early_stopping_patience=patience)]
++
++
+ def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
+     patch_torchao_compatibility()
+     from datasets import Dataset
+@@ -191,44 +207,30 @@ def train_sft(cfg: dict, seed: int, out_dir) -> list[Path]:
+     dev_raw = build_sft_dataset(dev_rows, fmt, guess)
+     dev_golds = [r["label"] for r in dev_rows]
+ 
+-    train_ds = Dataset.from_list([{"messages": r["prompt"] + r["completion"]} for r in train_raw])
+-    dev_ds = Dataset.from_list([{"messages": r["prompt"] + r["completion"]} for r in dev_raw])
++    train_ds = Dataset.from_list([tokenize_sft_example(r, tok, s["max_len"]) for r in train_raw])
++    dev_ds = Dataset.from_list([tokenize_sft_example(r, tok, s["max_len"]) for r in dev_raw])
+ 
+     args = _make_sft_config(s, seed, out_dir)
+ 
+-    collator = None
+-    if not getattr(args, "assistant_only_loss", False):
+-        try:
+-            from trl import DataCollatorForCompletionOnlyLM
+-            collator = DataCollatorForCompletionOnlyLM(
+-                response_template="<|im_start|>assistant\n",
+-                tokenizer=tok,
+-            )
+-        except Exception:
+-            collator = None
+-
+-    patience = s.get("early_stopping_patience", 3)
+-    callbacks = []
+-    try:
+-        from transformers import EarlyStoppingCallback
+-        callbacks.append(EarlyStoppingCallback(early_stopping_patience=patience))
+-    except Exception:
+-        pass
++    from functools import partial
++    collator = partial(collate_sft_examples, pad_token_id=tok.pad_token_id)
++
++    callbacks = _sft_callbacks(s)
+ 
+     kwargs = {
+         "model": model, "args": args, "train_dataset": train_ds, "eval_dataset": dev_ds,
+         "processing_class": tok, "peft_config": make_lora_config(cfg),
+-        "compute_metrics": make_compute_metrics(tok, fmt, guess, dev_golds=dev_golds),
+-        "preprocess_logits_for_metrics": preprocess_logits_for_metrics,
+         "callbacks": callbacks,
+     }
+     if collator is not None:
+         kwargs["data_collator"] = collator
+ 
+     trainer = SFTTrainer(**kwargs)
+-    trainer.train()
+-    trainer.save_model(str(out_dir / "best_adapter"))
+-    write_train_log(trainer.state.log_history, out_dir / "train_log.csv")
++    try:
++        trainer.train()
++        trainer.save_model(str(out_dir / "best_adapter"))
++    finally:
++        write_train_log(trainer.state.log_history, out_dir / "train_log.csv")
+     del trainer, model
+     import gc
+     gc.collect()

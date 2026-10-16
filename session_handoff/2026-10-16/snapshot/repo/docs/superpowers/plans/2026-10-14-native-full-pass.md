@@ -1,0 +1,14 @@
+# Native full-pass comparison
+
+The R5/R6 pilots have not reached the user's .57–.58 seed0 dev Macro-F1 target. Ordinary RL+answer CE reached.55739, direct native assignment.55894, token credit.55434 and rationale swap.55364 in their original checkpoint-selection evaluations. These scores are exploratory development evidence, with separately recorded inference repeats. Token credit and rationale swapping do not currently justify further combination runs.
+
+Test coverage before adding another mechanism: the existing native sampler has3343 blocks and visits eight/update.200 updates cover1600 blocks;400 cover3200, still inside its one-pass bound. Register N1R7 (ordinary RL+CE), N4R7 (direct assignment+ordinary RL+CE), and N5R7 (direct assignment+joint logQ reward+CE). All start from the same D3R3 seed0 adapter and use a shared `full_pass` schedule in base.yaml. Only the horizon changes to400; retain LR2e-6, K4,64 reasoning tokens, KL.01, CE.1, allocation coefficients.2, and checkpoint interval100. Select checkpoints by full dev Macro-F1, then check reasoning and label-only inference under the existing shared validation runtime. Keep test closed and teacher-free training unchanged.
+
+Run models only on Colab G4. Use existing HF caches offline after confirmed Hub429/500 failures; record cache revision and environment. No local weights or tests. Archive compact student-adapter checkpoints100/200/300 and the complete optimizer checkpoint400, plus selected adapter, metadata and costs. This preserves restart state at the terminal checkpoint while keeping the private15GiB Drive within its measured capacity. Do not delete earlier archives.
+
+- [x] Observe remote RED for shared schedule resolution and compact checkpoint contents: four expected failures, seven existing tests passed.
+- [x] Implement only the shared schedule and artifact transport; observe GREEN and full remote regression checks:272 tests passed independently on all three Colab runtimes.
+- [x] Freeze configs/source and upload manifests; N4R7 launched, N1R7/N5R7 queued behind completed offline evaluation gates. Child environments use cached HF weights offline. Upload targets use fresh run IDs and student-only intermediate checkpoint archives.
+- [ ] Verify full dev outcomes, selected adapter integrity, matched comparisons and remaining uncertainty. Never claim A/A* acceptance or a held-out result from dev tuning.
+
+User requested stopping all work before office. All three Colab G4 assignments were terminated; local monitoring was stopped. R7 runs remain incomplete, and the queued4B SFT warm start never started. Previously verified completed checkpoints remain on Drive. Reinspect archived state and use fresh run IDs before restarting; do not infer an optimizer-resumable R7 checkpoint from partial progress logs.

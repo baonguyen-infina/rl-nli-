@@ -1,0 +1,109 @@
+{
+  "run_id": "P0R14",
+  "split": "dev_subset",
+  "selection_allowed": false,
+  "summary": {
+    "split": "dev_subset",
+    "selection_allowed": false,
+    "repairs": 2,
+    "regressions": 0,
+    "net_repairs": 2,
+    "disagreements": 4,
+    "greedy": {
+      "n": 256,
+      "macro_f1": 0.5014176856282119,
+      "accuracy": 0.49609375,
+      "parse_rate": 1.0,
+      "per_class": {
+        "entailment": {
+          "precision": 0.5366,
+          "recall": 0.4944,
+          "f1": 0.5146,
+          "support": 89
+        },
+        "neutral": {
+          "precision": 0.3871,
+          "recall": 0.5647,
+          "f1": 0.4593,
+          "support": 85
+        },
+        "contradiction": {
+          "precision": 0.7,
+          "recall": 0.4268,
+          "f1": 0.5303,
+          "support": 82
+        }
+      },
+      "confusion": {
+        "neutral": {
+          "neutral": 48,
+          "entailment": 28,
+          "contradiction": 9
+        },
+        "entailment": {
+          "neutral": 39,
+          "entailment": 44,
+          "contradiction": 6
+        },
+        "contradiction": {
+          "neutral": 37,
+          "entailment": 10,
+          "contradiction": 35
+        }
+      }
+    },
+    "canonical_map": {
+      "n": 256,
+      "macro_f1": 0.5092689034975383,
+      "accuracy": 0.50390625,
+      "parse_rate": 1.0,
+      "per_class": {
+        "entailment": {
+          "precision": 0.5432,
+          "recall": 0.4944,
+          "f1": 0.5176,
+          "support": 89
+        },
+        "neutral": {
+          "precision": 0.3937,
+          "recall": 0.5882,
+          "f1": 0.4717,
+          "support": 85
+        },
+        "contradiction": {
+          "precision": 0.7292,
+          "recall": 0.4268,
+          "f1": 0.5385,
+          "support": 82
+        }
+      },
+      "confusion": {
+        "neutral": {
+          "neutral": 50,
+          "entailment": 28,
+          "contradiction": 7
+        },
+        "entailment": {
+          "neutral": 39,
+          "entailment": 44,
+          "contradiction": 6
+        },
+        "contradiction": {
+          "neutral": 38,
+          "entailment": 9,
+          "contradiction": 35
+        }
+      }
+    }
+  },
+  "archive": {
+    "id": "1RFoZOehHtvPm93biyJaONMbJ405YAuhg",
+    "name": "P0R14_s0_full-logs_terminal.tar.gz",
+    "md5Checksum": "43345c258766e5f11dc3f64da3766ca1",
+    "size": "143843",
+    "event": "terminal",
+    "sha256": "24dff753c1095ee0c08c33727986cb2b7878ddfad6af68fb23705889d1f92095"
+  },
+  "local_ml": false,
+  "test_accessed": false
+}

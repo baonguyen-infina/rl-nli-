@@ -1,0 +1,12 @@
+{
+  "registered_at_utc": "2026-10-15T17:56:47.905Z",
+  "run": "N21R20",
+  "review_checkpoint": 200,
+  "selection_split": "dev",
+  "test_accessed": false,
+  "baseline_macro_f1": 0.5674942572896857,
+  "minimum_absolute_improvement": 0.005,
+  "rule": "After checkpoint200 dev is verified, stop for futility if max(checkpoint100,checkpoint200) Macro-F1 is below warm-start full-dev Macro-F1 +0.005. No test for an aborted run. If continued, retain registered final checkpoint selection over 100,200,300,400.",
+  "scope": "Exploratory compute allocation rule; not a significance claim. Neutral regressions are descriptive, not an additional hidden stop criterion.",
+  "evidence_path": "r20_n21_checkpoint100_internal.json"
+}

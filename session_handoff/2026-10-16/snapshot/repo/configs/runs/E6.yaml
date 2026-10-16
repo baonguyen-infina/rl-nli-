@@ -1,0 +1,10 @@
+recipe: grpo
+format: label
+guess: false
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: null
+priority: P1
+seeds:
+- 0
+run_id: E6

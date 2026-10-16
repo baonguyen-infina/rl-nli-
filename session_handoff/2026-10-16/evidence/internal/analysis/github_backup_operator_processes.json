@@ -1,0 +1,10 @@
+{
+  "monitor_pid": 48713,
+  "archive_supervisor_pid": 52429,
+  "created_at": 1792072969.221177,
+  "local_ml": false,
+  "model_bytes_written_locally": 0,
+  "backup_provider": "github-private-draft-release",
+  "logs_only_interval_seconds": 900,
+  "restarted_at": 1792073219.2802508
+}

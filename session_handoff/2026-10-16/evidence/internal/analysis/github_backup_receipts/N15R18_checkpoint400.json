@@ -1,0 +1,16 @@
+{
+  "provider": "github-private-draft-release",
+  "id": 644383271,
+  "name": "N15R18_s0_checkpoint-400.tar.gz",
+  "size": "129281964",
+  "sha256": "3b3f891f3e66a1efeaf85577e5926ef13dffba06f618f957781a5414a503fc49",
+  "github_digest": "sha256:3b3f891f3e66a1efeaf85577e5926ef13dffba06f618f957781a5414a503fc49",
+  "repo": "baonguyen-infina/rl-nli-experiment-archives",
+  "release_id": 413873953,
+  "repo_private": true,
+  "release_draft": true,
+  "model_bytes_written_locally": 0,
+  "bytes_relayed_through_memory": 129281964,
+  "max_buffer_bytes": 16384,
+  "verified_at": 1792080090.161033
+}

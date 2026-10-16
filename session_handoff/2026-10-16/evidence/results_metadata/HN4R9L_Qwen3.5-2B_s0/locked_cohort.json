@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "locked": true,
+  "report_split": "test",
+  "selection_split": "dev",
+  "locked_at_utc": "2026-10-14T22:19:05.992401+00:00",
+  "model": "Qwen/Qwen3.5-2B",
+  "training_seeds": [
+    0
+  ],
+  "lanes": {
+    "primary": {
+      "sha256": "c9b40a3f04e54b8e9849ed3a399bf0516cbc66aa7aa41a542014f8117a5e50e9",
+      "runs": [
+        "HN4R9L",
+        "HN6R11L",
+        "HN6R11P200L",
+        "HN4R9C",
+        "HN6R11C"
+      ],
+      "manifest_file": "protocol_primary.json"
+    },
+    "warm": {
+      "sha256": "b5de92e43bb30edeac50b9ac689bac2b017dde4de45180727b28461e0a516ad4",
+      "runs": [
+        "HD3R9L",
+        "HN0R11L",
+        "HD3R9C",
+        "HN0R11C"
+      ],
+      "manifest_file": "protocol_warm.json"
+    },
+    "control": {
+      "sha256": "1ac19d67d263b7eec37038918791bf8600ddccdf9562255559fb20132d7d895f",
+      "runs": [
+        "HN1R9L",
+        "HN5R10L",
+        "HN7R12P200L",
+        "HN1R9C",
+        "HN5R10C"
+      ],
+      "manifest_file": "protocol_control.json"
+    }
+  },
+  "primary_method": "HN6R11L",
+  "primary_control": "HN1R9L",
+  "method_selection_after_test": false,
+  "test_threshold_is_not_a_tuning_rule": true
+}

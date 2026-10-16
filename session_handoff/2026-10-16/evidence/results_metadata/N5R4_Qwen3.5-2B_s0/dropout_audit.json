@@ -1,0 +1,5 @@
+{
+  "disable_dropout_requested": true,
+  "active_dropout_modules": {},
+  "reward_scoring": "detached eval"
+}

@@ -1,0 +1,41 @@
+{
+  "run_id": "N12R15",
+  "seed": 0,
+  "registered_at": 1792049589.9943092,
+  "teacher": false,
+  "test_accessed": false,
+  "fresh_init_from": "D3R9 checkpoint600",
+  "training_format": "bounded cot",
+  "eval_format": "greedy label",
+  "max_steps": 400,
+  "save_and_eval": [
+    100,
+    200,
+    300,
+    400
+  ],
+  "selection": "full1000-dev Macro-F1; ties later",
+  "model_revision": "15852e8c16360a2fea060d615a32b45270f8a8fc",
+  "warm_file_sha256": "d5918ecb23f7f877b718fe34697b3571a8fe9c080383f5840cd0c384eb917e31",
+  "reference_tensor_sha256": "662232c84b36759aba1e7260ff2febf9c544f73f5d62ab9343afd7d55359677f",
+  "prior_view": "HN7R12P200L",
+  "prior_dev_macro_f1": 0.577200109022618,
+  "paper_eligible": false,
+  "source_sha256": {
+    "configs/base.yaml": "682af5030dfcc7ff14667ca584b68d1faec92e78b122a1bcc9ec18bec50553fd",
+    "configs/matrix.py": "b0d412c3f3914c6c77bf459c25ef4fab3f8b1a659fb19b02420d161c2feac167",
+    "scripts/remote_logs.py": "4795bbf81a26acb3b8adbc90f94ed3a741b5be13dc52f54220e5ca25df5bcad5",
+    "tests/test_extended_random_pilot.py": "248e07b8d8ec22647708a3402c2979ba0af2a6a2aa5a12b6aa8e9c8b0b7c84f4",
+    "train/native_grpo.py": "6e4f69467c4e93fdfc095914c6a585a0e3657e2df774f8cbf4e69bd4d417654b",
+    "train/native_groups.py": "0ace37cec6e6fadaa37b42f07b2a0570371f7b01d776b23cf78c934ba8fcd278",
+    "train/native_rollout.py": "10b93ac615f1001e5ce8ad855c4cbefdd287ee9a4de68cc2734a87f338c38f85",
+    "train/native_training.py": "23c8ccd412cd32c593fca80c9732ff8d49e972e8f03cfbf5759751a17715a542",
+    "train/native_allocation.py": "e0bfb1e534a6127b5974c32698fc0ac09759c66ffc0d2f3bd46ff83dc688cc90",
+    "train/native_reward.py": "0a6aaa1291babbe57040398c06bf35a0132a1a66b25a1b57705da6bff6b7f2b8",
+    "formats/parser.py": "db8a4a467d3282a121eb49e5f7a8001b1bd2e2d9aa502a8f4ed78e08f6892bf0",
+    "formats/prompts.py": "5a9f1987dd939aac2cfdcf842960d79e8ce81f3c746757acc3c41287fa99b83b",
+    "eval/hf_generate.py": "d286a622b7bb1d32641be83406eb39a3085dc6b497ac7366e10b088859df0666",
+    "eval/predict.py": "0029797920bfa230f4debb5a5c19f0e4bc438a41c93ccc93ee09630571875a5c",
+    "scripts/run.py": "1fd8d7ccb4c022d5c91abe30a8ec528ef21d6b8fdcf0132094166f8a4d42dde8"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "run": "N11R13",
+  "attempt": 2,
+  "split": "dev",
+  "primary_macro_f1": 0.5589699375726608,
+  "parse_rate": 1.0,
+  "initial_same_protocol_macro_f1": 0.5217665228722886,
+  "selected_checkpoint": "checkpoint-100",
+  "primary_dev_threshold_met": false,
+  "paper_eligible": false,
+  "test_accessed": false,
+  "verified_at": 1792056707.339613
+}

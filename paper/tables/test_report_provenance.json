@@ -1,0 +1,108 @@
+{
+  "split": "test",
+  "training_seeds": [
+    0
+  ],
+  "generator": "analysis.paper_report",
+  "runs": [
+    {
+      "run_id": "HD3R9C",
+      "seed": 0,
+      "format": "cot",
+      "source": "/content/rl-nli-analysis/results/HD3R9C_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HD3R9L",
+      "seed": 0,
+      "format": "label",
+      "source": "/content/rl-nli-analysis/results/HD3R9L_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN0R11C",
+      "seed": 0,
+      "format": "cot",
+      "source": "/content/rl-nli-analysis/results/HN0R11C_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN0R11L",
+      "seed": 0,
+      "format": "label",
+      "source": "/content/rl-nli-analysis/results/HN0R11L_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN1R9C",
+      "seed": 0,
+      "format": "cot",
+      "source": "/content/rl-nli-analysis/results/HN1R9C_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN1R9L",
+      "seed": 0,
+      "format": "label",
+      "source": "/content/rl-nli-analysis/results/HN1R9L_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN4R9C",
+      "seed": 0,
+      "format": "cot",
+      "source": "/content/rl-nli-analysis/results/HN4R9C_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN4R9L",
+      "seed": 0,
+      "format": "label",
+      "source": "/content/rl-nli-analysis/results/HN4R9L_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN5R10C",
+      "seed": 0,
+      "format": "cot",
+      "source": "/content/rl-nli-analysis/results/HN5R10C_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN5R10L",
+      "seed": 0,
+      "format": "label",
+      "source": "/content/rl-nli-analysis/results/HN5R10L_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN6R11C",
+      "seed": 0,
+      "format": "cot",
+      "source": "/content/rl-nli-analysis/results/HN6R11C_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN6R11L",
+      "seed": 0,
+      "format": "label",
+      "source": "/content/rl-nli-analysis/results/HN6R11L_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN6R11P200L",
+      "seed": 0,
+      "format": "label",
+      "source": "/content/rl-nli-analysis/results/HN6R11P200L_Qwen3.5-2B_s0",
+      "n": 1000
+    },
+    {
+      "run_id": "HN7R12P200L",
+      "seed": 0,
+      "format": "label",
+      "source": "/content/rl-nli-analysis/results/HN7R12P200L_Qwen3.5-2B_s0",
+      "n": 1000
+    }
+  ],
+  "paired_uncertainty": "premise_cluster_conditional_on_fitted_models"
+}

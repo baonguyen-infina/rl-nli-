@@ -1,0 +1,29 @@
+{
+  "run": "N13R16",
+  "session": "rl-nli-r16-traceswap-g4",
+  "remote_state": {
+    "phase": "workload",
+    "updated_at": 1792060711.5446124,
+    "active_run": "N13R16",
+    "child_pid": 19700,
+    "last_train": {
+      "step": "104",
+      "loss": "0.0025290455669164658",
+      "grad_norm": "2.8486251831054688",
+      "native/answer_ce": "0.07058024619861196",
+      "native/answer_accuracy": null,
+      "native/replay_active_score_max_difference": "0.0",
+      "entropy": "1.4041678458452225",
+      "step_time": "27.282629182001074"
+    },
+    "initial_eval": {
+      "n": 1000,
+      "macro_f1": 0.5674942572896857,
+      "accuracy": 0.567,
+      "parse_rate": 1.0
+    }
+  },
+  "observed_at": 1792060715.623142,
+  "local_ml": false,
+  "archive_downloaded": false
+}

@@ -1,0 +1,12 @@
+{
+  "pid": 6596,
+  "script": "/private/tmp/native_r18_r19_monitor.py",
+  "log": "/private/tmp/native_r18_r19_monitor.log",
+  "started_at": 1792069820.269631,
+  "metadata_only": true,
+  "local_ml": false,
+  "sessions": [
+    "rl-nli-resume-r18-g4",
+    "rl-nli-r19-native-swap-2b-g4"
+  ]
+}

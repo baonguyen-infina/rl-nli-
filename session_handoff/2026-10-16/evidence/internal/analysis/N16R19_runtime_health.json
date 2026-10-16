@@ -1,0 +1,13 @@
+{
+  "run": "N16R19",
+  "observed_at": 1792075392.3634799,
+  "last_completed_step": 182,
+  "training_rows_checked": 182,
+  "nonfinite_fields": [],
+  "active_replay_drift_max": 0.0,
+  "frozen_sources_unchanged": true,
+  "passed": true,
+  "scope": "numerical/provenance diagnostics only; not model accuracy",
+  "test_read": false,
+  "paper_eligible": false
+}

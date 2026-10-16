@@ -1,0 +1,29 @@
+{
+  "run": "N14R17",
+  "session": "rl-nli-r17-tracesaliency-g4",
+  "remote_state": {
+    "phase": "workload",
+    "updated_at": 1792060700.394345,
+    "active_run": "N14R17",
+    "child_pid": 10243,
+    "last_train": {
+      "step": "53",
+      "loss": "0.14960075914859772",
+      "grad_norm": "6.041183948516846",
+      "native/answer_ce": "0.16047590233696005",
+      "native/answer_accuracy": null,
+      "native/replay_active_score_max_difference": "0.0",
+      "entropy": "1.5417703514297803",
+      "step_time": "36.02011043100174"
+    },
+    "initial_eval": {
+      "n": 1000,
+      "macro_f1": 0.5674942572896857,
+      "accuracy": 0.567,
+      "parse_rate": 1.0
+    }
+  },
+  "observed_at": 1792060715.0938292,
+  "local_ml": false,
+  "archive_downloaded": false
+}

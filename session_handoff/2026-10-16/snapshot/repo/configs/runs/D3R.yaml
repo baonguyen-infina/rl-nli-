@@ -1,0 +1,10 @@
+recipe: sft
+format: label
+guess: false
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: null
+priority: DEV
+seeds:
+- 0
+run_id: D3R

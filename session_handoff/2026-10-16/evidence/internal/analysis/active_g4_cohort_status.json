@@ -1,0 +1,110 @@
+{
+  "updated_at": 1792115375.791785,
+  "local_ml": false,
+  "archive_written_locally": false,
+  "observer_transfers_model_bytes": false,
+  "observation_interval_seconds": 120,
+  "max_gpu_sessions": 3,
+  "lanes": {
+    "r19": {
+      "run": "N16R19",
+      "session": "rl-nli-r19-native-swap-2b-g4",
+      "observed_at": 1792088240.584919,
+      "remote_state": {
+        "run": "N16R19",
+        "phase": "complete",
+        "observed_at": 1792082568.2842288,
+        "last_train": {
+          "step": "400",
+          "loss": "-0.024665940552949905",
+          "grad_norm": "2.057060718536377",
+          "step_time": "25.94916327899955"
+        },
+        "pid": 6211,
+        "backup_watchers": [],
+        "teacher": false,
+        "new_test_accessed": false,
+        "local_ml": false,
+        "training_complete": true,
+        "selection_complete": true,
+        "off_vm_backup_verified": true
+      },
+      "test_state": {
+        "stage": "test_verified_backup_pending",
+        "run": "N16R19",
+        "observed_at": 1792082481.7797298,
+        "test_accessed": true,
+        "summary": {
+          "run": "N16R19",
+          "split": "test",
+          "seed": 0,
+          "n": 1000,
+          "macro_f1": 0.5606293810806706,
+          "accuracy": 0.561,
+          "parse_rate": 1.0,
+          "target_macro_f1": 0.58,
+          "target_met": false,
+          "protocol_sha256": "01e16c9fce319b849ee65c6913d6146835e2395e5e878adfba4b309ceeb8c345",
+          "predictions_sha256": "6e71b34ea859bc874eefe5c31dc715938a4f3a0f0c70e228a2c02f247cc52f92",
+          "paper_eligible": true,
+          "scope": "single-seed exploratory follow-up; no A/A* acceptance claim"
+        }
+      },
+      "observation_error": {
+        "type": "EOFError",
+        "at": 1792115375.7905102
+      }
+    },
+    "r18": {
+      "run": "N15R18",
+      "session": "rl-nli-resume-r18-g4",
+      "observed_at": 1792088240.594003,
+      "remote_state": {
+        "run": "N15R18",
+        "phase": "complete",
+        "observed_at": 1792081592.0691435,
+        "last_train": {
+          "step": "400",
+          "loss": "-0.008382568135857582",
+          "grad_norm": "1.0397706031799316",
+          "step_time": "26.08483091100061"
+        },
+        "pid": 19554,
+        "backup_watchers": [],
+        "teacher": false,
+        "new_test_accessed": false,
+        "local_ml": false,
+        "training_complete": true,
+        "selection_complete": true,
+        "off_vm_backup_verified": true
+      },
+      "test_state": {
+        "stage": "test_verified_archived",
+        "run": "N15R18",
+        "observed_at": 1792081188.6219292,
+        "test_accessed": true,
+        "summary": {
+          "run": "N15R18",
+          "split": "test",
+          "seed": 0,
+          "n": 1000,
+          "macro_f1": 0.5651534564119155,
+          "accuracy": 0.565,
+          "parse_rate": 1.0,
+          "target_macro_f1": 0.58,
+          "target_met": false,
+          "protocol_sha256": "3b44839545d11c5fd0cdf52f57eb521184640c6fe9947a2728fcf7cbbcef5e81",
+          "predictions_sha256": "869ec87cff18d6679ed8fbe255c998a5fc8b3f3a34d90cfa07916ab22c09fbf5",
+          "paper_eligible": true,
+          "scope": "single-seed exploratory follow-up; no A/A* acceptance claim"
+        },
+        "archive_bytes": 57637,
+        "archive_id": "1DpCm7B6nSEAKotsBIOQT_gZPqRAjYkRJ"
+      },
+      "observation_error": {
+        "type": "EOFError",
+        "at": 1792115375.765586
+      }
+    }
+  }
+}

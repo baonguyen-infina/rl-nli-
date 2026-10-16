@@ -1,0 +1,37 @@
+{
+  "run": "N12R15",
+  "session": "rl-nli-r15-full-random-2b-g4",
+  "remote_state": {
+    "phase": "workload",
+    "updated_at": 1792060689.2988622,
+    "active_run": "N12R15",
+    "child_pid": 27028,
+    "last_train": {
+      "step": "400",
+      "loss": "0.02964646741747856",
+      "grad_norm": "2.3245410919189453",
+      "native/answer_ce": "0.025995231454241246",
+      "native/answer_accuracy": null,
+      "native/replay_active_score_max_difference": "0.0",
+      "entropy": "1.3424833739797275",
+      "step_time": "23.482011573993077"
+    },
+    "initial_eval": {
+      "n": 1000,
+      "macro_f1": 0.5674942572896857,
+      "accuracy": 0.567,
+      "parse_rate": 1.0
+    },
+    "checkpoint_scores": {
+      "checkpoint-100": {
+        "n": 1000,
+        "macro_f1": 0.5692322693918083,
+        "accuracy": 0.568,
+        "parse_rate": 1.0
+      }
+    }
+  },
+  "observed_at": 1792060715.617661,
+  "local_ml": false,
+  "archive_downloaded": false
+}

@@ -6,7 +6,7 @@ Mỗi file .py hiện chỉ có docstring nói nó phải làm gì. Implement th
 
 ## Quy tắc bất di bất dịch
 1. **Không đưa `uid` vào prompt hay feature.** Trường thứ 5 của uid ViANLI (11/21/31) là nhãn annotator được yêu cầu viết — gần như là đáp án.
-2. **Không chạm test split trước giai đoạn G4.** Chọn checkpoint bằng dev; dev-mini chỉ để vẽ đường cong.
+2. **Không chạm test split trước giai đoạn G4.** Chọn checkpoint bằng dev; dev-mini chỉ để vẽ đường cong nội bộ. **Mọi kết quả thực nghiệm ghi trong paper (bảng, hình, abstract, discussion) chỉ lấy từ tập test.** Số dev và training log chỉ lưu nội bộ; không dùng thay số test khi chưa mở G4.
 3. **Một parser duy nhất** (`formats/parser.py`) cho reward, eval và teacher filter.
 4. **Mọi run đi qua `scripts/run.py --run <ID> --seed <S>`** và ghi vào `results/<run_id>_<model>_s<seed>/`. Không chép số tay vào paper; bảng/hình sinh từ `analysis/`.
 5. Không tune riêng từng ô. Hyperparameter nằm ở `configs/base.yaml`; khác biệt giữa các run chỉ ở `configs/matrix.py`.

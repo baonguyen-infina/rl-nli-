@@ -1,0 +1,20 @@
+recipe: zs
+format: cot
+guess: false
+model:
+  name: Qwen/Qwen3.5-2B
+init_from: N1R9
+priority: DEV
+seeds:
+- 0
+native_mode: ordinary
+bounded_reasoning: true
+scoring_protocol: deterministic_fixed_padding
+native_schedule: full_reasoning
+eval_schedule: full_reasoning
+validation_protocol: fixed_single_sequence
+run_id: V1R9A
+eval:
+  gpu_memory_utilization: 0.65
+  max_new_tokens:
+    cot: 96

@@ -1,0 +1,57 @@
+{
+  "HN6R11L__HN1R9L": {
+    "diff": -0.007765261798470591,
+    "ci_low": -0.018934573095777785,
+    "ci_high": 0.0032674052799955638,
+    "n_boot": 10000,
+    "seed": 0,
+    "n_clusters": 529,
+    "bootstrap_unit": "premise_cluster",
+    "n": 1000,
+    "interval_scope": "conditional_on_fitted_models"
+  },
+  "HN4R9L__HN1R9L": {
+    "diff": -0.002575457129105785,
+    "ci_low": -0.01265435856902518,
+    "ci_high": 0.007773489121315669,
+    "n_boot": 10000,
+    "seed": 0,
+    "n_clusters": 529,
+    "bootstrap_unit": "premise_cluster",
+    "n": 1000,
+    "interval_scope": "conditional_on_fitted_models"
+  },
+  "HN6R11L__HN0R11L": {
+    "diff": -0.0013721642080573027,
+    "ci_low": -0.008627489056012363,
+    "ci_high": 0.005873482320432474,
+    "n_boot": 10000,
+    "seed": 0,
+    "n_clusters": 529,
+    "bootstrap_unit": "premise_cluster",
+    "n": 1000,
+    "interval_scope": "conditional_on_fitted_models"
+  },
+  "HN6R11L__HD3R9L": {
+    "diff": -0.007838222492416613,
+    "ci_low": -0.02310772488029292,
+    "ci_high": 0.007345265049641367,
+    "n_boot": 10000,
+    "seed": 0,
+    "n_clusters": 529,
+    "bootstrap_unit": "premise_cluster",
+    "n": 1000,
+    "interval_scope": "conditional_on_fitted_models"
+  },
+  "HN6R11P200L__HN7R12P200L": {
+    "diff": -0.007894211143993246,
+    "ci_low": -0.018903746954773877,
+    "ci_high": 0.0032800232883297004,
+    "n_boot": 10000,
+    "seed": 0,
+    "n_clusters": 529,
+    "bootstrap_unit": "premise_cluster",
+    "n": 1000,
+    "interval_scope": "conditional_on_fitted_models"
+  }
+}

@@ -1,0 +1,4 @@
+trl==1.15.0
+vllm
+peft
+datasets

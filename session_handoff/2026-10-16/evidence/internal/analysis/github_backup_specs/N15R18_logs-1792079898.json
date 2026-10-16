@@ -1,0 +1,12 @@
+{
+  "run": "N15R18",
+  "event": "logs-1792079898",
+  "name": "N15R18_s0_logs-1792079898.tar.gz",
+  "path": "/content/native_github_staging/N15R18_s0_logs-1792079898.tar.gz",
+  "bytes": 8169637,
+  "sha256": "a710f97f8aa778d3b9705bc4982b13614835983a588e3cc05fb8eea3dbc4cbdc",
+  "md5": "f96a833317c3bc11fe13b6c44affcf11",
+  "files": 54,
+  "created_at": 1792079902.721888,
+  "model_bytes_written_locally": 0
+}

@@ -1,0 +1,158 @@
+{
+  "N12R15": {
+    "run": "N12R15",
+    "observed_at": 1792059775.8857327,
+    "split": "train",
+    "paper_eligible": false,
+    "test_accessed": false,
+    "source_steps": [
+      0,
+      19
+    ],
+    "prompt_rollout_groups": 386,
+    "mixed_correctness_groups": 213,
+    "wrong_samples_in_mixed_groups": 379,
+    "correct_samples_in_mixed_groups": 473,
+    "wrong_positive_advantage": 0,
+    "correct_negative_advantage": 0,
+    "wrong_advantage_max": -0.3692063093185425,
+    "correct_advantage_min": 0.27395838499069214,
+    "training_metric_summary": {
+      "native/accuracy": {
+        "n": 20,
+        "min": 0.55,
+        "mean": 0.6939484448085455,
+        "max": 0.8214285714285714
+      },
+      "native/policy_allocation_bonus": {
+        "n": 20,
+        "min": 0.06929246670806424,
+        "mean": 0.11088969127301991,
+        "max": 0.1485919199478943
+      },
+      "native/replay_active_score_max_difference": {
+        "n": 20,
+        "min": 0.0,
+        "mean": 0.0,
+        "max": 0.0
+      }
+    },
+    "partial_lines_skipped": 0,
+    "training_sources_changed": false,
+    "native_grpo_sha256": "6e4f69467c4e93fdfc095914c6a585a0e3657e2df774f8cbf4e69bd4d417654b",
+    "diagnostic_source_sha256": "e5c824085b1011f0e1e44671ab61daa79937d2c70d45b1ac07805048c21d9818",
+    "limitation": "Stored scalar advantages diagnose transport; canonical score-width drift was not measured."
+  },
+  "N13R16": {
+    "run": "N13R16",
+    "observed_at": 1792059733.0600736,
+    "split": "train",
+    "paper_eligible": false,
+    "test_accessed": false,
+    "source_steps": [
+      0,
+      19
+    ],
+    "prompt_rollout_groups": 386,
+    "mixed_correctness_groups": 227,
+    "wrong_samples_in_mixed_groups": 374,
+    "correct_samples_in_mixed_groups": 534,
+    "wrong_positive_advantage": 39,
+    "correct_negative_advantage": 109,
+    "wrong_advantage_max": 1.489817500114441,
+    "correct_advantage_min": -1.4919151067733765,
+    "training_metric_summary": {
+      "native/trace_gap": {
+        "n": 20,
+        "min": 1.16379976272583,
+        "mean": 2.6758376479148867,
+        "max": 4.3222503662109375
+      },
+      "native/trace_gap_std": {
+        "n": 20,
+        "min": 2.502732515335083,
+        "mean": 3.5734273195266724,
+        "max": 4.935873508453369
+      },
+      "native/rotated_logq": {
+        "n": 20,
+        "min": -4.611126382953913,
+        "mean": -3.1771165419435046,
+        "max": -1.5568314797185097
+      },
+      "native/accuracy": {
+        "n": 20,
+        "min": 0.6136363636363636,
+        "mean": 0.6893227065547112,
+        "max": 0.7857142857142857
+      },
+      "native/replay_active_score_max_difference": {
+        "n": 20,
+        "min": 0.0,
+        "mean": 0.0,
+        "max": 0.0
+      }
+    },
+    "partial_lines_skipped": 0,
+    "training_sources_changed": false,
+    "native_grpo_sha256": "6e4f69467c4e93fdfc095914c6a585a0e3657e2df774f8cbf4e69bd4d417654b",
+    "diagnostic_source_sha256": "e5c824085b1011f0e1e44671ab61daa79937d2c70d45b1ac07805048c21d9818",
+    "limitation": "Stored scalar advantages diagnose transport; canonical score-width drift was not measured."
+  },
+  "N14R17": {
+    "run": "N14R17",
+    "observed_at": 1792059771.8216674,
+    "split": "train",
+    "paper_eligible": false,
+    "test_accessed": false,
+    "source_steps": [
+      0,
+      19
+    ],
+    "prompt_rollout_groups": 386,
+    "mixed_correctness_groups": 221,
+    "wrong_samples_in_mixed_groups": 374,
+    "correct_samples_in_mixed_groups": 510,
+    "wrong_positive_advantage": 36,
+    "correct_negative_advantage": 94,
+    "wrong_advantage_max": 1.4772846698760986,
+    "correct_advantage_min": -1.4500312805175781,
+    "training_metric_summary": {
+      "native/trace_gap": {
+        "n": 20,
+        "min": 1.0804674625396729,
+        "mean": 2.6042386293411255,
+        "max": 4.078864574432373
+      },
+      "native/trace_gap_std": {
+        "n": 20,
+        "min": 2.511212110519409,
+        "mean": 3.619016206264496,
+        "max": 5.141840934753418
+      },
+      "native/rotated_logq": {
+        "n": 20,
+        "min": -4.8105609658617245,
+        "mean": -3.140453157385114,
+        "max": -1.5056776450534473
+      },
+      "native/accuracy": {
+        "n": 20,
+        "min": 0.5,
+        "mean": 0.6897131713530708,
+        "max": 0.775
+      },
+      "native/replay_active_score_max_difference": {
+        "n": 20,
+        "min": 0.0,
+        "mean": 0.0,
+        "max": 0.0
+      }
+    },
+    "partial_lines_skipped": 0,
+    "training_sources_changed": false,
+    "native_grpo_sha256": "6e4f69467c4e93fdfc095914c6a585a0e3657e2df774f8cbf4e69bd4d417654b",
+    "diagnostic_source_sha256": "e5c824085b1011f0e1e44671ab61daa79937d2c70d45b1ac07805048c21d9818",
+    "limitation": "Stored scalar advantages diagnose transport; canonical score-width drift was not measured."
+  }
+}

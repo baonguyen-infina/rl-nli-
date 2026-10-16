@@ -1,0 +1,15 @@
+{
+  "run": "N16R19",
+  "ready": [
+    "checkpoint-100",
+    "checkpoint-200",
+    "checkpoint-300",
+    "checkpoint-400",
+    "final"
+  ],
+  "test_verified": true,
+  "failure_stage": null,
+  "pipeline_finished": true,
+  "test_terminal": true,
+  "observed_at": 1792082671.5070841
+}

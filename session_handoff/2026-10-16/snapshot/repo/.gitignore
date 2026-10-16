@@ -1,0 +1,8 @@
+artifacts/*
+!artifacts/.gitkeep
+results/*
+!results/.gitkeep
+__pycache__/
+*.pyc
+.venv/
+wandb/

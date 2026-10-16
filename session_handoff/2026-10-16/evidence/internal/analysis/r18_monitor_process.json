@@ -1,0 +1,9 @@
+{
+  "pid": 87536,
+  "script": "/private/tmp/native_resume_r18_monitor.py",
+  "log": "/private/tmp/native_resume_r18_monitor.log",
+  "session": "rl-nli-resume-r18-g4",
+  "started_at": 1792068953.4578362,
+  "local_ml": false,
+  "metadata_only": true
+}

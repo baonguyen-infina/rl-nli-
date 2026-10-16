@@ -1,0 +1,12 @@
+{
+  "run": "N21R20",
+  "event": "checkpoint-100",
+  "name": "N21R20_s0_checkpoint-100.tar.gz",
+  "path": "/content/native_github_staging/N21R20_s0_checkpoint-100.tar.gz",
+  "bytes": 123264984,
+  "sha256": "b00b55760f6e9624e6bfecf1b735b197861f585015c3b22c6dedaff79bcdb53d",
+  "md5": "6922a740362e72f18085cfd1b623359a",
+  "files": 79,
+  "created_at": 1792086652.7372193,
+  "model_bytes_written_locally": 0
+}

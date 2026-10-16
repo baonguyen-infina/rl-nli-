@@ -1,0 +1,51 @@
+{
+  "run": "N15R18",
+  "session": "rl-nli-resume-r18-g4",
+  "observed_at": 1792088240.594003,
+  "remote_state": {
+    "run": "N15R18",
+    "phase": "complete",
+    "observed_at": 1792081592.0691435,
+    "last_train": {
+      "step": "400",
+      "loss": "-0.008382568135857582",
+      "grad_norm": "1.0397706031799316",
+      "step_time": "26.08483091100061"
+    },
+    "pid": 19554,
+    "backup_watchers": [],
+    "teacher": false,
+    "new_test_accessed": false,
+    "local_ml": false,
+    "training_complete": true,
+    "selection_complete": true,
+    "off_vm_backup_verified": true
+  },
+  "test_state": {
+    "stage": "test_verified_archived",
+    "run": "N15R18",
+    "observed_at": 1792081188.6219292,
+    "test_accessed": true,
+    "summary": {
+      "run": "N15R18",
+      "split": "test",
+      "seed": 0,
+      "n": 1000,
+      "macro_f1": 0.5651534564119155,
+      "accuracy": 0.565,
+      "parse_rate": 1.0,
+      "target_macro_f1": 0.58,
+      "target_met": false,
+      "protocol_sha256": "3b44839545d11c5fd0cdf52f57eb521184640c6fe9947a2728fcf7cbbcef5e81",
+      "predictions_sha256": "869ec87cff18d6679ed8fbe255c998a5fc8b3f3a34d90cfa07916ab22c09fbf5",
+      "paper_eligible": true,
+      "scope": "single-seed exploratory follow-up; no A/A* acceptance claim"
+    },
+    "archive_bytes": 57637,
+    "archive_id": "1DpCm7B6nSEAKotsBIOQT_gZPqRAjYkRJ"
+  },
+  "observation_error": {
+    "type": "EOFError",
+    "at": 1792115375.765586
+  }
+}
